@@ -56,7 +56,7 @@ const sampleSurvey = {
         "items": [
           {
             "type": "html",
-            "html": "<div class=\"flex w-full flex-col gap-1\"><h4 style=\"color: rgb(23, 23, 23);\" class=\"!no-underline text-brand-heading-text font-brand-header text-3xl font-bold\"><p>Losing 5 to 20 lbs is closer than you think, and it doesn't require calorie counting, or a workout routine.</p><p><br></p><p>To find out if you’re eligible for treatment, you’ll need to answer some questions about your goals, lifestyle and health history.</p><p><br></p><p>Ready?</p></h4></div>",
+            "html": "<div class=\"w-full max-w-3xl mx-auto py-8 px-4\"> <div class=\"flex w-full flex-col gap-1\">\n    <h4 class=\"text-gray-900 text-3xl font-regular\">\n      <p class=\"mb-6\"> Losing 5 to 20 lbs is closer than you think, and it doesn't require calorie counting, or a workout routine.\n      </p>\n      <p class=\"mb-6\"> To find out if you’re eligible for treatment, you’ll need to answer some questions about your goals, lifestyle and health history.\n      </p>\n      <p>\n        Ready?\n      </p>\n    </h4>\n  </div>\n</div>",
             "variableName": "",
             "className": "",
             "uuid": "0f165c88-7459-43cb-b674-fe4414c3aaf1"
