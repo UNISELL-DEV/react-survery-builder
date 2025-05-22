@@ -348,7 +348,8 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
           </TabsContent>
         </Tabs>
 
-        <Separator />
+        {block.showResults ?
+        <Separator /> : null }
 
         {/* BMI Result */}
         {block.showResults ?
