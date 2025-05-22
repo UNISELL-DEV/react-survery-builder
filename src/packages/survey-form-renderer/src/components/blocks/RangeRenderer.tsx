@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BlockData } from '@/lib/survey/types';
 import { themes } from '../../themes';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
+import { BlockData } from '@/lib/survey/types';
 
 interface RangeRendererProps {
   block: BlockData;
@@ -68,9 +68,20 @@ export const RangeRenderer: React.FC<RangeRendererProps> = ({
   };
 
   // Format the value display if specified in the block
-  const valueDisplay = block.showValue
-    ? block.showValue.replace("{value}", String(currentValue))
-    : `Value: ${currentValue}`;
+  let valueDisplay = `Value: ${currentValue}`;
+
+  if (block.showValue) {
+    if (typeof block.showValue === 'string') {
+      // If it's a string format, use the replace
+      valueDisplay = block.showValue.replace("{value}", String(currentValue));
+    } else {
+      // If it's just a boolean true, use the default format
+      valueDisplay = `Value: ${currentValue}`;
+    }
+  } else if (block.showValue === false) {
+    // Hide the value completely
+    valueDisplay = "";
+  }
 
   // Generate marks if specified
   const marks: React.ReactNode[] = [];
@@ -131,13 +142,15 @@ export const RangeRenderer: React.FC<RangeRendererProps> = ({
         )}
 
         {/* Value display */}
-        <div className="flex justify-between mt-3 text-sm">
-          <span className={cn("text-muted-foreground", themeConfig.field.text)}>{min}</span>
-          <span className={cn("font-medium", themeConfig.field.activeText)}>
-            {valueDisplay}
-          </span>
-          <span className={cn("text-muted-foreground", themeConfig.field.text)}>{max}</span>
-        </div>
+        {valueDisplay && (
+          <div className="flex justify-between mt-3 text-sm">
+            <span className={cn("text-muted-foreground", themeConfig.field.text)}>{min}</span>
+            <span className={cn("font-medium", themeConfig.field.activeText)}>
+              {valueDisplay}
+            </span>
+            <span className={cn("text-muted-foreground", themeConfig.field.text)}>{max}</span>
+          </div>
+        )}
       </div>
 
       {/* Error message */}

@@ -44,6 +44,36 @@ export const blockTypeMap: Record<string, any> = {
 
   // Container blocks
   set: { type: 'set' }, // Simple definition for set type
+
+  // Conditional blocks
+  conditional: {
+    type: 'conditional',
+    validate: (block: BlockData) => {
+      if (!block.condition) return 'Condition is required';
+      if (!block.childBlock) return 'Child block is required';
+      return null;
+    }
+  },
+
+  // Calculated blocks
+  calculated: {
+    type: 'calculated',
+    validate: (block: BlockData) => {
+      if (!block.formula) return 'Formula is required';
+      if (!block.dependencies || !Array.isArray(block.dependencies))
+        return 'Dependencies array is required';
+      return null;
+    }
+  },
+
+  // BMI Calculator block
+  bmiCalculator: {
+    type: 'bmiCalculator',
+    validate: (block: BlockData) => {
+      // BMI Calculator has no specific validation
+      return null;
+    }
+  }
 };
 
 /**
@@ -72,7 +102,7 @@ export function getDefaultBlockProperties(blockType: string): Partial<BlockData>
  * Checks if a block is a content block (doesn't collect data)
  */
 export function isContentBlock(blockType: string): boolean {
-  return ['markdown', 'html', 'script'].includes(blockType);
+  return ['markdown', 'html', 'script', 'calculated'].includes(blockType);
 }
 
 /**
@@ -80,4 +110,20 @@ export function isContentBlock(blockType: string): boolean {
  */
 export function isInputBlock(blockType: string): boolean {
   return !isContentBlock(blockType);
+}
+
+/**
+ * Checks if a block supports conditional rendering
+ */
+export function supportsConditionalRendering(blockType: string): boolean {
+  // All block types can be conditionally rendered
+  return true;
+}
+
+/**
+ * Checks if a block supports branching logic
+ */
+export function supportsBranchingLogic(blockType: string): boolean {
+  // Only certain blocks can have branching logic
+  return ['radio', 'select', 'checkbox', 'range', 'textfield', 'bmiCalculator'].includes(blockType);
 }

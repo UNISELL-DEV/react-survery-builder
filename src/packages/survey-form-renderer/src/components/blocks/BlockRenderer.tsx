@@ -14,15 +14,25 @@ import { MatrixRenderer } from './MatrixRenderer';
 import { SelectableBoxRenderer } from './SelectableBoxRenderer'
 import { ScriptRenderer } from './ScriptRenderer';
 import { SetRenderer } from './SetRenderer';
+import { ConditionalBlock } from './ConditionalBlock';
+import { CalculatedFieldRenderer } from './CalculatedFieldRenderer';
+import { BMICalculatorRenderer } from './BMICalculatorRenderer';
 import { themes } from '../../themes';
 import { blockTypeMap, validateBlock } from '../../utils/blockAdapter';
+import { useSurveyForm } from '../../context/SurveyFormContext';
 
 /**
  * A component that renders different types of blocks based on their type
  */
 export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((props, ref) => {
-  const { block, value, onChange, onBlur, error, disabled, customComponents, theme = 'default' } = props;
+  const { block, value, onChange, onBlur, error, disabled, customComponents, theme = 'default', isVisible } = props;
   const themeConfig = themes[theme] || themes.default;
+  const { getVisibleBlocks } = useSurveyForm();
+
+  // If the block has a visibility condition and is explicitly not visible, don't render it
+  if (isVisible === false) {
+    return null;
+  }
 
   // Common props for all renderers
   const commonProps = {
@@ -41,9 +51,11 @@ export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((p
     return <CustomComponent {...props} />;
   }
 
-  // Check if we have a built-in renderer for this block type
-  // We're now using the blockTypeMap to check if the block type exists
-  if (!blockTypeMap[block.type]) {
+  // Check if we have a built-in renderer for this block type or special types
+  if (
+    !blockTypeMap[block.type] &&
+    !['conditional', 'calculated', 'bmiCalculator'].includes(block.type)
+  ) {
     // For any unhandled types, render a placeholder
     return (
       <div className="p-4 border border-gray-300 rounded">
@@ -52,6 +64,34 @@ export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((p
         </p>
       </div>
     );
+  }
+
+  // Special handling for conditional blocks
+  if (block.type === 'conditional' && block.condition) {
+    return (
+      <ConditionalBlock
+        {...props}
+        condition={block.condition}
+        block={block.childBlock || { type: 'html', html: 'No child block specified' }}
+      />
+    );
+  }
+
+  // Special handling for calculated fields
+  if (block.type === 'calculated' && block.formula) {
+    return (
+      <CalculatedFieldRenderer
+        {...props}
+        formula={block.formula}
+        dependencies={block.dependencies || []}
+        format={block.format}
+      />
+    );
+  }
+
+  // Special handling for BMI calculator
+  if (block.type === 'bmiCalculator') {
+    return <BMICalculatorRenderer {...props} />;
   }
 
   // Render the appropriate component based on block type
@@ -83,6 +123,12 @@ export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((p
     case 'script':
       return <ScriptRenderer block={block} theme={theme} />;
     case 'set':
+      // For set blocks, we need to filter child items based on visibility conditions
+      if (block.items) {
+        const visibleItems = getVisibleBlocks(block.items);
+        const blockWithVisibleItems = { ...block, items: visibleItems };
+        return <SetRenderer block={blockWithVisibleItems} {...commonProps} />;
+      }
       return <SetRenderer block={block} {...commonProps} />;
     default:
       // For any unhandled types with a definition, render a generic component
