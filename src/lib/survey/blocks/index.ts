@@ -11,6 +11,9 @@ import { DatePickerBlock } from "./DatePickerBlock";
 import { FileUploadBlock } from "./FileUploadBlock";
 import { MatrixBlock } from "./MatrixBlock";
 import { SelectableBoxQuestionBlock } from "./SelectableBoxQuestionBlock"
+import { BMICalculatorBlock } from "./BMICalculatorBlock";
+import { CalculatedFieldBlock } from "./CalculatedFieldBlock";
+import { ConditionalBlock } from "./ConditionalBlock";
 import type { BlockDefinition } from "../types";
 
 // Export all standard block definitions
@@ -34,6 +37,11 @@ export const StandardBlocks: BlockDefinition[] = [
 
   // Logic blocks
   ScriptBlock,
+
+  // Advanced calculation and conditional blocks
+  BMICalculatorBlock,
+  CalculatedFieldBlock,
+  ConditionalBlock,
 ];
 
 // Export individual blocks for direct imports
@@ -51,4 +59,7 @@ export {
   FileUploadBlock,
   MatrixBlock,
   SelectableBoxQuestionBlock,
+  BMICalculatorBlock,
+  CalculatedFieldBlock,
+  ConditionalBlock,
 };

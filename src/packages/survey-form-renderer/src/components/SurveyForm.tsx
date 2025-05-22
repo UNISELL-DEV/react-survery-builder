@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { SurveyFormRendererProps } from '../types';
 import { SurveyFormProvider } from '../context/SurveyFormContext';
 import { PageByPageLayout } from './layouts/PageByPageLayout';
+import { FullPageSurveyLayout } from './layouts/FullPageSurveyLayout';
 import { ContinuousLayout } from './layouts/ContinuousLayout';
 import { AccordionLayout } from './layouts/AccordionLayout';
 import { TabsLayout } from './layouts/TabsLayout';
@@ -71,6 +72,10 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
         return <TabsLayout {...layoutProps} />;
       case 'stepper':
         return <StepperLayout {...layoutProps} />;
+      case 'stepper':
+        return <StepperLayout {...layoutProps} />;
+      case 'fullpage':
+        return <FullPageSurveyLayout {...layoutProps} />;
       case 'page-by-page':
       default:
         return <PageByPageLayout {...layoutProps} />;

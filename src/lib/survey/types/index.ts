@@ -29,6 +29,7 @@ export interface BlockData {
   values?: Array<string | number | boolean>;
   defaultValue?: any;
   className?: string;
+  showResults?: boolean;
   [key: string]: any;
 }
 

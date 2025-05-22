@@ -62,6 +62,7 @@ interface SurveyFormProviderProps {
   computedFields?: ComputedFieldsConfig;
   customValidators?: Record<string, CustomValidator>;
   debug?: boolean;
+  enableDebug? : boolean;
 }
 
 // Provider component
@@ -76,6 +77,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   theme = "default",
   computedFields = {},
   customValidators = {},
+  enableDebug = false,
   debug = false,
 }) => {
   // State for form values and errors

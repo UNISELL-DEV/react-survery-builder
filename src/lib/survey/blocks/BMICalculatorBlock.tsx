@@ -1,80 +1,125 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useSurveyForm } from '../../context/SurveyFormContext';
-import { themes } from '../../themes';
-import { calculateBMI } from '../../utils/conditionalUtils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { Activity, Ruler, Weight, TrendingUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React, { useState } from "react";
+import { BlockDefinition, ContentBlockItemProps } from "../types";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import { Activity, Ruler, Weight, TrendingUp } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
-interface BMICalculatorRendererProps {
-  block: {
-    fieldName?: string;
-    label?: string;
-    description?: string;
-    className?: string;
-    showResults?: boolean;
-    heightUnit?: 'cm' | 'inches';
-    weightUnit?: 'kg' | 'lbs';
-    defaultUnit?: 'metric' | 'imperial';
-    theme?: string;
-  };
-  value?: {
-    height?: number;
-    weight?: number;
-    bmi?: number;
-    category?: string;
-    unitSystem?: string;
-  };
-  onChange?: (value: any) => void;
-  onBlur?: () => void;
-  error?: string;
-  disabled?: boolean;
-  theme?: string;
-}
-
-/**
- * A specialized block for calculating BMI with modern design
- */
-export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
-  block,
-  value = {},
-  onChange,
-  onBlur,
-  error,
-  disabled = false,
-  theme = 'default',
+// Form component for editing the block configuration
+const BMICalculatorForm: React.FC<ContentBlockItemProps> = ({
+  data,
+  onUpdate,
 }) => {
-  const { setValue } = useSurveyForm();
-  const themeConfig = themes[theme] || themes.default;
-  const initialRenderRef = useRef(true);
+  const handleChange = (field: string, value: string | boolean) => {
+    onUpdate?.({
+      ...data,
+      [field]: value,
+    });
+  };
 
-  // Extract field name from block
-  const fieldName = block.fieldName || 'bmiCalculator';
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="label">Label</Label>
+        <Input
+          id="label"
+          value={data.label || ""}
+          onChange={(e) => handleChange("label", e.target.value)}
+          placeholder="BMI Calculator"
+        />
+      </div>
 
-  // Local state
-  const [unitSystem, setUnitSystem] = useState(
-    value.unitSystem || block.defaultUnit || 'metric'
-  );
-  const [height, setHeight] = useState(
-    value.height || (unitSystem === 'metric' ? 170 : 70)
-  );
-  const [weight, setWeight] = useState(
-    value.weight || (unitSystem === 'metric' ? 70 : 150)
-  );
+      <div className="space-y-2">
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={data.description || ""}
+          onChange={(e) => handleChange("description", e.target.value)}
+          placeholder="Calculate your Body Mass Index"
+          rows={3}
+        />
+      </div>
 
-  // Track previous values to prevent infinite loops
-  const prevValuesRef = useRef({
-    height: value.height || (unitSystem === 'metric' ? 170 : 70),
-    weight: value.weight || (unitSystem === 'metric' ? 70 : 150),
-    unitSystem: value.unitSystem || block.defaultUnit || 'metric'
-  });
+      <div className="space-y-2">
+        <Label htmlFor="fieldName">Field Name</Label>
+        <Input
+          id="fieldName"
+          value={data.fieldName || ""}
+          onChange={(e) => handleChange("fieldName", e.target.value)}
+          placeholder="bmiResult"
+        />
+        <p className="text-xs text-muted-foreground">
+          The name of the field to store the BMI results
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="defaultUnit">Default Unit System</Label>
+        <Select value={data.defaultUnit || "metric"} onValueChange={(value) => handleChange("defaultUnit", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select default unit system" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="metric">Metric (cm, kg)</SelectItem>
+            <SelectItem value="imperial">Imperial (ft/in, lbs)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="theme">Theme</Label>
+        <Select value={data.theme || "default"} onValueChange={(value) => handleChange("theme", value)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Default</SelectItem>
+            <SelectItem value="minimal">Minimal</SelectItem>
+            <SelectItem value="gradient">Gradient</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="className">CSS Class Names</Label>
+        <Input
+          id="className"
+          value={data.className || ""}
+          onChange={(e) => handleChange("className", e.target.value)}
+          placeholder="custom-bmi-calculator"
+        />
+      </div>
+      <div className="space-y-2">
+          <Checkbox
+            id="showResults"
+            checked={!!data.showResults}
+            onCheckedChange={(checked) => {
+              handleChange("showResults", !!checked);
+            }}
+          />
+          <Label htmlFor="showResults">Show results?</Label>
+      </div>
+
+    </div>
+  );
+};
+
+// Component to render the block in the survey
+const BMICalculatorItem: React.FC<ContentBlockItemProps> = ({
+  data,
+  onUpdate,
+}) => {
+  const [unitSystem, setUnitSystem] = useState(data.defaultUnit || "metric");
+  const [height, setHeight] = useState(unitSystem === "metric" ? 170 : 70); // 170cm or 70 inches
+  const [weight, setWeight] = useState(unitSystem === "metric" ? 70 : 150); // 70kg or 150lbs
 
   // Convert height input for imperial (total inches)
   const getImperialHeight = () => {
@@ -87,12 +132,12 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
     setHeight(feet * 12 + inches);
   };
 
-  // Enhanced BMI calculation
-  const calculateBMIEnhanced = () => {
+  // BMI calculation
+  const calculateBMI = () => {
     let heightInMeters;
     let weightInKg = weight;
 
-    if (unitSystem === 'metric') {
+    if (unitSystem === "metric") {
       heightInMeters = height / 100; // Convert cm to meters
     } else {
       heightInMeters = height * 0.0254; // Convert inches to meters
@@ -138,52 +183,37 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
     };
   };
 
-  const bmi = calculateBMIEnhanced();
+  const bmi = calculateBMI();
   const bmiData = getBMIData(bmi);
   const imperialHeight = getImperialHeight();
 
   // Update form data when BMI changes
-  useEffect(() => {
-    const prevValues = prevValuesRef.current;
-    const hasChanged = 
-      prevValues.height !== height || 
-      prevValues.weight !== weight || 
-      prevValues.unitSystem !== unitSystem;
-
-    if (onChange && height > 0 && weight > 0 && hasChanged) {
-      const calculatedBmi = calculateBMIEnhanced();
-      const calculatedBmiData = getBMIData(calculatedBmi);
-      
-      const newValue = {
-        height,
-        weight,
-        bmi: parseFloat(calculatedBmi.toFixed(1)),
-        category: calculatedBmiData.category,
-        unitSystem
-      };
-      
-      onChange(newValue);
-      
-      // Update previous values
-      prevValuesRef.current = {
-        height,
-        weight,
-        unitSystem
-      };
+  React.useEffect(() => {
+    if (data.fieldName && onUpdate) {
+      onUpdate({
+        ...data,
+        [data.fieldName]: {
+          bmi: parseFloat(bmi.toFixed(1)),
+          category: bmiData.category,
+          height: unitSystem === "metric" ? height : imperialHeight,
+          weight: weight,
+          unitSystem: unitSystem
+        }
+      });
     }
-  }, [height, weight, unitSystem, onChange]);
+  }, [height, weight, unitSystem, bmi, bmiData.category]);
+
+  const theme = data.theme || "default";
 
   const getCardClassName = () => {
-    const base = `w-full max-w-2xl border-0 shadow-none ${block.className || ''}`;
-    const blockTheme = block.theme || 'default';
-    
-    switch (blockTheme) {
+    const base = `w-full max-w-2xl border-0 ${data.className || ''}`;
+    switch (theme) {
       case "minimal":
         return `${base} shadow-none bg-transparent`;
       case "gradient":
         return `${base} bg-gradient-to-br from-background via-background to-accent/10 shadow-lg`;
       default:
-        return `${base}`;
+        return `${base} shadow-md`;
     }
   };
 
@@ -194,36 +224,32 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
           <div className={`p-2 rounded-full bg-gradient-to-r ${bmiData.color}`}>
             <Activity className="w-6 h-6 text-white" />
           </div>
-          {block.label || 'BMI Calculator'}
+          {data.label || 'BMI Calculator'}
         </CardTitle>
-        {block.description && (
-          <p className="text-muted-foreground max-w-md mx-auto">{block.description}</p>
+        {data.description && (
+          <p className="text-muted-foreground max-w-md mx-auto">{data.description}</p>
         )}
       </CardHeader>
 
       <CardContent className="space-y-8">
         {/* Unit System Tabs */}
-        <Tabs 
-          value={unitSystem} 
-          onValueChange={(value) => {
-            setUnitSystem(value);
-            // Reset to reasonable defaults when switching units
-            if (value === "metric") {
-              setHeight(170);
-              setWeight(70);
-            } else {
-              setHeight(70); // 5'10" in inches
-              setWeight(150);
-            }
-          }} 
-          className="w-full"
-        >
+        <Tabs value={unitSystem} onValueChange={(value) => {
+          setUnitSystem(value);
+          // Reset to reasonable defaults when switching units
+          if (value === "metric") {
+            setHeight(170);
+            setWeight(70);
+          } else {
+            setHeight(70); // 5'10" in inches
+            setWeight(150);
+          }
+        }} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="metric" className="flex items-center gap-2" disabled={disabled}>
+            <TabsTrigger value="metric" className="flex items-center gap-2">
               <Ruler className="w-4 h-4" />
               Metric
             </TabsTrigger>
-            <TabsTrigger value="imperial" className="flex items-center gap-2" disabled={disabled}>
+            <TabsTrigger value="imperial" className="flex items-center gap-2">
               <Weight className="w-4 h-4" />
               Imperial
             </TabsTrigger>
@@ -241,11 +267,9 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                     type="number"
                     value={height}
                     onChange={(e) => setHeight(parseInt(e.target.value) || 170)}
-                    onBlur={onBlur}
-                    disabled={disabled}
                     min={100}
                     max={250}
-                    className="text-center text-xl font-semibold h-14"
+                    className="text-center text-xl font-semibold h-14 text-lg"
                     placeholder="170"
                   />
                   <div className="absolute right-3 pl-2 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -264,8 +288,6 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                     type="number"
                     value={weight}
                     onChange={(e) => setWeight(parseInt(e.target.value) || 70)}
-                    onBlur={onBlur}
-                    disabled={disabled}
                     min={30}
                     max={300}
                     className="text-center text-xl font-semibold h-14"
@@ -290,7 +312,6 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                   <Select 
                     value={imperialHeight.feet.toString()} 
                     onValueChange={(value) => setImperialHeight(parseInt(value), imperialHeight.inches)}
-                    disabled={disabled}
                   >
                     <SelectTrigger className="h-14">
                       <SelectValue />
@@ -306,7 +327,6 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                   <Select 
                     value={imperialHeight.inches.toString()} 
                     onValueChange={(value) => setImperialHeight(imperialHeight.feet, parseInt(value))}
-                    disabled={disabled}
                   >
                     <SelectTrigger className="h-14">
                       <SelectValue />
@@ -332,8 +352,6 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                     type="number"
                     value={weight}
                     onChange={(e) => setWeight(parseInt(e.target.value) || 150)}
-                    onBlur={onBlur}
-                    disabled={disabled}
                     min={70}
                     max={660}
                     className="text-center text-xl font-semibold h-14"
@@ -351,7 +369,7 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
         <Separator />
 
         {/* BMI Result */}
-        {block.showResults ?
+        {data.showResults ?
         <div className={`space-y-6 p-6 rounded-xl border-2 ${bmiData.bgColor}`}>
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -397,17 +415,60 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
               {bmiData.advice}
             </p>
           </div>
-        </div> : null }
-
-        {/* Error display */}
-        {error && (
-          <div className={cn("text-sm text-destructive mt-2 p-3 bg-destructive/10 rounded-md", themeConfig.field.error)}>
-            {error}
-          </div>
-        )}
+        </div>
+        : null }
       </CardContent>
     </Card>
   );
 };
 
-export default BMICalculatorRenderer;
+// Preview component shown in the block library
+const BMICalculatorPreview: React.FC = () => {
+  return (
+    <div className="w-full flex items-center justify-center py-4">
+      <div className="text-center space-y-3">
+        <div className="flex items-center justify-center gap-2">
+          <div className="p-2 rounded-full bg-gradient-to-r from-green-500 to-green-600">
+            <Activity className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-semibold">BMI Calculator</span>
+        </div>
+        <div className="space-y-1">
+          <div className="text-3xl font-bold bg-gradient-to-r from-green-500 to-green-600 bg-clip-text text-transparent">
+            23.5
+          </div>
+          <Badge variant="secondary" className="text-xs">Normal Weight</Badge>
+        </div>
+        <div className="flex gap-2 justify-center text-xs text-muted-foreground">
+          <span>Height • Weight • BMI</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Export the block definition
+export const BMICalculatorBlock: BlockDefinition = {
+  type: "bmiCalculator",
+  name: "BMI Calculator",
+  description: "Modern BMI calculator with sleek design and intuitive controls",
+  icon: <Activity className="w-4 h-4" />,
+  defaultData: {
+    type: "bmiCalculator",
+    label: "BMI Calculator",
+    description: "Calculate your Body Mass Index",
+    fieldName: "bmiResult",
+    defaultUnit: "metric",
+    showResults: false,
+    theme: "default",
+    className: "",
+  },
+  renderItem: (props) => <BMICalculatorItem {...props} />,
+  renderFormFields: (props) => <BMICalculatorForm {...props} />,
+  renderPreview: () => <BMICalculatorPreview />,
+  validate: (data) => {
+    if (!data.label) return "Label is required";
+    if (!data.fieldName) return "Field name is required";
+    return null;
+  },
+};

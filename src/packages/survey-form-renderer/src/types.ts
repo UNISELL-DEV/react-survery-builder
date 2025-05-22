@@ -24,6 +24,7 @@ export interface SurveyFormRendererProps {
   computedFields?: ComputedFieldsConfig;
   customValidators?: Record<string, CustomValidator>;
   debug?: boolean;
+  enableDebug?: boolean;
 }
 
 export type SurveyTheme =
@@ -39,7 +40,8 @@ export type SurveyLayout =
   | "continuous"
   | "accordion"
   | "tabs"
-  | "stepper";
+  | "stepper"
+  | "fullpage";
 
 export interface ProgressBarOptions {
   type?: "bar" | "dots" | "numbers" | "percentage";
