@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { NodeData, BlockData, LocalizationMap } from "../../../lib/survey/types";
+import type { NodeData, BlockData, LocalizationMap } from "../../survey-form-builder/src/types";
 
 export interface SurveyFormRendererProps {
   survey: {
@@ -99,10 +99,13 @@ export interface SurveyFormContextProps {
   errors: Record<string, string>;
   setError: (field: string, error: string | null) => void;
   currentPage: number;
+  currentBlockIndex: number;
   totalPages: number;
   goToPage: (pageIndex: number) => void;
   goToNextPage: () => void;
   goToPreviousPage: () => void;
+  goToNextBlock: () => void;
+  goToPreviousBlock: () => void;
   isFirstPage: boolean;
   isLastPage: boolean;
   isSubmitting: boolean;
