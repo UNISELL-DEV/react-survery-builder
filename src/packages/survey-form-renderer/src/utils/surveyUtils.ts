@@ -1,4 +1,4 @@
-import type { NodeData, BlockData } from "../../../../lib/survey/types";
+import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
 
 /**
  * Extracts all pages/sections from a survey
@@ -73,6 +73,44 @@ export function getSurveyPages(rootNode: NodeData): Array<BlockData[]> {
   }
 
   return pages;
+}
+
+/**
+ * Returns an array of page UUIDs in the same order as getSurveyPages
+ */
+export function getSurveyPageIds(rootNode: NodeData): string[] {
+  const ids: string[] = [];
+
+  const processNode = (node: NodeData) => {
+    if (node.items && node.items.length > 0) {
+      const setBlocks = node.items.filter(item => item.type === 'set');
+
+      if (setBlocks.length > 0) {
+        setBlocks.forEach(setBlock => {
+          ids.push(setBlock.uuid || '');
+        });
+      } else {
+        ids.push(node.uuid || '');
+      }
+    }
+
+    if (node.nodes && node.nodes.length > 0) {
+      node.nodes.forEach(n => {
+        const child = typeof n === 'string' ? { type: 'section', uuid: n } : n;
+        if (child.type === 'section') {
+          processNode(child);
+        }
+      });
+    }
+  };
+
+  processNode(rootNode);
+
+  if (ids.length === 0) {
+    ids.push(rootNode.uuid || '');
+  }
+
+  return ids;
 }
 
 /**
