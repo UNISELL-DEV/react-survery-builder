@@ -2,7 +2,8 @@ import type React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { type BlockData, useSurveyBuilder } from "@/lib/survey";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
+import { BlockData } from "../../types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ContentBlockItemProps {
@@ -28,7 +29,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
             <span className="text-destructive">Unknown block type: {data.type}</span>
           </div>
           <div className="flex gap-2">
-            <Button
+            <Button type="button"
               variant="destructive"
               size="sm"
               onClick={onRemove}
@@ -56,7 +57,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
         <div className="flex gap-2">
           <Dialog open={isEditing} onOpenChange={setIsEditing}>
             <DialogTrigger asChild>
-              <Button
+              <Button type="button"
                 variant="outline"
                 size="sm"
               >
@@ -80,7 +81,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
             </DialogContent>
           </Dialog>
 
-          <Button
+          <Button type="button"
             variant="outline"
             size="sm"
             onClick={onRemove}

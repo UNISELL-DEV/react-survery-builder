@@ -286,7 +286,7 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
     const data = {
       rootNode: {
         type: "section",
-        name: "New Survey",
+        name: "New Form",
         uuid: createId(),
         items: [
         ],

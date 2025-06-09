@@ -3,10 +3,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useSurveyBuilder } from "@/lib/survey";
-import { ensureNodeUuids } from "@/lib/survey/utils/nodeUtils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { NodeData } from "@/lib/survey/types";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
+import { NodeData } from "../../types";
+import { ensureNodeUuids } from "../../utils/nodeUtils";
 
 export const JsonEditor: React.FC = () => {
   const { state, importSurvey, exportSurvey } = useSurveyBuilder();
@@ -94,7 +94,7 @@ export const JsonEditor: React.FC = () => {
             </div>
 
             <div className="flex justify-end">
-              <Button onClick={handleImport}>Import</Button>
+              <Button type="button" onClick={handleImport}>Import</Button>
             </div>
 
             {error && (
@@ -129,8 +129,8 @@ export const JsonEditor: React.FC = () => {
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button onClick={handleExport}>Refresh</Button>
-              <Button
+              <Button type="button" onClick={handleExport}>Refresh</Button>
+              <Button type="button"
                 onClick={() => {
                   navigator.clipboard.writeText(exportJson);
                   setSuccess("Copied to clipboard!");

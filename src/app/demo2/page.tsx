@@ -4,12 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SurveyBuilder } from "@/components/survey/SurveyBuilder";
 import { StandardBlocks } from "@/lib/survey/blocks";
 import { StandardNodes } from "@/lib/survey/nodes";
 import { DemoSurveys } from "@/lib/demo/surveys";
 import { GraphDemo } from "@/lib/demo/components/GraphDemo";
 import { BranchingLogicDemo } from "@/lib/demo/components/BranchingLogicDemo";
+import { SurveyBuilder } from "@/packages/survey-form-builder/src";
 
 // Demo tabs for different survey examples
 const DemoPage = () => {

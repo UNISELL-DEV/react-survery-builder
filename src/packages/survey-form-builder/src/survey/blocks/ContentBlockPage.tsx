@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { type BlockData, useSurveyBuilder } from "@/lib/survey";
 import { ContentBlockItem } from "./ContentBlockItem";
 import { v4 as uuidv4 } from "uuid";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
+import { BlockData } from "../../types";
 
 interface ContentBlockPageProps {
   data: BlockData;
@@ -74,14 +75,14 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
           />
         </div>
         <div className="flex gap-2">
-          <Button
+          <Button type="button"
             variant="outline"
             size="sm"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? "Expand" : "Collapse"}
           </Button>
-          <Button
+          <Button type="button"
             variant="outline"
             size="sm"
             onClick={onRemove}
@@ -109,7 +110,7 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
               <h4 className="text-sm font-medium mb-2">Add Item</h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {Object.entries(state.definitions.blocks).map(([type, definition]) => (
-                  <Button
+                  <Button type="button"
                     key={type}
                     variant="outline"
                     size="sm"

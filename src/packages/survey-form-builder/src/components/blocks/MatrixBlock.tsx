@@ -164,7 +164,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
                   placeholder="Question text"
                 />
               </div>
-              <Button
+              <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemoveQuestion(index)}
@@ -188,7 +188,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
                   onKeyDown={(e) => e.key === "Enter" && handleAddQuestion()}
                 />
               </div>
-              <Button
+              <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={handleAddQuestion}
@@ -224,7 +224,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
                   placeholder="Option value"
                 />
               </div>
-              <Button
+              <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={() => handleRemoveOption(index)}
@@ -252,7 +252,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
                   placeholder="New option value (optional)"
                 />
               </div>
-              <Button
+              <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={handleAddOption}

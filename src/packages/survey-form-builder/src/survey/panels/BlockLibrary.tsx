@@ -1,6 +1,6 @@
 import type React from "react";
-import { useSurveyBuilder } from "@/lib/survey";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 
 export const BlockLibrary: React.FC = () => {
   const { state } = useSurveyBuilder();

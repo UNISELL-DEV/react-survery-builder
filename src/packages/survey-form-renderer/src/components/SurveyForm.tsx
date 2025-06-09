@@ -72,8 +72,6 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
         return <TabsLayout {...layoutProps} />;
       case 'stepper':
         return <StepperLayout {...layoutProps} />;
-      case 'stepper':
-        return <StepperLayout {...layoutProps} />;
       case 'fullpage':
         return <FullPageSurveyLayout {...layoutProps} />;
       case 'page-by-page':

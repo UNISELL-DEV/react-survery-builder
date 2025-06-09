@@ -236,7 +236,7 @@ const FileUploadBlockItem: React.FC<ContentBlockItemProps> = ({
             </p>
           </div>
 
-          <Button
+          <Button type="button"
             variant="ghost"
             size="icon"
             onClick={() => handleRemoveFile(index)}

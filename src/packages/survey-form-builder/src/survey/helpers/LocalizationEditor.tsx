@@ -2,12 +2,12 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSurveyBuilder } from "@/lib/survey";
-import type { LocalizationMap } from "@/lib/survey/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ClipboardCopy } from "lucide-react";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
+import { LocalizationMap } from "../../types";
 
 export const LocalizationEditor: React.FC = () => {
   const { state, updateLocalizations } = useSurveyBuilder();
@@ -116,7 +116,7 @@ export const LocalizationEditor: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Localizations</h2>
-        <Button
+        <Button type="button"
           variant="outline"
           onClick={handleCopyToClipboard}
           className="flex items-center gap-2"
@@ -142,7 +142,7 @@ export const LocalizationEditor: React.FC = () => {
             onChange={(e) => setNewLanguageCode(e.target.value)}
           />
         </div>
-        <Button onClick={handleAddLanguage}>Add</Button>
+        <Button type="button" onClick={handleAddLanguage}>Add</Button>
       </div>
 
       {labels.length === 0 && (
@@ -162,6 +162,7 @@ export const LocalizationEditor: React.FC = () => {
               </CardTitle>
               {langCode !== "en" && (
                 <Button
+                  type="button"
                   variant="outline"
                   size="sm"
                   onClick={() => handleRemoveLanguage(langCode)}

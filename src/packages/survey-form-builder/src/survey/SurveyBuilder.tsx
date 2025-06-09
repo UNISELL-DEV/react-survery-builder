@@ -2,15 +2,14 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { SurveyBuilderProvider, useSurveyBuilder } from "@/lib/survey";
-import type { NodeData, LocalizationMap, BlockDefinition, NodeDefinition } from "@/lib/survey/types";
 import { SurveyNode } from "./SurveyNode";
-import { findNodeById } from "@/lib/survey/utils/nodeUtils";
 import { LocalizationEditor } from "./helpers/LocalizationEditor";
 import { v4 as uuidv4 } from "uuid";
 import { BlockLibrary } from "./panels/BlockLibrary";
 import { JsonEditor } from "./helpers/JsonEditor";
-import { SurveyGraph } from "@/lib/demo/components/SurveyGraph";
+import { BlockDefinition, LocalizationMap, NodeData, NodeDefinition } from "../types";
+import { SurveyBuilderProvider, useSurveyBuilder } from "../context/SurveyBuilderContext";
+import { SurveyGraph } from "./SurveryGraph";
 
 // Define the props
 interface SurveyBuilderProps {
@@ -103,7 +102,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
   return (
     <div className="survey-builder h-full flex flex-col pb-5">
       <div className="survey-builder-header flex items-center justify-between p-4 bg-card border-b">
-        <h2 className="text-xl font-bold">Survey Builder</h2>
+        <h2 className="text-xl font-bold">Form Builder</h2>
 
         <div className="flex items-center gap-2">
           <Tabs
@@ -120,7 +119,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
 
           <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline">Tools</Button>
+              <Button type="button" variant="outline">Tools</Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[540px] sm:w-[540px]">
               <SheetHeader>
@@ -144,7 +143,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           </Sheet>
 
           {!state.rootNode && (
-            <Button onClick={handleCreateRootNode}>Create Survey</Button>
+            <Button type="button" onClick={handleCreateRootNode}>Create Form</Button>
           )}
         </div>
       </div>
@@ -156,11 +155,11 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
               <SurveyNode data={state.rootNode} />
             ) : (
               <div className="text-center p-12 bg-muted rounded-lg">
-                <h3 className="text-lg font-semibold mb-4">No Survey Created</h3>
+                <h3 className="text-lg font-semibold mb-4">No Form Created</h3>
                 <p className="text-muted-foreground mb-6">
-                  Click "Create Survey" to start building your survey.
+                  Click "Create Form" to start building your Form.
                 </p>
-                <Button onClick={handleCreateRootNode}>Create Survey</Button>
+                <Button type="button" onClick={handleCreateRootNode}>Create Form</Button>
               </div>
             )}
           </div>
@@ -184,7 +183,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
                 <p className="text-muted-foreground mb-6">
                   Create a survey first to see the graph visualization.
                 </p>
-                <Button onClick={handleCreateRootNode}>Create Survey</Button>
+                <Button type="button" onClick={handleCreateRootNode}>Create Survey</Button>
               </div>
             )}
           </div>

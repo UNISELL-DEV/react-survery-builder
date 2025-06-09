@@ -134,7 +134,7 @@ const DatePickerBlockForm: React.FC<ContentBlockItemProps> = ({
           <Label htmlFor="defaultValue">Default Value</Label>
           <Popover>
             <PopoverTrigger>
-              <Button
+              <Button type="button"
                 variant="outline"
                 className={cn(
                   "w-full justify-start text-left font-normal",
@@ -272,7 +272,7 @@ const DatePickerBlockItem: React.FC<ContentBlockItemProps> = ({
 
       <Popover>
         <PopoverTrigger>
-          <Button
+          <Button type="button"
             id={data.fieldName}
             variant="outline"
             className={cn(
@@ -301,7 +301,7 @@ const DatePickerBlockItem: React.FC<ContentBlockItemProps> = ({
 const DatePickerBlockPreview: React.FC = () => {
   return (
     <div className="w-full flex items-center justify-center py-1">
-      <Button
+      <Button type="button"
         variant="outline"
         className="w-4/5 max-w-full justify-start text-left font-normal text-muted-foreground"
         disabled

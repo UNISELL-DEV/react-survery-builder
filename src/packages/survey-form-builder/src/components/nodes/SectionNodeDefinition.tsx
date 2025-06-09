@@ -1,9 +1,9 @@
 // src/lib/survey/nodes/SectionNodeDefinition.tsx
 import React from "react";
 import type { NodeDefinition } from "../../types";
-import { SectionNode } from "@/components/survey/nodes/SectionNode";
 import { LayoutGrid } from 'lucide-react';
 import { v4 as uuidv4 } from "uuid";
+import { SectionNode } from "../../survey/nodes/SectionNode";
 
 export const SectionNodeDefinition: NodeDefinition = {
   type: "section",

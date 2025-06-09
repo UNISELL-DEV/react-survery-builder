@@ -6,9 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { type NodeData, useSurveyBuilder } from "@/lib/survey";
 import { ContentBlockPage } from "../blocks/ContentBlockPage";
 import { v4 as uuidv4 } from "uuid";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
+import { NodeData } from "../../types";
 
 interface SectionNodeProps {
   data: NodeData;
@@ -94,6 +95,7 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
         </div>
         <div className="flex gap-2">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => setCollapsed(!collapsed)}
@@ -103,6 +105,7 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
           <Button
             variant="outline"
             size="sm"
+            type="button"
             onClick={onRemove}
           >
             Remove
@@ -130,7 +133,7 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
                   />
                 ))}
 
-                <Button onClick={handleAddPage}>Add Page</Button>
+                <Button type="button" onClick={handleAddPage}>Add Page</Button>
               </div>
             </TabsContent>
 
@@ -195,7 +198,7 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
                   );
                 })}
 
-                <Button onClick={handleAddChildSection}>Add Child Section</Button>
+                <Button type="button" onClick={handleAddChildSection}>Add Child Section</Button>
               </div>
             </TabsContent>
           </Tabs>

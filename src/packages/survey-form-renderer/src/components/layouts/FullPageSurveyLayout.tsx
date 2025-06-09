@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getSurveyPages } from '../../utils/surveyUtils';
 
 interface FullPageSurveyLayoutProps {
   progressBar?: boolean | {
@@ -78,7 +79,6 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
   const firstInputRef = useRef<HTMLInputElement>(null);
 
   // Get the current page blocks from the surveyData in context
-  const { getSurveyPages } = require('../../utils/surveyUtils');
   const pages = getSurveyPages(surveyData.rootNode);
   const currentPageBlocks = currentPage < pages.length ? pages[currentPage] : [];
 
@@ -180,7 +180,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
       </div>
 
       {/* Main Content Area - Blocks at the top with margin */}
-      <div className="flex-1 flex flex-col mt-8">
+      <div className="flex flex-col mt-8">
         <div className="w-full max-w-2xl mx-auto px-4 flex-1 flex flex-col">
           <AnimatePresence mode="wait">
             <motion.div
@@ -208,7 +208,6 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
               </div>
 
               {/* Spacer to push navigation buttons down */}
-              <div className="flex-1 min-h-[200px]" />
             </motion.div>
           </AnimatePresence>
         </div>

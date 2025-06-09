@@ -1,4 +1,3 @@
-import type { BlockData } from "../../../../lib/survey/types";
 import {
   TextInputBlock,
   TextareaBlock,
@@ -13,8 +12,9 @@ import {
   FileUploadBlock,
   MatrixBlock,
   SelectableBoxQuestionBlock,
+  BlockData,
   // Import all block types from the survey builder
-} from "../../../../lib/survey/blocks";
+} from "@/packages/survey-form-builder/src";
 
 /**
  * Maps survey builder block types to the appropriate renderer components

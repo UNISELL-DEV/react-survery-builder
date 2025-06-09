@@ -158,7 +158,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
                     placeholder="Option value"
                   />
                 </div>
-                <Button
+                <Button type="button"
                   variant="ghost"
                   size="icon"
                   onClick={() => handleRemoveOption(index)}
@@ -187,7 +187,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
                   placeholder="New option value (optional)"
                 />
               </div>
-              <Button
+              <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={handleAddOption}

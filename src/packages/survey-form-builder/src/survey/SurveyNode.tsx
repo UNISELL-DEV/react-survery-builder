@@ -1,7 +1,8 @@
 import type React from "react";
-import { type NodeData, useSurveyBuilder } from "@/lib/survey";
 import { SectionNode } from "./nodes/SectionNode";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { NodeData } from "../types";
+import { useSurveyBuilder } from "../context/SurveyBuilderContext";
 
 interface SurveyNodeProps {
   data: NodeData;
