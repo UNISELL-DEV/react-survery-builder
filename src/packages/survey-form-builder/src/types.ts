@@ -38,6 +38,7 @@ export interface BlockData {
   className?: string;
   showResults?: boolean;
   navigationRules?: NavigationRule[];
+  visibleIf?: any;
   [key: string]: any;
 }
 

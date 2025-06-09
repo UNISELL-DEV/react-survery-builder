@@ -40,7 +40,9 @@ export const SurveyFormContext = createContext<SurveyFormContextProps>({
   language: "en",
   setLanguage: () => {},
   theme: "default",
-  surveyData: { rootNode: {} },
+  surveyData: { rootNode: {
+    type: ""
+  } },
   // Default values for new conditional props
   conditionalErrors: {},
   computedValues: {},
@@ -266,7 +268,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
               fieldValues: updatedValues,
               getFieldValue: (name) => updatedValues[name] || computedValues[name]
             });
-            if (result && typeof result === 'object' && 'isValid' === false) {
+            if (result && typeof result === 'object' && isValid === false) {
               setError(field, result.errorMessage || 'Invalid value');
             } else {
               setError(field, null);
