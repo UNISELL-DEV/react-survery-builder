@@ -35,6 +35,7 @@ import {
 import {
   evaluateLogic,
   getSurveyPages,
+  getSurveyPageIds,
   getLocalized,
   getThemeClass,
   formatFieldName
@@ -107,6 +108,7 @@ export {
   // Utility functions
   evaluateLogic,
   getSurveyPages,
+  getSurveyPageIds,
   getLocalized,
   getThemeClass,
   formatFieldName,
@@ -122,7 +124,8 @@ export {
   executeCalculation,
   calculateBMI,
   supportsConditionalRendering,
-  supportsBranchingLogic
+  supportsBranchingLogic,
+  getSurveyPageIds
 };
 
 export default SurveyForm;

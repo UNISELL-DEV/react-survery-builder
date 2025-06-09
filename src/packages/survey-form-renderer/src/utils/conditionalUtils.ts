@@ -235,6 +235,7 @@ export function getNextPageIndex(
 export function getNextPageFromNavigationRules(
   blocks: BlockData[],
   pages: Array<BlockData[]>,
+  pageIds: string[],
   fieldValues: Record<string, any>
 ): number | null {
   for (const block of blocks) {
@@ -245,7 +246,7 @@ export function getNextPageFromNavigationRules(
           return -1;
         }
         if (rule.isPage) {
-          const idx = pages.findIndex((p) => p[0]?.uuid === rule.target);
+          const idx = pageIds.indexOf(String(rule.target));
           if (idx >= 0) return idx;
         } else {
           const idx = pages.findIndex((p) =>
@@ -262,7 +263,7 @@ export function getNextPageFromNavigationRules(
     if (defaultRule) {
       if (defaultRule.target === "submit") return -1;
       if (defaultRule.isPage) {
-        const idx = pages.findIndex((p) => p[0]?.uuid === defaultRule.target);
+        const idx = pageIds.indexOf(String(defaultRule.target));
         if (idx >= 0) return idx;
       } else {
         const idx = pages.findIndex((p) =>
@@ -297,6 +298,7 @@ export function findBlockPosition(
 export function getNextStepFromNavigationRules(
   block: BlockData,
   pages: Array<BlockData[]>,
+  pageIds: string[],
   fieldValues: Record<string, any>
 ): { pageIndex: number; blockIndex: number } | 'submit' | null {
   if (!block.navigationRules) return null;
@@ -307,7 +309,7 @@ export function getNextStepFromNavigationRules(
         return 'submit';
       }
       if (rule.isPage) {
-        const idx = pages.findIndex((p) => p[0]?.uuid === rule.target);
+        const idx = pageIds.indexOf(String(rule.target));
         if (idx >= 0) return { pageIndex: idx, blockIndex: 0 };
       } else {
         const pos = findBlockPosition(pages, String(rule.target));
@@ -320,7 +322,7 @@ export function getNextStepFromNavigationRules(
   if (defaultRule) {
     if (defaultRule.target === 'submit') return 'submit';
     if (defaultRule.isPage) {
-      const idx = pages.findIndex((p) => p[0]?.uuid === defaultRule.target);
+      const idx = pageIds.indexOf(String(defaultRule.target));
       if (idx >= 0) return { pageIndex: idx, blockIndex: 0 };
     } else {
       const pos = findBlockPosition(pages, String(defaultRule.target));

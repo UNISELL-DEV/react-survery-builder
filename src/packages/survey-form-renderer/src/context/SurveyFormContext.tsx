@@ -8,7 +8,7 @@ import type {
   CustomValidator,
   BranchingLogic
 } from "../types";
-import { getSurveyPages, evaluateLogic } from "../utils/surveyUtils";
+import { getSurveyPages, getSurveyPageIds, evaluateLogic } from "../utils/surveyUtils";
 import {
   evaluateCondition,
   isBlockVisible,
@@ -97,6 +97,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
 
   // Get all pages from the survey
   const pages = getSurveyPages(surveyData.rootNode);
+  const pageIds = getSurveyPageIds(surveyData.rootNode);
   const totalPages = Math.max(1, pages.length); // Ensure we always have at least 1 page
 
   // Log pages for debugging
@@ -213,6 +214,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     const navIndex = getNextPageFromNavigationRules(
       currentPageBlocks,
       pages,
+      pageIds,
       { ...values, ...computedValues }
     );
     if (navIndex !== null) {
@@ -328,6 +330,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     const target = getNextStepFromNavigationRules(
       currentBlock,
       pages,
+      pageIds,
       { ...values, ...computedValues }
     );
 
