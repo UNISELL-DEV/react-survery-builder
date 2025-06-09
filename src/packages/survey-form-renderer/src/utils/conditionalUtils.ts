@@ -1,4 +1,10 @@
-import type { ConditionRule, ConditionOperator, BranchingLogic, CalculationRule } from '../types';
+import type {
+  ConditionRule,
+  ConditionOperator,
+  BranchingLogic,
+  CalculationRule,
+} from '../types';
+import type { BlockData } from '../../../../lib/survey/types';
 
 /**
  * Evaluates a simple condition between two values using the specified operator
@@ -215,6 +221,52 @@ export function getNextPageIndex(
 
   // Default to next page
   return currentPage + 1 < totalPages ? currentPage + 1 : currentPage;
+}
+
+/**
+ * Evaluate navigation rules defined on blocks to determine next page
+ */
+export function getNextPageFromNavigationRules(
+  blocks: BlockData[],
+  pages: Array<BlockData[]>,
+  fieldValues: Record<string, any>
+): number | null {
+  for (const block of blocks) {
+    if (!block.navigationRules) continue;
+    for (const rule of block.navigationRules) {
+      if (evaluateCondition(rule.condition, fieldValues)) {
+        if (rule.target === "submit") {
+          return -1;
+        }
+        if (rule.isPage) {
+          const idx = pages.findIndex((p) => p[0]?.uuid === rule.target);
+          if (idx >= 0) return idx;
+        } else {
+          const idx = pages.findIndex((p) =>
+            p.some((b) => b.uuid === rule.target)
+          );
+          if (idx >= 0) return idx;
+        }
+      }
+    }
+  }
+  // Look for default rules
+  for (const block of blocks) {
+    const defaultRule = block.navigationRules?.find((r) => r.isDefault);
+    if (defaultRule) {
+      if (defaultRule.target === "submit") return -1;
+      if (defaultRule.isPage) {
+        const idx = pages.findIndex((p) => p[0]?.uuid === defaultRule.target);
+        if (idx >= 0) return idx;
+      } else {
+        const idx = pages.findIndex((p) =>
+          p.some((b) => b.uuid === defaultRule.target)
+        );
+        if (idx >= 0) return idx;
+      }
+    }
+  }
+  return null;
 }
 
 /**

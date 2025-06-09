@@ -171,6 +171,13 @@ export interface BranchingLogic {
   message?: string;
 }
 
+export interface NavigationRule {
+  condition: string;
+  target: string;
+  isPage?: boolean;
+  isDefault?: boolean;
+}
+
 export interface CalculationRule {
   formula: string;
   targetField: string;

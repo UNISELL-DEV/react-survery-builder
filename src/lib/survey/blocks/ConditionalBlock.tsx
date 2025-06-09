@@ -64,10 +64,10 @@ return fieldA === "Yes";`}
           <div className="text-xs text-muted-foreground bg-muted p-3 rounded space-y-2">
             <strong>Examples:</strong>
             <div className="space-y-1">
-              <code className="block">return age >= 18;</code>
-              <code className="block">return income > 50000 && hasInsurance === true;</code>
-              <code className="block">return bmiCalculator?.category === "Overweight";</code>
-              <code className="block">return answers.includes("Option A");</code>
+              <code className="block">{"return age >= 18;"}</code>
+              <code className="block">{"return income > 50000 && hasInsurance === true;"}</code>
+              <code className="block">{"return bmiCalculator?.category === 'Overweight';"}</code>
+              <code className="block">{"return answers.includes('Option A');"}</code>
             </div>
           </div>
         </div>
