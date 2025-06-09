@@ -1,0 +1,45 @@
+{
+  "name": "survey-form-builder",
+  "version": "0.1.0",
+  "description": "A beautiful and customizable survey forms builders",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.tsx --format cjs,esm --dts",
+    "dev": "tsup src/index.tsx --format cjs,esm --dts --watch",
+    "lint": "biome lint ."
+  },
+  "keywords": [
+    "react",
+    "survey",
+    "form",
+    "renderer",
+    "quiz",
+    "questionnaire"
+  ],
+  "author": "Survey Builder Team",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.0",
+    "framer-motion": "^10.18.0",
+    "tailwind-merge": "^2.2.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3"
+  }
+}
