@@ -2,6 +2,13 @@ import type { JSX, ReactNode } from "react";
 
 export type UUID = string;
 
+export interface NavigationRule {
+  condition: string;
+  target: UUID | string;
+  isPage?: boolean;
+  isDefault?: boolean;
+}
+
 export interface NodeData {
   uuid?: UUID;
   name?: string;
@@ -30,6 +37,7 @@ export interface BlockData {
   defaultValue?: any;
   className?: string;
   showResults?: boolean;
+  navigationRules?: NavigationRule[];
   [key: string]: any;
 }
 

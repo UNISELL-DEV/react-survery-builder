@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { BlockData } from "../../types";
+import { NavigationRulesEditor } from "../../components/common/NavigationRulesEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface ContentBlockItemProps {
@@ -77,6 +78,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
                     onRemove();
                   },
                 })}
+                <NavigationRulesEditor data={data} onUpdate={onUpdate} />
               </div>
             </DialogContent>
           </Dialog>

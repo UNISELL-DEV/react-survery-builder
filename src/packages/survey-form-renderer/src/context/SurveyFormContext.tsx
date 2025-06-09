@@ -13,7 +13,8 @@ import {
   evaluateCondition,
   isBlockVisible,
   executeCalculation,
-  getNextPageIndex
+  getNextPageIndex as calculateNextPageIndex,
+  getNextPageFromNavigationRules
 } from "../utils/conditionalUtils";
 
 // Create context with default values
@@ -184,7 +185,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
 
     // If we found branching logic, use it to determine the next page
     if (branchingLogic) {
-      const nextIndex = getNextPageIndex(
+      const nextIndex = calculateNextPageIndex(
         currentPage,
         branchingLogic,
         { ...values, ...computedValues },
@@ -197,6 +198,16 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       }
 
       return nextIndex;
+    }
+
+    // Check navigation rules on blocks
+    const navIndex = getNextPageFromNavigationRules(
+      currentPageBlocks,
+      pages,
+      { ...values, ...computedValues }
+    );
+    if (navIndex !== null) {
+      return navIndex === -1 ? null : navIndex;
     }
 
     // Default to next page
