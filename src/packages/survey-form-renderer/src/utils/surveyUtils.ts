@@ -1,4 +1,4 @@
-import type { NodeData, BlockData } from "../../../../lib/survey/types";
+import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
 
 /**
  * Extracts all pages/sections from a survey

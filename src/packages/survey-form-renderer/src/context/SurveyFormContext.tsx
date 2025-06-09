@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
-import type { NodeData, BlockData } from "../../../../lib/survey/types";
+import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
 import type {
   SurveyFormContextProps,
   SurveyTheme,
@@ -14,7 +14,8 @@ import {
   isBlockVisible,
   executeCalculation,
   getNextPageIndex as calculateNextPageIndex,
-  getNextPageFromNavigationRules
+  getNextPageFromNavigationRules,
+  getNextStepFromNavigationRules
 } from "../utils/conditionalUtils";
 
 // Create context with default values
@@ -24,10 +25,13 @@ export const SurveyFormContext = createContext<SurveyFormContextProps>({
   errors: {},
   setError: () => {},
   currentPage: 0,
+  currentBlockIndex: 0,
   totalPages: 0,
   goToPage: () => {},
   goToNextPage: () => {},
   goToPreviousPage: () => {},
+  goToNextBlock: () => {},
+  goToPreviousBlock: () => {},
   isFirstPage: true,
   isLastPage: true,
   isSubmitting: false,
@@ -87,6 +91,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   const [conditionalErrors, setConditionalErrors] = useState<Record<string, string>>({});
   const [computedValues, setComputedValues] = useState<Record<string, any>>({});
   const [currentPage, setCurrentPage] = useState(0);
+  const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(language);
 
@@ -104,6 +109,10 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   // Navigation states
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
+
+  useEffect(() => {
+    setCurrentBlockIndex(0);
+  }, [currentPage]);
 
   // Update computed values whenever form values change
   const updateComputedValues = useCallback(() => {
@@ -303,6 +312,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   const goToPage = (pageIndex: number) => {
     if (pageIndex >= 0 && pageIndex < totalPages) {
       setCurrentPage(pageIndex);
+      setCurrentBlockIndex(0);
 
       // Notify parent of page change
       if (onPageChange) {
@@ -311,27 +321,65 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   };
 
-  const goToNextPage = () => {
-    if (!isLastPage) {
-      // Get the next page based on branching logic
-      const nextIndex = getNextPageIndex();
+  const goToNextBlock = () => {
+    const pageBlocks = pages[currentPage] || [];
+    const currentBlock = pageBlocks[currentBlockIndex];
 
-      // If nextIndex is null, handle submission
-      if (nextIndex === null) {
-        submit();
-      } else {
-        goToPage(nextIndex);
-      }
-    } else if (isLastPage) {
-      // If we're on the last page, submit the form
+    const target = getNextStepFromNavigationRules(
+      currentBlock,
+      pages,
+      { ...values, ...computedValues }
+    );
+
+    if (target === 'submit') {
       submit();
+      return;
+    }
+
+    if (target) {
+      setCurrentPage(target.pageIndex);
+      setCurrentBlockIndex(target.blockIndex);
+      if (onPageChange) {
+        onPageChange(target.pageIndex, totalPages);
+      }
+      return;
+    }
+
+    if (currentBlockIndex < pageBlocks.length - 1) {
+      setCurrentBlockIndex(currentBlockIndex + 1);
+      return;
+    }
+
+    const nextIndex = getNextPageIndex();
+    if (nextIndex === null) {
+      submit();
+    } else {
+      goToPage(nextIndex);
     }
   };
 
-  const goToPreviousPage = () => {
-    if (!isFirstPage) {
-      goToPage(currentPage - 1);
+  const goToPreviousBlock = () => {
+    if (currentBlockIndex > 0) {
+      setCurrentBlockIndex(currentBlockIndex - 1);
+      return;
     }
+    if (!isFirstPage) {
+      const prevPage = currentPage - 1;
+      const prevBlocks = pages[prevPage] || [];
+      setCurrentPage(prevPage);
+      setCurrentBlockIndex(prevBlocks.length > 0 ? prevBlocks.length - 1 : 0);
+      if (onPageChange) {
+        onPageChange(prevPage, totalPages);
+      }
+    }
+  };
+
+  const goToNextPage = () => {
+    goToNextBlock();
+  };
+
+  const goToPreviousPage = () => {
+    goToPreviousBlock();
   };
 
   // Handle form submission
@@ -389,10 +437,13 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         errors,
         setError,
         currentPage,
+        currentBlockIndex,
         totalPages,
         goToPage,
         goToNextPage,
         goToPreviousPage,
+        goToNextBlock,
+        goToPreviousBlock,
         isFirstPage,
         isLastPage,
         isSubmitting,

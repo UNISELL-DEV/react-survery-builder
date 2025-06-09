@@ -64,18 +64,20 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
 
   const {
     currentPage,
+    currentBlockIndex,
     totalPages,
     values,
     setValue,
     errors,
-    goToNextPage,
-    goToPreviousPage,
+    goToNextBlock,
+    goToPreviousBlock,
     isFirstPage,
     isLastPage,
     submit,
     isValid,
     theme,
-    goToPage
+    goToPage,
+    surveyData
   } = useSurveyForm();
 
   const themeConfig = themes[theme] || themes.default;
@@ -83,7 +85,7 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
 
   // Get all survey pages
   const { getSurveyPages } = require('../../utils/surveyUtils');
-  const pages = getSurveyPages(useSurveyForm().surveyData.rootNode);
+  const pages = getSurveyPages(surveyData.rootNode);
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
@@ -165,16 +167,19 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
           <CardContent>
             {/* Page content */}
             <div className="survey-page-content space-y-6">
-              {pages[currentPage]?.map((block, index) => (
+              {pages[currentPage] && pages[currentPage][currentBlockIndex] && (
                 <BlockRenderer
-                  key={block.uuid || `block-${index}`}
-                  block={block}
-                  value={block.fieldName ? values[block.fieldName] : undefined}
-                  onChange={(value) => block.fieldName && setValue(block.fieldName, value)}
-                  error={block.fieldName ? errors[block.fieldName] : undefined}
+                  key={pages[currentPage][currentBlockIndex].uuid || `block-${currentBlockIndex}`}
+                  block={pages[currentPage][currentBlockIndex]}
+                  value={pages[currentPage][currentBlockIndex].fieldName ? values[pages[currentPage][currentBlockIndex].fieldName as string] : undefined}
+                  onChange={(value) => {
+                    const field = pages[currentPage][currentBlockIndex].fieldName;
+                    if (field) setValue(field, value);
+                  }}
+                  error={pages[currentPage][currentBlockIndex].fieldName ? errors[pages[currentPage][currentBlockIndex].fieldName as string] : undefined}
                   theme={theme}
                 />
-              ))}
+              )}
             </div>
 
             {/* Debug information */}
@@ -183,9 +188,9 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
             {/* Navigation buttons */}
             <div className="mt-6">
               <NavigationButtons
-                onPrevious={!isFirstPage ? goToPreviousPage : undefined}
-                onNext={!isLastPage ? goToNextPage : undefined}
-                onSubmit={isLastPage ? submit : undefined}
+                onPrevious={!isFirstPage || currentBlockIndex > 0 ? goToPreviousBlock : undefined}
+                onNext={goToNextBlock}
+                onSubmit={isLastPage && currentBlockIndex === pages[currentPage].length - 1 ? submit : undefined}
                 isValid={isValid}
                 options={navigationButtons}
                 submitText={submitText}
