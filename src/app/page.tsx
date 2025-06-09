@@ -10,191 +10,895 @@ const sampleSurvey =
 {
   "rootNode": {
     "type": "section",
-    "name": "New Survey",
-    "uuid": "30fb78d9-d253-4f06-a373-20fb6a3f4fdb",
+    "name": "TRT Initial Intake Form",
+    "uuid": "5de71609-0e0e-4c8f-a79a-aa563ad91716",
     "items": [
       {
         "type": "set",
-        "name": "Page 1",
-        "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac7",
-        "items": [
-          {
-            "type": "textfield",
-            "fieldName": "name",
-            "label": "Hey, Let's start with your name.",
-            "placeholder": "Your full name",
-            "description": "",
-            "defaultValue": "",
-            "uuid": "dd060ccd-cab8-49a5-a007-5f5b638c5902"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 2",
-        "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b514",
+        "name": "Page 1 - Allergy History",
+        "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "weightgoal",
-            "questionTitle": "What's your goal?",
-            "description": "",
+            "fieldName": "allergyHistory",
+            "questionTitle": "Have you ever had an adverse or allergic reaction to testosterone or testosterone replacement support medications?",
+            "description": "e.g., testosterone injectable, topical (androgel, testim, bioidentical), clomiphene (clomid), enclomiphene, hcg (human chorionic gonadotropin), gonadorelin, anastrazole (arimadex), or to any of its ingredients?",
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
             "options": [
               {
-                "id": "084d92b6-32f6-4c86-932d-6135b112a88f",
-                "label": "Lose 5 to 20 lbs",
-                "value": "5-20"
-              },
-              {
-                "id": "8163f76f-5e24-4023-8631-07634eac8c81",
-                "label": "Lose 21 to 50 lbs",
-                "value": "21-50"
-              },
-              {
-                "id": "64763efb-f44f-41e7-a1ed-de307f2f5441",
-                "label": "Lose 51+ lbs",
-                "value": "51+"
-              },
-              {
-                "id": "ee26833b-b6eb-49b5-8360-706d12b7a68b",
-                "label": "I'm not sure yet",
-                "value": "unsure"
-              }
-            ],
-            "uuid": "a775a4da-b947-4b4b-8067-df8b462ca634"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 2",
-        "uuid": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ac",
-        "items": [
-          {
-            "type": "html",
-            "html": "<div class=\"w-full max-w-3xl mx-auto py-8 px-4\"> <div class=\"flex w-full flex-col gap-1\">\n    <h4 class=\"text-gray-900 text-3xl font-regular\">\n      <p class=\"mb-6\"> Losing 5 to 20 lbs is closer than you think, and it doesn't require calorie counting, or a workout routine.\n      </p>\n      <p class=\"mb-6\"> To find out if you’re eligible for treatment, you’ll need to answer some questions about your goals, lifestyle and health history.\n      </p>\n      <p>\n        Ready?\n      </p>\n    </h4>\n  </div>\n</div>",
-            "variableName": "",
-            "className": "",
-            "uuid": "0f165c88-7459-43cb-b674-fe4414c3aaf1"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 3",
-        "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c989",
-        "items": [
-          {
-            "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\">\n  <h2 class=\"text-3xl font-bold text-gray-800 mb-8\">How GLP-1 medication works</h2>\n  <div class=\"space-y-6\">\n    <div class=\"flex items-start space-x-4\">\n      <div class=\"flex-shrink-0\">\n        <svg class=\"w-7 h-7 text-gray-700\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\"></path> <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M7.5 7.5h9M7.5 12h9M7.5 16.5h5\" style=\"stroke-dasharray: 3, 2;\"></path>\n        </svg>\n      </div>\n      <p class=\"text-gray-700 text-base\">\n        Mimics your body's natural hormones to regulate blood sugar & <strong class=\"font-semibold text-gray-900\">reduce appetite</strong>\n      </p>\n    </div>\n    <div class=\"flex items-start space-x-4\">\n      <div class=\"flex-shrink-0\">\n        <svg class=\"w-7 h-7 text-gray-700\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2h10a2 2 0 002-2v-1a2 2 0 012-2h1.945M7.242 4.758A4.962 4.962 0 007.5 4.5c1.381 0 2.5 1.119 2.5 2.5 0 .29-.05.569-.138.829M16.758 4.758A4.962 4.962 0 0116.5 4.5c-1.381 0-2.5 1.119-2.5 2.5 0 .29.05.569.138.829M12 11c0 6.627-5.373 12-12 12s-12-5.373-12-12c0-2.033.54-3.935 1.481-5.57M12 11v0M7.5 11a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z\"></path>\n        </svg>\n      </div>\n      <p class=\"text-gray-700 text-base\">\n        Slows down digestion and delays stomach emptying, <strong class=\"font-semibold text-gray-900\">helping you feel fuller for longer</strong>\n      </p>\n    </div>\n    <div class=\"flex items-start space-x-4\">\n      <div class=\"flex-shrink-0\">\n        <svg class=\"w-7 h-7 text-gray-700\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n          <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 19.128A9.38 9.38 0 0012 21c3.924 0 7.282-2.341 8.733-5.555M15 4.397A9.386 9.386 0 0012 3c-3.924 0-7.282 2.341-8.733 5.555m0 0A9.353 9.353 0 0012 15c2.228 0 4.23-1.03 5.59-2.646m-3.186 0A2.5 2.5 0 1112 10.5a2.5 2.5 0 012.404 1.854z\"></path>\n          <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 12a3 3 0 11-6 0 3 3 0 016 0zm12 0a3 3 0 11-6 0 3 3 0 016 0zM12 6a3 3 0 110-6 3 3 0 010 6zm0 18a3 3 0 110-6 3 3 0 010 6z\"></path>\n        </svg>\n      </div>\n      <p class=\"text-gray-700 text-base\">\n        Acts on brain receptors to <strong class=\"font-semibold text-gray-900\">decrease food cravings</strong> & regulate eating behavior\n      </p>\n    </div>\n  </div>\n</div>",
-            "variableName": "",
-            "className": "",
-            "uuid": "cbfb3099-0e36-4864-b520-e2546d88046b"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 4",
-        "uuid": "1a250ac6-1959-43e2-9238-3e8adaac44f3",
-        "items": [
-          {
-            "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\">\n  <div class=\"flex w-full flex-col gap-2\"> <h4 class=\"text-gray-900 text-3xl font-bold\"> <p>How Ivy works</p>\n    </h4>\n    <div>\n      <div class=\"space-y-6 mt-6\"> <div class=\"flex items-start space-x-4\">\n          <div class=\"flex-shrink-0\">\n            <svg class=\"w-7 h-7 text-gray-700\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z\"></path>\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 13V9m0 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm0 4h.01\"></path>\n            </svg>\n          </div>\n          <p class=\"text-gray-700 text-base\">\n            Fill out this medical questionnaire, 100% online\n          </p>\n        </div>\n\n        <div class=\"flex items-start space-x-4\">\n          <div class=\"flex-shrink-0\">\n            <svg class=\"w-7 h-7 text-gray-700\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01\"></path>\n            </svg>\n          </div>\n          <p class=\"text-gray-700 text-base\">\n            A medical professional will review your answers and evaluate if you are eligible for treatment\n          </p>\n        </div>\n\n        <div class=\"flex items-start space-x-4\">\n          <div class=\"flex-shrink-0\">\n            <svg class=\"w-7 h-7 text-gray-700\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\">\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4\"></path>\n              <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M4 12l8 4 8-4\"></path>\n            </svg>\n          </div>\n          <p class=\"text-gray-700 text-base\">\n            If approved, your medication will be shipped within 48 hours\n          </p>\n        </div>\n\n        <div class=\"pl-11\"> <p class=\"text-gray-600 text-sm\"> Get unlimited access to follow-ups, adjustments, and questions.\n          </p>\n        </div>\n      </div>\n    </div>\n  </div>\n</div>",
-            "variableName": "",
-            "className": "",
-            "uuid": "f1939970-154e-46d0-b3de-8685bc484e8a"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 5",
-        "uuid": "d9a559b2-3add-485f-9b42-7963f1720bda",
-        "items": [
-          {
-            "type": "selectablebox",
-            "fieldName": "boxqb34c",
-            "questionTitle": "Are you currently taking a GLP-1 medication?",
-            "description": "e.g Ozempic, Wegovy, Zepbound, Mounjaro, Semaglutide, Tirzepatide",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "options": [
-              {
-                "id": "b3c006c5-943b-4c68-a097-251b0d63a718",
+                "id": "allergy-yes",
                 "label": "Yes",
                 "value": "yes"
               },
               {
-                "id": "d8d34c20-5e3f-41d3-ac14-e241a639dc13",
+                "id": "allergy-no",
                 "label": "No",
                 "value": "no"
               }
             ],
-            "uuid": "49e06e01-84d1-4d7b-84ef-4c067bda1b23"
-          }
-        ]
-      },
-
-      {
-        "type": "set",
-        "name": "Page 3",
-        "uuid": "d27dc2d5-6046-4fce-bb61-14aa429cdda6",
-        "items": [
-          {
-            "type": "bmiCalculator",
-            "label": "BMI Calculator",
-            "description": "Calculate your Body Mass Index",
-            "fieldName": "bmiResult",
-            "defaultUnit": "metric",
-            "theme": "default",
-            "className": "",
-            "uuid": "ac93f201-0f57-4629-b567-46e13b2ced87",
-            "bmiResult": {
-              "bmi": 24.2,
-              "category": "Normal Weight",
-              "height": 170,
-              "weight": 70,
-              "unitSystem": "metric"
-            }
+            "uuid": "dd060ccd-cab8-49a5-a007-5f5b638c5901",
+            "navigationRules": [
+              {
+                "condition": "allergyHistory == \"yes\"",
+                "target": "disq-allergy-1171-4a9b-b076-209d58b86f23",
+                "isPage": true
+              },
+              {
+                "condition": "allergyHistory == \"no\"",
+                "target": "f6366314-ec4a-4af5-8843-5928b7d8b515",
+                "isPage": true
+              }
+            ]
           }
         ]
       },
       {
         "type": "set",
-        "name": "Page 7",
-        "uuid": "1c14950b-1171-4a9b-b076-209d58b86f0f",
+        "name": "Page 2 - Medication History",
+        "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b515",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "boxqb34c",
-            "questionTitle": "Are you currently, or have you in the past two months, taken any of the following medications?",
+            "fieldName": "medicationHistory",
+            "questionTitle": "Are you currently taking or have you taken any of the following in the past?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
             "options": [
               {
-                "id": "b3c006c5-943b-4c68-a097-251b0d63a718",
-                "label": "Semaglutide (Ozempic, Wegovy, Rybelsus)",
-                "value": "Semaglutide (Ozempic, Wegovy, Rybelsus)"
+                "id": "med-testosterone-injectable",
+                "label": "Testosterone Injectable",
+                "value": "testosterone-injectable"
               },
               {
-                "id": "d8d34c20-5e3f-41d3-ac14-e241a639dc13",
-                "label": "Tirzepatide (Zepbound, Mounjaro)",
-                "value": "Tirzepatide (Zepbound, Mounjaro)"
+                "id": "med-testosterone-topical",
+                "label": "Testosterone Topical (Androgel, Testim, Bioidentical)",
+                "value": "testosterone-topical"
               },
               {
-                "id": "303c68ac-a694-4bf1-86ff-c27b1f954924",
-                "label": "None of these",
-                "value": "None of these"
+                "id": "med-clomiphene",
+                "label": "Clomiphene (Clomid)",
+                "value": "clomiphene"
+              },
+              {
+                "id": "med-enclomiphene",
+                "label": "Enclomiphene",
+                "value": "enclomiphene"
+              },
+              {
+                "id": "med-hcg",
+                "label": "HCG (Human Chorionic Gonadotropin)",
+                "value": "hcg"
+              },
+              {
+                "id": "med-gonadorelin",
+                "label": "Gonadorelin",
+                "value": "gonadorelin"
+              },
+              {
+                "id": "med-anastrazole",
+                "label": "Anastrazole (Arimadex)",
+                "value": "anastrazole"
+              },
+              {
+                "id": "med-none",
+                "label": "No",
+                "value": "none"
               }
             ],
-            "uuid": "54197f31-8da6-450c-af52-5ec8f664f5c8"
+            "uuid": "a775a4da-b947-4b4b-8067-df8b462ca635",
+            "navigationRules": [
+              {
+                "condition": "medicationHistory == \"none\"",
+                "target": "49e06e01-84d1-4d7b-84ef-4c067bda1b24",
+                "isPage": true
+              },
+              {
+                "condition": "medicationHistory != \"none\"",
+                "target": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 3 - Medication Timing",
+        "uuid": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "medicationTiming",
+            "questionTitle": "Are you currently taking this medication, or did you take it previously?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "timing-current",
+                "label": "Currently taking the medication",
+                "value": "current"
+              },
+              {
+                "id": "timing-previous",
+                "label": "Previously took this medication",
+                "value": "previous"
+              }
+            ],
+            "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c990",
+            "navigationRules": [
+              {
+                "condition": "medicationTiming == \"current\" || medicationTiming == \"previous\"",
+                "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 4 - Medication Dose",
+        "uuid": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
+        "items": [
+          {
+            "type": "textfield",
+            "fieldName": "medicationDose",
+            "label": "What dose were you taking, or are you taking currently?",
+            "placeholder": "Enter dosage information",
+            "description": "",
+            "defaultValue": "",
+            "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 5 - Medical Advice",
+        "uuid": "49e06e01-84d1-4d7b-84ef-4c067bda1b24",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "medicalAdvice",
+            "questionTitle": "Have you been advised to avoid hormone replacement due to a medical condition?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "advice-yes",
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "id": "advice-no",
+                "label": "No",
+                "value": "no"
+              }
+            ],
+            "uuid": "ac93f201-0f57-4629-b567-46e13b2ced88",
+            "navigationRules": [
+              {
+                "condition": "medicalAdvice == \"yes\"",
+                "target": "disq-medical-1171-4a9b-b076-209d58b86f24",
+                "isPage": true
+              },
+              {
+                "condition": "medicalAdvice == \"no\"",
+                "target": "1c14950b-1171-4a9b-b076-209d58b86f10",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 6 - Cancer History",
+        "uuid": "1c14950b-1171-4a9b-b076-209d58b86f10",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "cancerHistory",
+            "questionTitle": "Have you ever been diagnosed with prostate, breast, or testicular cancer?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "cancer-yes",
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "id": "cancer-no",
+                "label": "No",
+                "value": "no"
+              }
+            ],
+            "uuid": "54197f31-8da6-450c-af52-5ec8f664f5c9",
+            "navigationRules": [
+              {
+                "condition": "cancerHistory == \"yes\"",
+                "target": "disq-cancer-1171-4a9b-b076-209d58b86f25",
+                "isPage": true
+              },
+              {
+                "condition": "cancerHistory == \"no\"",
+                "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 7 - Polycythemia",
+        "uuid": "e1c14950b-1171-4a9b-b076-209d58b86f11",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "polycythemia",
+            "questionTitle": "Have you ever been diagnosed with polycythemia (too many red blood cells)?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "poly-yes",
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "id": "poly-no",
+                "label": "No",
+                "value": "no"
+              }
+            ],
+            "uuid": "f4197f31-8da6-450c-af52-5ec8f664f5c0",
+            "navigationRules": [
+              {
+                "condition": "polycythemia == \"yes\"",
+                "target": "disq-poly-1171-4a9b-b076-209d58b86f26",
+                "isPage": true
+              },
+              {
+                "condition": "polycythemia == \"no\"",
+                "target": "g1c14950b-1171-4a9b-b076-209d58b86f12",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 8 - Medical Conditions",
+        "uuid": "g1c14950b-1171-4a9b-b076-209d58b86f12",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "medicalConditions",
+            "questionTitle": "Do you have a personal medical history involving any of the following medical conditions?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "multiSelect": true,
+            "options": [
+              {
+                "id": "condition-cardiovascular",
+                "label": "Cardiovascular (Heart Attack, Stroke, BP, Atrial Fibrillation, etc.)",
+                "value": "cardiovascular"
+              },
+              {
+                "id": "condition-bph",
+                "label": "Benign Prostatic Hyperplasia (BPH)",
+                "value": "bph"
+              },
+              {
+                "id": "condition-hematologic",
+                "label": "Hematologic-bleeding or clotting disorders (Deep Vein Thrombosis (DVT) or Pulmonary Embolism (PE))",
+                "value": "hematologic"
+              },
+              {
+                "id": "condition-hepatic",
+                "label": "Hepatic-Liver conditions (Hepatitis, Jaundice, Liver Dysfunction)",
+                "value": "hepatic"
+              },
+              {
+                "id": "condition-edema",
+                "label": "Edema (Swelling of the legs)",
+                "value": "edema"
+              },
+              {
+                "id": "condition-gynecomastia",
+                "label": "Gynecomastia",
+                "value": "gynecomastia"
+              },
+              {
+                "id": "condition-hypercalcemia",
+                "label": "Hypercalcemia",
+                "value": "hypercalcemia"
+              },
+              {
+                "id": "condition-prolactin",
+                "label": "High Prolactin",
+                "value": "high-prolactin"
+              },
+              {
+                "id": "condition-sleep-apnea",
+                "label": "Untreated or severe sleep apnea",
+                "value": "sleep-apnea"
+              },
+              {
+                "id": "condition-none",
+                "label": "None of the above",
+                "value": "none"
+              }
+            ],
+            "uuid": "h4197f31-8da6-450c-af52-5ec8f664f5c1",
+            "navigationRules": [
+              {
+                "condition": "medicalConditions.includes(\"cardiovascular\") || medicalConditions.includes(\"bph\") || medicalConditions.includes(\"hematologic\") || medicalConditions.includes(\"hepatic\") || medicalConditions.includes(\"edema\") || medicalConditions.includes(\"gynecomastia\") || medicalConditions.includes(\"hypercalcemia\") || medicalConditions.includes(\"high-prolactin\") || medicalConditions.includes(\"sleep-apnea\")",
+                "target": "disq-conditions-1171-4a9b-b076-209d58b86f27",
+                "isPage": true
+              },
+              {
+                "condition": "medicalConditions.includes(\"none\") || !medicalConditions.some(condition => [\"cardiovascular\", \"bph\", \"hematologic\", \"hepatic\", \"edema\", \"gynecomastia\", \"hypercalcemia\", \"high-prolactin\", \"sleep-apnea\"].includes(condition))",
+                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 9 - Symptom Assessment",
+        "uuid": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "libidoRating",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): libido (sex drive)",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "libido-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "libido-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "libido-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "libido-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "libido-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "j4197f31-8da6-450c-af52-5ec8f664f5c2"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 10 - Erection Strength",
+        "uuid": "k1c14950b-1171-4a9b-b076-209d58b86f14",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "erectionStrength",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): erection strength",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "erection-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "erection-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "erection-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "erection-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "erection-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "l4197f31-8da6-450c-af52-5ec8f664f5c3"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 11 - Energy Level",
+        "uuid": "m1c14950b-1171-4a9b-b076-209d58b86f15",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "energyLevel",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): energy level",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "energy-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "energy-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "energy-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "energy-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "energy-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "n4197f31-8da6-450c-af52-5ec8f664f5c4"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 12 - Enjoyment of Life",
+        "uuid": "o1c14950b-1171-4a9b-b076-209d58b86f16",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "enjoymentOfLife",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): enjoyment of life",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "enjoyment-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "enjoyment-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "enjoyment-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "enjoyment-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "enjoyment-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "p4197f31-8da6-450c-af52-5ec8f664f5c5"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 13 - Depression Feelings",
+        "uuid": "q1c14950b-1171-4a9b-b076-209d58b86f17",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "depressionFeelings",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of depression",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "depression-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "depression-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "depression-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "depression-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "depression-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "r4197f31-8da6-450c-af52-5ec8f664f5c6"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 14 - Anxiety Feelings",
+        "uuid": "s1c14950b-1171-4a9b-b076-209d58b86f18",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "anxietyFeelings",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of anxiety",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "anxiety-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "anxiety-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "anxiety-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "anxiety-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "anxiety-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "t4197f31-8da6-450c-af52-5ec8f664f5c7"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 15 - Strength and Endurance",
+        "uuid": "u1c14950b-1171-4a9b-b076-209d58b86f19",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "strengthEndurance",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): strength and/or endurance?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "strength-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "strength-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "strength-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "strength-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "strength-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "v4197f31-8da6-450c-af52-5ec8f664f5c8"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 16 - Sports Ability",
+        "uuid": "w1c14950b-1171-4a9b-b076-209d58b86f20",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "sportsAbility",
+            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): ability to play sports",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "sports-1",
+                "label": "One",
+                "value": "1"
+              },
+              {
+                "id": "sports-2",
+                "label": "Two",
+                "value": "2"
+              },
+              {
+                "id": "sports-3",
+                "label": "Three",
+                "value": "3"
+              },
+              {
+                "id": "sports-4",
+                "label": "Four",
+                "value": "4"
+              },
+              {
+                "id": "sports-5",
+                "label": "Five",
+                "value": "5"
+              }
+            ],
+            "uuid": "x4197f31-8da6-450c-af52-5ec8f664f5c9"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 17 - Height Loss",
+        "uuid": "y1c14950b-1171-4a9b-b076-209d58b86f21",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "heightLoss",
+            "questionTitle": "Have you lost height?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "height-yes",
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "id": "height-no",
+                "label": "No",
+                "value": "no"
+              }
+            ],
+            "uuid": "z4197f31-8da6-450c-af52-5ec8f664f5d0"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 18 - Fertility Concerns",
+        "uuid": "aa1c14950b-1171-4a9b-b076-209d58b86f22",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "fertilityConcerns",
+            "questionTitle": "Are you concerned with the side effects of low sperm count and decreased fertility that can occur with Testosterone?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "options": [
+              {
+                "id": "fertility-yes",
+                "label": "Yes",
+                "value": "yes"
+              },
+              {
+                "id": "fertility-no",
+                "label": "No",
+                "value": "no"
+              }
+            ],
+            "uuid": "bb4197f31-8da6-450c-af52-5ec8f664f5d1",
+            "navigationRules": [
+              {
+                "condition": "fertilityConcerns == \"yes\"",
+                "target": "qualified-enclo-1171-4a9b-b076-209d58b86f29",
+                "isPage": true
+              },
+              {
+                "condition": "fertilityConcerns == \"no\"",
+                "target": "qualified-test-1171-4a9b-b076-209d58b86f28",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Disqualified - Allergy",
+        "uuid": "disq-allergy-1171-4a9b-b076-209d58b86f23",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your allergy history with testosterone or related medications, we cannot safely provide TRT treatment at this time.</p><p class=\"text-sm text-gray-500\">We recommend consulting with your healthcare provider for alternative treatment options.</p></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "disq-allergy-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Disqualified - Medical Condition",
+        "uuid": "disq-medical-1171-4a9b-b076-209d58b86f24",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on medical advice you've received to avoid hormone replacement therapy, we cannot provide TRT treatment at this time.</p><p class=\"text-sm text-gray-500\">Please follow your healthcare provider's recommendations regarding hormone replacement therapy.</p></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "disq-medical-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Disqualified - Cancer History",
+        "uuid": "disq-cancer-1171-4a9b-b076-209d58b86f25",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Due to your history of prostate, breast, or testicular cancer, TRT treatment is not recommended and could be unsafe.</p><p class=\"text-sm text-gray-500\">Please consult with your oncologist for appropriate treatment options.</p></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "disq-cancer-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Disqualified - Polycythemia",
+        "uuid": "disq-poly-1171-4a9b-b076-209d58b86f26",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Your history of polycythemia (high red blood cell count) makes TRT treatment unsafe, as it can further increase red blood cell production.</p><p class=\"text-sm text-gray-500\">Please work with your hematologist to manage your condition.</p></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "disq-poly-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Disqualified - Medical Conditions",
+        "uuid": "disq-conditions-1171-4a9b-b076-209d58b86f27",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your medical history, TRT treatment may not be safe for you at this time. Your existing conditions require careful management.</p><p class=\"text-sm text-gray-500\">Please consult with your healthcare provider about alternative treatment options that are appropriate for your medical conditions.</p></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "disq-conditions-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Qualified - Testosterone Treatment",
+        "uuid": "qualified-test-1171-4a9b-b076-209d58b86f28",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your responses, you appear to be a good candidate for Testosterone Replacement Therapy. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">What happens next:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Medical review of your responses</li><li>• Lab work coordination</li><li>• Treatment plan development</li><li>• Medication delivery setup</li></ul></div></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "qualified-test-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Qualified - Enclomiphene Treatment",
+        "uuid": "qualified-enclo-1171-4a9b-b076-209d58b86f29",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for Enclomiphene</h2><p class=\"text-gray-600 mb-6\">Based on your fertility concerns, we recommend Enclomiphene treatment, which can help boost testosterone while preserving fertility. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Benefits of Enclomiphene:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Increases natural testosterone production</li><li>• Preserves fertility and sperm production</li><li>• Oral medication (no injections)</li><li>• Fewer side effects than traditional TRT</li></ul></div></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "qualified-enclo-html-uuid"
           }
         ]
       }
