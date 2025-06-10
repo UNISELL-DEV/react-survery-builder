@@ -6,6 +6,7 @@ import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { BlockData } from "../../types";
 import { NavigationRulesEditor } from "../../components/common/NavigationRulesEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import CommonBlockRules from "../../components/common/CommonBlockRules";
 
 interface ContentBlockItemProps {
   data: BlockData;
@@ -70,6 +71,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
                 <DialogTitle>Edit {blockDefinition.name}</DialogTitle>
               </DialogHeader>
               <div className="py-4">
+                <CommonBlockRules data={data} onUpdate={onUpdate} />
                 {blockDefinition.renderFormFields({
                   data,
                   onUpdate,

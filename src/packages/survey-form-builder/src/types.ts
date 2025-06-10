@@ -39,6 +39,7 @@ export interface BlockData {
   showResults?: boolean;
   navigationRules?: NavigationRule[];
   visibleIf?: any;
+  isEndBlock?: boolean;
   [key: string]: any;
 }
 
