@@ -174,7 +174,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
                   <p className="mt-1">You can zoom and pan to explore the graph. Hover over nodes to see more details.</p>
                 </div>
                 <div className="flex-grow">
-                  <SurveyGraph rootNode={state.rootNode} height="calc(100vh - 300px)" />
+                  <SurveyGraph rootNode={state.rootNode} />
                 </div>
               </div>
             ) : (
