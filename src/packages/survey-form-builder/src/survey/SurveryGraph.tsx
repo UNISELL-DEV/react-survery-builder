@@ -44,7 +44,7 @@ interface FlowEdge {
 export const SurveyGraph: React.FC<SurveyGraphProps> = ({
   rootNode,
   zoomable = true,
-  height = "600px",
+  height = "500px",
 }) => {
   const { state, updateNode } = useSurveyBuilder();
   const svgRef = useRef<SVGSVGElement>(null);
@@ -67,23 +67,23 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
   // Color scheme for different node types
   const getNodeColorByType = (type: string) => {
     const colorMap: Record<string, any> = {
-      'section': { fill: '#dbeafe', stroke: '#3b82f6', darkFill: '#1e3a8a', darkStroke: '#60a5fa' },
-      'set': { fill: '#dcfce7', stroke: '#22c55e', darkFill: '#14532d', darkStroke: '#4ade80' },
-      'page': { fill: '#dcfce7', stroke: '#22c55e', darkFill: '#14532d', darkStroke: '#4ade80' },
-      'selectablebox': { fill: '#fef3c7', stroke: '#f59e0b', darkFill: '#78350f', darkStroke: '#fbbf24' },
-      'textfield': { fill: '#e0e7ff', stroke: '#6366f1', darkFill: '#312e81', darkStroke: '#818cf8' },
-      'html': { fill: '#fce7f3', stroke: '#ec4899', darkFill: '#831843', darkStroke: '#f472b6' },
-      'button': { fill: '#f3e8ff', stroke: '#a855f7', darkFill: '#581c87', darkStroke: '#c084fc' },
+      'section': { fill: '#f0f9ff', stroke: '#0ea5e9', darkFill: '#0c4a6e', darkStroke: '#38bdf8' },
+      'set': { fill: '#f0fdf4', stroke: '#22c55e', darkFill: '#14532d', darkStroke: '#4ade80' },
+      'page': { fill: '#f0fdf4', stroke: '#22c55e', darkFill: '#14532d', darkStroke: '#4ade80' },
+      'selectablebox': { fill: '#fefce8', stroke: '#eab308', darkFill: '#713f12', darkStroke: '#facc15' },
+      'textfield': { fill: '#faf5ff', stroke: '#a855f7', darkFill: '#581c87', darkStroke: '#c084fc' },
+      'html': { fill: '#fdf2f8', stroke: '#ec4899', darkFill: '#831843', darkStroke: '#f472b6' },
+      'button': { fill: '#f3e8ff', stroke: '#8b5cf6', darkFill: '#5b21b6', darkStroke: '#a78bfa' },
       'checkbox': { fill: '#ecfdf5', stroke: '#10b981', darkFill: '#064e3b', darkStroke: '#34d399' },
       'radio': { fill: '#fff7ed', stroke: '#f97316', darkFill: '#7c2d12', darkStroke: '#fb923c' },
       'textarea': { fill: '#f0f9ff', stroke: '#0ea5e9', darkFill: '#0c4a6e', darkStroke: '#38bdf8' },
       'date': { fill: '#fef2f2', stroke: '#ef4444', darkFill: '#7f1d1d', darkStroke: '#f87171' },
       'time': { fill: '#f5f3ff', stroke: '#8b5cf6', darkFill: '#5b21b6', darkStroke: '#a78bfa' },
       'number': { fill: '#fefce8', stroke: '#eab308', darkFill: '#713f12', darkStroke: '#facc15' },
-      'block': { fill: '#fff4e8', stroke: '#ffd7a8', darkFill: '#78350f', darkStroke: '#fbbf24' },
+      'block': { fill: '#f8fafc', stroke: '#64748b', darkFill: '#334155', darkStroke: '#94a3b8' },
     };
 
-    return colorMap[type] || { fill: '#f3f4f6', stroke: '#9ca3af', darkFill: '#374151', darkStroke: '#6b7280' };
+    return colorMap[type] || { fill: '#f8fafc', stroke: '#64748b', darkFill: '#334155', darkStroke: '#94a3b8' };
   };
 
   // Collect all field names and targets for navigation rules
@@ -473,7 +473,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
 
   // Save navigation rules
   const saveNavigationRules = (nodeId: string, rules: NavigationRule[]) => {
-    // Update edges
+    // Update edges for visual representation
     setEdges(prev => {
       const otherEdges = prev.filter(e => e.source !== nodeId);
       const newEdges = rules.map(rule => ({
@@ -487,9 +487,22 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
     });
 
     // Update the actual node data in context
-    if (updateNode) {
-      const selectedNodeData = nodes.find(n => n.id === nodeId);
-      if (selectedNodeData?.data.originalData) {
+    const selectedNodeData = nodes.find(n => n.id === nodeId);
+    if (selectedNodeData?.data.originalData && updateNode) {
+      // For nodes that have items (new structure), update the first item's navigation rules
+      if (selectedNodeData.data.originalData.items && selectedNodeData.data.originalData.items.length > 0) {
+        const updatedItems = [...selectedNodeData.data.originalData.items];
+        updatedItems[0] = {
+          ...updatedItems[0],
+          navigationRules: rules
+        };
+        
+        updateNode(nodeId, {
+          ...selectedNodeData.data.originalData,
+          items: updatedItems
+        });
+      } else {
+        // For nodes without items, update the node directly
         updateNode(nodeId, {
           ...selectedNodeData.data.originalData,
           navigationRules: rules
@@ -497,6 +510,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
       }
     }
 
+    // Update visual nodes
     setNodes(prev => prev.map(node => {
       if (node.id === nodeId) {
         return {
@@ -643,75 +657,134 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                   handleMouseDown(e, node.id);
                 }}
               >
-                {/* Node shadow and selection */}
-                <rect
-                  x="-4"
-                  y="-4"
-                  width={node.width + 8}
-                  height={node.height + 8}
-                  rx="8"
-                  fill="none"
-                  stroke={isSelected ? (isDarkMode ? '#3b82f6' : '#2563eb') : 'transparent'}
-                  strokeWidth="3"
-                  filter={isSelected ? 'url(#shadow)' : ''}
-                />
+                {/* Node shadow and selection glow */}
+                {isSelected && (
+                  <rect
+                    x="-6"
+                    y="-6"
+                    width={node.width + 12}
+                    height={node.height + 12}
+                    rx="12"
+                    fill="none"
+                    stroke={isDarkMode ? '#3b82f6' : '#2563eb'}
+                    strokeWidth="2"
+                    opacity="0.6"
+                    filter="url(#shadow)"
+                  />
+                )}
                 
-                {/* Node background */}
+                {/* Node main background */}
                 <rect
                   width={node.width}
                   height={node.height}
-                  rx="6"
+                  rx="8"
                   fill={isDarkMode ? colors.darkFill : colors.fill}
                   stroke={isDarkMode ? colors.darkStroke : colors.stroke}
-                  strokeWidth="2"
+                  strokeWidth={isSelected ? "2" : "1"}
                   filter="url(#shadow)"
                 />
                 
-                {/* Node header */}
+                {/* Gradient overlay for depth */}
+                <defs>
+                  <linearGradient id={`gradient-${node.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.1)" />
+                    <stop offset="100%" stopColor="rgba(0,0,0,0.05)" />
+                  </linearGradient>
+                </defs>
                 <rect
                   width={node.width}
-                  height="30"
-                  rx="6"
-                  fill={isDarkMode ? colors.darkStroke : colors.stroke}
-                  opacity="0.2"
+                  height={node.height}
+                  rx="8"
+                  fill={`url(#gradient-${node.id})`}
                 />
                 
-                {/* Node content */}
+                {/* Node header bar */}
+                <rect
+                  width={node.width}
+                  height="28"
+                  rx="8"
+                  fill={isDarkMode ? colors.darkStroke : colors.stroke}
+                  opacity="0.15"
+                />
+                
+                {/* Node type badge */}
+                <rect
+                  x="8"
+                  y="6"
+                  width="auto"
+                  height="16"
+                  rx="8"
+                  fill={isDarkMode ? colors.darkStroke : colors.stroke}
+                  opacity="0.8"
+                />
+                
+                {/* Node type text */}
                 <text
                   x="12"
-                  y="20"
-                  className="text-xs font-medium"
-                  fill={isDarkMode ? '#f3f4f6' : '#374151'}
+                  y="17"
+                  className="text-xs font-semibold"
+                  fill="white"
                 >
-                  {node.data.nodeType.toUpperCase()} - {node.data.itemType}
+                  {node.data.itemType.toUpperCase()}
                 </text>
                 
+                {/* Node title */}
                 <text
                   x="12"
-                  y="50"
-                  className="text-sm font-semibold"
-                  fill={isDarkMode ? '#f3f4f6' : '#111827'}
+                  y="48"
+                  className="text-sm font-bold"
+                  fill={isDarkMode ? '#f8fafc' : '#1e293b'}
                 >
-                  {node.data.label.length > 25 ? node.data.label.substring(0, 22) + '...' : node.data.label}
+                  {node.data.label.length > 22 ? node.data.label.substring(0, 19) + '...' : node.data.label}
                 </text>
                 
+                {/* Node description */}
                 {node.data.description && (
                   <text
                     x="12"
-                    y="70"
+                    y="68"
                     className="text-xs"
-                    fill={isDarkMode ? '#d1d5db' : '#4b5563'}
+                    fill={isDarkMode ? '#cbd5e1' : '#64748b'}
                   >
-                    {node.data.description.length > 35 ? node.data.description.substring(0, 32) + '...' : node.data.description}
+                    {node.data.description.length > 30 ? node.data.description.substring(0, 27) + '...' : node.data.description}
                   </text>
                 )}
                 
-                {/* Conditional flow indicator */}
-                {node.data.hasConditionalFlow && (
-                  <g transform={`translate(${node.width - 30}, 10)`}>
-                    <circle cx="10" cy="10" r="10" fill={isDarkMode ? '#fb923c' : '#f97316'} opacity="0.2" />
-                    <ChevronRight className="w-5 h-5" x="7.5" y="7.5" stroke={isDarkMode ? '#fb923c' : '#f97316'} />
-                  </g>
+                {/* Status indicators */}
+                <g transform={`translate(${node.width - 40}, 8)`}>
+                  {/* Conditional flow indicator */}
+                  {node.data.hasConditionalFlow && (
+                    <g>
+                      <circle 
+                        cx="12" 
+                        cy="12" 
+                        r="10" 
+                        fill={isDarkMode ? '#fb7185' : '#f43f5e'} 
+                        opacity="0.2" 
+                      />
+                      <path
+                        d="M8 12l3 3 6-6"
+                        stroke={isDarkMode ? '#fb7185' : '#f43f5e'}
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </g>
+                  )}
+                </g>
+                
+                {/* Interaction hint for selected node */}
+                {isSelected && (
+                  <text
+                    x={node.width / 2}
+                    y={node.height + 20}
+                    textAnchor="middle"
+                    className="text-xs"
+                    fill={isDarkMode ? '#94a3b8' : '#64748b'}
+                  >
+                    Click settings to edit rules
+                  </text>
                 )}
               </g>
             );
@@ -721,72 +794,118 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
 
       {/* Controls */}
       {zoomable && (
-        <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 rounded-md shadow-sm border flex">
-          <button
-            onClick={() => handleZoom(0.1)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 border-r"
-            title="Zoom In"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleZoom(-0.1)}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 border-r"
-            title="Zoom Out"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleFitView}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 border-r"
-            title="Fit View"
-          >
-            <Maximize2 className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setCursorMode(cursorMode === 'select' ? 'pan' : 'select')}
-            className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-700 ${cursorMode === 'pan' ? 'bg-blue-100 dark:bg-blue-900' : ''}`}
-            title={cursorMode === 'select' ? 'Switch to Pan Mode' : 'Switch to Select Mode'}
-          >
-            {cursorMode === 'select' ? <Move className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
-          </button>
+        <div className="absolute bottom-4 left-4 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-2">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => handleZoom(0.1)}
+              className="flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all"
+              title="Zoom In"
+            >
+              <ZoomIn className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => handleZoom(-0.1)}
+              className="flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all"
+              title="Zoom Out"
+            >
+              <ZoomOut className="w-4 h-4" />
+            </button>
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+            <button
+              onClick={handleFitView}
+              className="flex items-center justify-center w-8 h-8 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all"
+              title="Fit View"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+            <button
+              onClick={() => setCursorMode(cursorMode === 'select' ? 'pan' : 'select')}
+              className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
+                cursorMode === 'pan' 
+                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' 
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+              }`}
+              title={cursorMode === 'select' ? 'Switch to Pan Mode (or hold Space)' : 'Switch to Select Mode'}
+            >
+              {cursorMode === 'select' ? <Move className="w-4 h-4" /> : <MousePointer className="w-4 h-4" />}
+            </button>
+          </div>
+          
+          {/* Zoom level indicator */}
+          <div className="text-center mt-2">
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+              {Math.round(zoom * 100)}%
+            </span>
+          </div>
         </div>
       )}
 
       {/* Info Panel */}
       {selectedNode && selectedNodeData && (
-        <div className="absolute top-4 right-4 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border p-3">
-          <div className="flex justify-between items-start mb-3">
-            <h3 className="text-sm font-semibold">Node Details</h3>
-            <button
-              onClick={() => setEditingRules(selectedNode)}
-              className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="space-y-2">
-            <div>
-              <label className="text-xs text-gray-500 dark:text-gray-400">Name</label>
-              <p className="text-sm">{selectedNodeData.data.label}</p>
+        <div className="absolute top-4 right-4 w-72 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-t-xl border-b border-gray-200/50 dark:border-gray-600/50">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">Node Details</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Click to configure</p>
+              </div>
+              <button
+                onClick={() => setEditingRules(selectedNode)}
+                className="flex items-center gap-1 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-md transition-colors"
+              >
+                <Settings className="w-3 h-3" />
+                Edit
+              </button>
             </div>
+          </div>
+          
+          {/* Content */}
+          <div className="p-4 space-y-4">
             <div>
-              <label className="text-xs text-gray-500 dark:text-gray-400">Type</label>
-              <div className="flex gap-1">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Name</label>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white mt-1">{selectedNodeData.data.label}</p>
+            </div>
+            
+            <div>
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Type</label>
+              <div className="flex gap-2 mt-1">
+                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border">
                   {selectedNodeData.data.nodeType}
                 </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                   {selectedNodeData.data.itemType}
                 </span>
               </div>
             </div>
+            
             {selectedNodeData.data.description && (
               <div>
-                <label className="text-xs text-gray-500 dark:text-gray-400">Description</label>
-                <p className="text-xs">{selectedNodeData.data.description.length > 50 ? selectedNodeData.data.description.substring(0, 47) + '...' : selectedNodeData.data.description}</p>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Description</label>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
+                  {selectedNodeData.data.description.length > 80 ? selectedNodeData.data.description.substring(0, 77) + '...' : selectedNodeData.data.description}
+                </p>
               </div>
             )}
+            
+            {/* Status */}
+            <div>
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Status</label>
+              <div className="flex items-center gap-2 mt-1">
+                {selectedNodeData.data.hasConditionalFlow ? (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    Has Rules
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    Sequential
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -797,11 +916,17 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
           data={selectedNodeData.data.originalData}
           nodeId={editingRules}
           nodeName={selectedNodeData.data.label}
-          navigationRules={edges.filter(e => e.source === editingRules).map(e => ({
-            condition: e.label === 'default' ? 'true' : (e.label || ''),
-            target: e.target,
-            isDefault: e.label === 'default' || !e.isConditional,
-          }))}
+          navigationRules={(() => {
+            // Extract navigation rules from the correct location
+            const originalData = selectedNodeData.data.originalData;
+            if (originalData.items && originalData.items.length > 0 && originalData.items[0].navigationRules) {
+              return originalData.items[0].navigationRules;
+            }
+            if (originalData.navigationRules) {
+              return originalData.navigationRules;
+            }
+            return [];
+          })()}
           availableFields={fieldNames}
           availableTargets={targets}
           onSave={(rules: NavigationRule[]) => saveNavigationRules(editingRules, rules)}
