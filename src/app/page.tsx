@@ -951,7 +951,7 @@ export default function FormRendererExample() {
                         theme={activeTheme as any}
                         enableDebug={false}
                         progressBar={{
-                            type: 'bar',
+                            type: 'percentage',
                             showPercentage: true,
                             showStepInfo: true,
                             position: 'top',

@@ -1,3 +1,4 @@
+// Enhanced SurveyFormContext with Navigation History
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
@@ -18,8 +19,25 @@ import {
   getNextStepFromNavigationRules
 } from "../utils/conditionalUtils";
 
+// Navigation history entry
+interface NavigationHistoryEntry {
+  pageIndex: number;
+  blockIndex: number;
+  timestamp: number;
+  trigger: 'forward' | 'back' | 'jump' | 'initial';
+}
+
+// Enhanced context interface
+interface EnhancedSurveyFormContextProps extends SurveyFormContextProps {
+  navigationHistory: NavigationHistoryEntry[];
+  canGoBack: boolean;
+  getActualProgress: () => number; // Returns percentage of actual progress
+  getTotalVisibleSteps: () => number;
+  getCurrentStepPosition: () => number;
+}
+
 // Create context with default values
-export const SurveyFormContext = createContext<SurveyFormContextProps>({
+export const SurveyFormContext = createContext<EnhancedSurveyFormContextProps>({
   values: {},
   setValue: () => {},
   errors: {},
@@ -40,10 +58,7 @@ export const SurveyFormContext = createContext<SurveyFormContextProps>({
   language: "en",
   setLanguage: () => {},
   theme: "default",
-  surveyData: { rootNode: {
-    type: ""
-  } },
-  // Default values for new conditional props
+  surveyData: { rootNode: { type: "" } },
   conditionalErrors: {},
   computedValues: {},
   updateComputedValues: () => {},
@@ -51,6 +66,12 @@ export const SurveyFormContext = createContext<SurveyFormContextProps>({
   getNextPageIndex: () => null,
   getVisibleBlocks: () => [],
   validateField: () => null,
+  // Enhanced navigation props
+  navigationHistory: [],
+  canGoBack: false,
+  getActualProgress: () => 0,
+  getTotalVisibleSteps: () => 0,
+  getCurrentStepPosition: () => 0,
 });
 
 // Props for the provider
@@ -65,11 +86,10 @@ interface SurveyFormProviderProps {
   onPageChange?: (pageIndex: number, totalPages: number) => void;
   language?: string;
   theme?: SurveyTheme;
-  // New properties for conditional features
   computedFields?: ComputedFieldsConfig;
   customValidators?: Record<string, CustomValidator>;
   debug?: boolean;
-  enableDebug? : boolean;
+  enableDebug?: boolean;
 }
 
 // Provider component
@@ -96,34 +116,141 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState(language);
+  
+  // Navigation history state
+  const [navigationHistory, setNavigationHistory] = useState<NavigationHistoryEntry[]>([
+    {
+      pageIndex: 0,
+      blockIndex: 0,
+      timestamp: Date.now(),
+      trigger: 'initial'
+    }
+  ]);
 
   // Get all pages from the survey
   const pages = getSurveyPages(surveyData.rootNode);
   const pageIds = getSurveyPageIds(surveyData.rootNode);
-  const totalPages = Math.max(1, pages.length); // Ensure we always have at least 1 page
-
-  // Log pages for debugging
-  useEffect(() => {
-    if (debug) {
-      console.log(`Survey has ${totalPages} pages:`, pages);
-    }
-  }, [surveyData, totalPages, debug]);
+  const totalPages = Math.max(1, pages.length);
 
   // Navigation states
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
+  const canGoBack = navigationHistory.length > 1;
 
+  // Handle browser back/forward for mobile
   useEffect(() => {
-    setCurrentBlockIndex(0);
-  }, [currentPage]);
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      
+      // Check if we have navigation history to go back to
+      if (canGoBack) {
+        goToPreviousBlock();
+      } else {
+        // If no history, allow normal browser behavior
+        // This will exit the app on mobile or go back in browser
+        window.history.back();
+      }
+    };
 
-  // Update computed values whenever form values change
+    // Add state to browser history to intercept back button
+    window.history.pushState({ surveyPage: currentPage, surveyBlock: currentBlockIndex }, '');
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [currentPage, currentBlockIndex, canGoBack]);
+
+  // Add navigation entry to history
+  const addToNavigationHistory = useCallback((
+    pageIndex: number, 
+    blockIndex: number, 
+    trigger: NavigationHistoryEntry['trigger']
+  ) => {
+    const newEntry: NavigationHistoryEntry = {
+      pageIndex,
+      blockIndex,
+      timestamp: Date.now(),
+      trigger
+    };
+    
+    setNavigationHistory(prev => {
+      // Avoid duplicate consecutive entries
+      const lastEntry = prev[prev.length - 1];
+      if (lastEntry && 
+          lastEntry.pageIndex === pageIndex && 
+          lastEntry.blockIndex === blockIndex) {
+        return prev;
+      }
+      
+      // Keep max 50 entries to prevent memory issues
+      const newHistory = [...prev, newEntry];
+      return newHistory.slice(-50);
+    });
+  }, []);
+
+  // Get visible blocks for current state
+  const getVisibleBlocks = useCallback((blocks: BlockData[]): BlockData[] => {
+    return blocks.filter(block => {
+      if (!block.visibleIf) return true;
+      return isBlockVisible(block, { ...values, ...computedValues });
+    });
+  }, [values, computedValues]);
+
+  // Calculate total visible steps across all pages
+  const getTotalVisibleSteps = useCallback((): number => {
+    return pages.reduce((total, pageBlocks) => {
+      const visibleBlocks = getVisibleBlocks(pageBlocks);
+      return total + visibleBlocks.length;
+    }, 0);
+  }, [pages, getVisibleBlocks]);
+
+  // Get current step position (0-based index of current step across all visible steps)
+  const getCurrentStepPosition = useCallback((): number => {
+    let position = 0;
+    
+    // Count visible steps in previous pages
+    for (let i = 0; i < currentPage; i++) {
+      const visibleBlocks = getVisibleBlocks(pages[i] || []);
+      position += visibleBlocks.length;
+    }
+    
+    // Add current block index within current page (only counting visible blocks)
+    const currentPageBlocks = pages[currentPage] || [];
+    const visibleCurrentPageBlocks = getVisibleBlocks(currentPageBlocks);
+    const currentBlockInVisibleBlocks = visibleCurrentPageBlocks.findIndex(
+      (block, index) => {
+        // Find the actual index of current block in visible blocks
+        const actualIndex = currentPageBlocks.findIndex(b => b.uuid === block.uuid);
+        return actualIndex === currentBlockIndex;
+      }
+    );
+    
+    if (currentBlockInVisibleBlocks >= 0) {
+      position += currentBlockInVisibleBlocks;
+    }
+    
+    return position;
+  }, [currentPage, currentBlockIndex, pages, getVisibleBlocks]);
+
+  // Get actual progress percentage based on visible steps completed
+  const getActualProgress = useCallback((): number => {
+    const totalSteps = getTotalVisibleSteps();
+    const currentPosition = getCurrentStepPosition();
+    
+    if (totalSteps === 0) return 0;
+    
+    // Add 1 to current position because we're calculating completion of current step
+    return Math.min(100, ((currentPosition + 1) / totalSteps) * 100);
+  }, [getTotalVisibleSteps, getCurrentStepPosition]);
+
+  // Rest of the existing context logic (setValue, setError, etc.)
   const updateComputedValues = useCallback(() => {
     if (Object.keys(computedFields).length === 0) return;
 
     const newComputedValues: Record<string, any> = {};
 
-    // Execute each calculation rule
     Object.entries(computedFields).forEach(([fieldName, config]) => {
       const result = executeCalculation(
         {
@@ -134,21 +261,17 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         { ...values, ...computedValues }
       );
 
-      // Apply formatting if specified
       newComputedValues[fieldName] = config.format ? config.format(result) : result;
     });
 
     setComputedValues(prev => ({ ...prev, ...newComputedValues }));
   }, [values, computedValues, computedFields]);
 
-  // Update computed values when dependencies change
   useEffect(() => {
     updateComputedValues();
   }, [values, updateComputedValues]);
 
-  // Evaluate a condition with current values
   const evaluateConditionWithContext = useCallback((condition: string, contextData?: Record<string, any>) => {
-    // Combine form values, computed values, and any additional context data
     const contextValues = {
       ...values,
       ...computedValues,
@@ -158,25 +281,10 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     return evaluateCondition(condition, contextValues);
   }, [values, computedValues]);
 
-  // Get visible blocks based on visibility conditions
-  const getVisibleBlocks = useCallback((blocks: BlockData[]): BlockData[] => {
-    return blocks.filter(block => {
-      // Check if the block has a visibility condition
-      if (!block.visibleIf) return true;
-
-      // Evaluate the visibility condition
-      return isBlockVisible(block, { ...values, ...computedValues });
-    });
-  }, [values, computedValues]);
-
-  // Get the next page index based on branching logic
   const getNextPageIndex = useCallback((): number | null => {
     const currentPageBlocks = pages[currentPage] || [];
-
-    // Check if there's a branching logic defined for the current page
     let branchingLogic: BranchingLogic | undefined;
 
-    // Look for branching logic in the first set block if this is a set page
     if (currentPageBlocks.length > 0) {
       const firstBlock = currentPageBlocks[0];
       if (typeof firstBlock === 'object' && firstBlock.branchingLogic) {
@@ -185,7 +293,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
 
     if (!branchingLogic) {
-      // Check if there's a branching logic at the page level
       const page = pages[currentPage];
       if (Array.isArray(page) && page.length > 0) {
         const setParent = page[0];
@@ -195,7 +302,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       }
     }
 
-    // If we found branching logic, use it to determine the next page
     if (branchingLogic) {
       const nextIndex = calculateNextPageIndex(
         currentPage,
@@ -204,15 +310,13 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         totalPages
       );
 
-      // Special case: -1 indicates submission
       if (nextIndex === -1) {
-        return null; // Signal submission
+        return null;
       }
 
       return nextIndex;
     }
 
-    // Check navigation rules on blocks
     const navIndex = getNextPageFromNavigationRules(
       currentPageBlocks,
       pages,
@@ -223,18 +327,14 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       return navIndex === -1 ? null : navIndex;
     }
 
-    // Default to next page
     return currentPage + 1 < totalPages ? currentPage + 1 : null;
   }, [currentPage, pages, totalPages, values, computedValues]);
 
-  // Validate a field with custom validators
   const validateField = useCallback((fieldName: string, value: any): string | null => {
-    // Check if we have a custom validator for this field
     const validator = customValidators[fieldName];
     if (!validator) return null;
 
     try {
-      // Run the synchronous validation
       const error = validator.validate(value, { ...values, ...computedValues });
       return error;
     } catch (error) {
@@ -243,7 +343,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   }, [customValidators, values, computedValues]);
 
-  // Calculate if the current page is valid (no errors)
+  // Calculate if the current page is valid
   const currentPageBlocks = pages[currentPage] || [];
   const visibleCurrentPageBlocks = getVisibleBlocks(currentPageBlocks);
   const currentPageFields = visibleCurrentPageBlocks
@@ -252,15 +352,14 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
 
   const isValid = currentPageFields.every(field => !errors[field] && !conditionalErrors[field]);
 
-  // Handle value change for a field
+  // Enhanced setValue with navigation history
   const setValue = (field: string, value: any) => {
     setValues(prev => {
       const updatedValues = { ...prev, [field]: value };
 
-      // Run exit logic validation if it exists
+      // Existing validation logic...
       const currentPageItem = pages[currentPage];
       if (Array.isArray(currentPageItem) && currentPageItem.length > 0) {
-        // Assuming the first item could be a set with exitLogic
         const setParent = currentPageItem[0];
         if (typeof setParent === 'object' && setParent.exitLogic) {
           try {
@@ -279,7 +378,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         }
       }
 
-      // Run custom validator if exists
       const validationError = validateField(field, value);
       if (validationError) {
         setConditionalErrors(prev => ({ ...prev, [field]: validationError }));
@@ -291,7 +389,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         });
       }
 
-      // Notify parent of change
       if (onChange) {
         onChange(updatedValues);
       }
@@ -300,7 +397,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     });
   };
 
-  // Handle setting an error for a field
   const setError = (field: string, error: string | null) => {
     setErrors(prev => {
       if (error === null) {
@@ -312,13 +408,18 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     });
   };
 
-  // Navigation functions
+  // Enhanced navigation functions
   const goToPage = (pageIndex: number) => {
     if (pageIndex >= 0 && pageIndex < totalPages) {
+      // Add to navigation history
+      addToNavigationHistory(pageIndex, 0, 'jump');
+      
       setCurrentPage(pageIndex);
       setCurrentBlockIndex(0);
 
-      // Notify parent of page change
+      // Update browser history
+      window.history.pushState({ surveyPage: pageIndex, surveyBlock: 0 }, '');
+
       if (onPageChange) {
         onPageChange(pageIndex, totalPages);
       }
@@ -342,8 +443,15 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
 
     if (target) {
+      // Add to navigation history
+      addToNavigationHistory(target.pageIndex, target.blockIndex, 'forward');
+      
       setCurrentPage(target.pageIndex);
       setCurrentBlockIndex(target.blockIndex);
+      
+      // Update browser history
+      window.history.pushState({ surveyPage: target.pageIndex, surveyBlock: target.blockIndex }, '');
+      
       if (onPageChange) {
         onPageChange(target.pageIndex, totalPages);
       }
@@ -351,7 +459,12 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
 
     if (currentBlockIndex < pageBlocks.length - 1) {
-      setCurrentBlockIndex(currentBlockIndex + 1);
+      const newBlockIndex = currentBlockIndex + 1;
+      addToNavigationHistory(currentPage, newBlockIndex, 'forward');
+      setCurrentBlockIndex(newBlockIndex);
+      
+      // Update browser history
+      window.history.pushState({ surveyPage: currentPage, surveyBlock: newBlockIndex }, '');
       return;
     }
 
@@ -359,22 +472,35 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     if (nextIndex === null) {
       submit();
     } else {
+      addToNavigationHistory(nextIndex, 0, 'forward');
       goToPage(nextIndex);
     }
   };
 
+  // Enhanced goToPreviousBlock using navigation history
   const goToPreviousBlock = () => {
-    if (currentBlockIndex > 0) {
-      setCurrentBlockIndex(currentBlockIndex - 1);
-      return;
+    if (navigationHistory.length <= 1) {
+      return; // No history to go back to
     }
-    if (!isFirstPage) {
-      const prevPage = currentPage - 1;
-      const prevBlocks = pages[prevPage] || [];
-      setCurrentPage(prevPage);
-      setCurrentBlockIndex(prevBlocks.length > 0 ? prevBlocks.length - 1 : 0);
+
+    // Remove current entry and get previous entry
+    const newHistory = [...navigationHistory];
+    newHistory.pop(); // Remove current position
+    const previousEntry = newHistory[newHistory.length - 1];
+
+    if (previousEntry) {
+      setNavigationHistory(newHistory);
+      setCurrentPage(previousEntry.pageIndex);
+      setCurrentBlockIndex(previousEntry.blockIndex);
+
+      // Update browser history
+      window.history.pushState({ 
+        surveyPage: previousEntry.pageIndex, 
+        surveyBlock: previousEntry.blockIndex 
+      }, '');
+
       if (onPageChange) {
-        onPageChange(prevPage, totalPages);
+        onPageChange(previousEntry.pageIndex, totalPages);
       }
     }
   };
@@ -387,14 +513,12 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     goToPreviousBlock();
   };
 
-  // Handle form submission
+  // Enhanced submit function
   const submit = async () => {
     setIsSubmitting(true);
 
-    // Update computed values one last time before submission
     updateComputedValues();
 
-    // Validate all fields one last time
     let hasErrors = false;
     const allFields = pages.flat()
       .filter(block => block.fieldName)
@@ -403,7 +527,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     const newErrors: Record<string, string> = {};
     const newConditionalErrors: Record<string, string> = {};
 
-    // Run validators for all fields
     allFields.forEach(field => {
       const value = values[field];
       const validationError = validateField(field, value);
@@ -415,11 +538,9 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
 
     setConditionalErrors(newConditionalErrors);
 
-    // Check if there are any errors
     if (!hasErrors && Object.keys(errors).length === 0) {
       if (onSubmit) {
         try {
-          // Combine form values and computed values for submission
           const submissionData = {
             ...values,
             ...computedValues
@@ -458,7 +579,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         setLanguage: setCurrentLanguage,
         theme,
         surveyData,
-        // New conditional features
         conditionalErrors,
         computedValues,
         updateComputedValues,
@@ -466,6 +586,12 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         getNextPageIndex,
         getVisibleBlocks,
         validateField,
+        // Enhanced navigation properties
+        navigationHistory,
+        canGoBack,
+        getActualProgress,
+        getTotalVisibleSteps,
+        getCurrentStepPosition,
       }}
     >
       {children}

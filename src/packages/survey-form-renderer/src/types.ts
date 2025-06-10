@@ -198,3 +198,21 @@ export interface EvaluationResult {
   isPage: boolean | null;
   error?: any;
 }
+
+export interface MobileNavigationConfig {
+    enableSwipeNavigation?: boolean;
+    enableDoubleTapToGoBack?: boolean;
+    showMobileBackButton?: boolean;
+    preventBrowserBack?: boolean;
+    swipeThreshold?: number; // Minimum distance for swipe gesture
+}
+
+export interface SwipeDirection {
+    direction: 'left' | 'right' | 'up' | 'down' | null;
+    distance: number;
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+}
+  

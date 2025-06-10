@@ -108,7 +108,6 @@ export {
   // Utility functions
   evaluateLogic,
   getSurveyPages,
-  getSurveyPageIds,
   getLocalized,
   getThemeClass,
   formatFieldName,
