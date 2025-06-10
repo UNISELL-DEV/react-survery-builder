@@ -187,3 +187,14 @@ export interface CalculationRule {
   dependencies: string[];
   runOn?: 'change' | 'blur' | 'submit' | 'pageChange';
 }
+
+export interface CurrentValues {
+  [key: string]: string | number | boolean;
+}
+
+export interface EvaluationResult {
+  matched: boolean;
+  target: string | null;
+  isPage: boolean | null;
+  error?: any;
+}

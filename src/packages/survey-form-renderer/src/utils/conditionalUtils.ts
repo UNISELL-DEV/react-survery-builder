@@ -3,6 +3,9 @@ import type {
   ConditionOperator,
   BranchingLogic,
   CalculationRule,
+  NavigationRule,
+  CurrentValues,
+  EvaluationResult,
 } from '../types';
 import type { BlockData } from '../../../survey-form-builder/src/types';
 
@@ -102,6 +105,120 @@ export function evaluateConditionRule(
     rule.value,
     rule.type
   );
+}
+
+function evaluateNavigationalRule(conditionalRule: NavigationRule, currentValues: CurrentValues): EvaluationResult {
+  console.log(conditionalRule)
+  console.log(currentValues)
+  try {
+    const { condition, target, isPage } = conditionalRule;
+    
+    // Create a safe evaluation context with only the current values
+    const context = { ...currentValues };
+    
+    // Method 1: Using Function constructor (safer than eval)
+    // This creates a function that returns the result of the condition
+    const evaluator = new Function(...Object.keys(context), `return ${condition}`);
+    const result = evaluator(...Object.values(context));
+    
+    // If condition is true, return the target
+    if (result) {
+      return {
+        matched: true,
+        target: target,
+        isPage: isPage ? true : false
+      };
+    }
+    
+    return {
+      matched: false,
+      target: null,
+      isPage: null
+    };
+    
+  } catch (error) {
+    console.error('Error evaluating condition:', error);
+    return {
+      matched: false,
+      target: null,
+      isPage: null,
+      error: error
+    };
+  }
+}
+
+// Alternative safer method using manual parsing for simple conditions
+function evaluateNavigationalRuleSafe(conditionalRule: NavigationRule, currentValues: CurrentValues): EvaluationResult {
+  try {
+    const { condition, target, isPage } = conditionalRule;
+    
+    // Parse simple conditions like "field == value" or "field != value"
+    const operatorRegex: RegExp = /(.*?)\s*(==|!=|>|<|>=|<=)\s*(.*)/;
+    const match: RegExpMatchArray | null = condition.match(operatorRegex);
+    
+    if (!match) {
+      throw new Error('Unsupported condition format');
+    }
+    
+    const [, leftSide, operator, rightSide]: string[] = match;
+    const fieldName: string = leftSide.trim();
+    
+    // Remove quotes from string values
+    let expectedValue: string = rightSide.trim();
+    if ((expectedValue.startsWith('"') && expectedValue.endsWith('"')) ||
+        (expectedValue.startsWith("'") && expectedValue.endsWith("'"))) {
+      expectedValue = expectedValue.slice(1, -1);
+    }
+    
+    const currentValue: string | number | boolean = currentValues[fieldName];
+    let result: boolean = false;
+    
+    switch (operator) {
+      case '==':
+        result = currentValue == expectedValue;
+        break;
+      case '!=':
+        result = currentValue != expectedValue;
+        break;
+      case '>':
+        result = Number(currentValue) > Number(expectedValue);
+        break;
+      case '<':
+        result = Number(currentValue) < Number(expectedValue);
+        break;
+      case '>=':
+        result = Number(currentValue) >= Number(expectedValue);
+        break;
+      case '<=':
+        result = Number(currentValue) <= Number(expectedValue);
+        break;
+      default:
+        throw new Error(`Unsupported operator: ${operator}`);
+    }
+    
+    if (result) {
+      return {
+        matched: true,
+        target: target,
+        isPage: isPage ? true : false,
+      };
+    }
+    
+    return {
+      matched: false,
+      target: null,
+      isPage: null
+    };
+    
+  } catch (error) {
+    console.error('Error evaluating condition:', error);
+    return {
+      matched: false,
+      target: null,
+      isPage: null,
+      error: error
+    };
+  }
 }
 
 /**
@@ -304,18 +421,33 @@ export function getNextStepFromNavigationRules(
   if (!block.navigationRules) return null;
 
   for (const rule of block.navigationRules) {
-    if (evaluateCondition(rule.condition, fieldValues)) {
-      if (rule.target === 'submit') {
+    console.log(evaluateNavigationalRule(rule, fieldValues))
+    // evaluateNavigationalRule(rule, fieldValues)
+    const evaluate = evaluateNavigationalRule(rule, fieldValues);
+    if(evaluate.matched) {
+      if (evaluate.target === 'submit') {
         return 'submit';
       }
-      if (rule.isPage) {
-        const idx = pageIds.indexOf(String(rule.target));
+      if (evaluate.isPage) {
+        const idx = pageIds.indexOf(String(evaluate.target));
         if (idx >= 0) return { pageIndex: idx, blockIndex: 0 };
       } else {
-        const pos = findBlockPosition(pages, String(rule.target));
+        const pos = findBlockPosition(pages, String(evaluate.target));
         if (pos) return pos;
       }
     }
+    // if (evaluateCondition(rule.condition, fieldValues)) {
+    //   if (rule.target === 'submit') {
+    //     return 'submit';
+    //   }
+    //   if (rule.isPage) {
+    //     const idx = pageIds.indexOf(String(rule.target));
+    //     if (idx >= 0) return { pageIndex: idx, blockIndex: 0 };
+    //   } else {
+    //     const pos = findBlockPosition(pages, String(rule.target));
+    //     if (pos) return pos;
+    //   }
+    // }
   }
 
   const defaultRule = block.navigationRules.find((r) => r.isDefault);
