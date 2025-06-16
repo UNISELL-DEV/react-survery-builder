@@ -1,11 +1,11 @@
 import React from "react";
 import type { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Button } from "@survey-form-builder/components/ui/button";
 import { FileUp, Upload, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
 
 // Form component for editing the block configuration
 const FileUploadBlockForm: React.FC<ContentBlockItemProps> = ({

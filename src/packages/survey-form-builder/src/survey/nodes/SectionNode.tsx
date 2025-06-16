@@ -1,11 +1,11 @@
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Card, CardContent, CardHeader, CardFooter } from "@survey-form-builder/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@survey-form-builder/components/ui/tabs";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Textarea } from "@survey-form-builder/components/ui/textarea";
+import { Label } from "@survey-form-builder/components/ui/label";
 import { ContentBlockPage } from "../blocks/ContentBlockPage";
 import { v4 as uuidv4 } from "uuid";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { themes } from '../../themes';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
-import { BlockData } from '@/lib/survey/types';
+import { Slider } from '@survey-form-renderer/components/ui/slider';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { cn } from '@survey-form-renderer/lib/utils';
+import { BlockData } from '@survey-form-renderer/types';
 
 interface RangeRendererProps {
   block: BlockData;
@@ -24,7 +24,7 @@ export const RangeRenderer: React.FC<RangeRendererProps> = ({
   disabled,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   // Parse block configuration
   const min = parseInt(String(block.min || "0"), 10);
@@ -128,7 +128,6 @@ export const RangeRenderer: React.FC<RangeRendererProps> = ({
           step={step}
           value={[currentValue]}
           onValueChange={handleChange}
-          onValueCommit={() => { if (onBlur) onBlur(); }}
           disabled={disabled}
           className={cn(error && "border-destructive", themeConfig.field.range)}
           aria-invalid={!!error}

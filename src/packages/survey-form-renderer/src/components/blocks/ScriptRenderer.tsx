@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { SurveyFormContext } from '../../context/SurveyFormContext';
 import { evaluateLogic } from '../../utils/surveyUtils';
 

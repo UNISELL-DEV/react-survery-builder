@@ -1,15 +1,15 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
 import { Plus, Trash2, Edit2, Save, X, ChevronRight, ChevronLeft, Settings, Link2, Unlink, ZoomIn, ZoomOut, Maximize2, Move, MousePointer } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@survey-form-builder/components/ui/card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@survey-form-builder/components/ui/dialog';
+import { Badge } from '@survey-form-builder/components/ui/badge';
+import { Separator } from '@survey-form-builder/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@survey-form-builder/components/ui/tabs';
+import { ScrollArea } from '@survey-form-builder/components/ui/scroll-area';
 import {
   Select,
   SelectContent,
@@ -18,7 +18,7 @@ import {
   SelectValue,
   SelectGroup,
   SelectLabel,
-} from "@/components/ui/select";
+} from "@survey-form-builder/components/ui/select";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import type { BlockData, NavigationRule } from "../../types";
 

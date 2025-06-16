@@ -1,8 +1,8 @@
 import React from "react";
 import type { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Slider } from "@survey-form-builder/components/ui/slider";
 import { ArrowRightToLine } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 

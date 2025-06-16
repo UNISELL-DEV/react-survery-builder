@@ -4,9 +4,9 @@ import { useSurveyForm } from "../../context/SurveyFormContext";
 import { BlockRenderer } from "../blocks/BlockRenderer";
 import { themes } from "../../themes";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@survey-form-renderer/components/ui/button";
 import { ChevronLeft, ArrowRight, History } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@survey-form-renderer/lib/utils";
 import { getSurveyPages } from "../../utils/surveyUtils";
 
 interface FullPageSurveyLayoutProps {
@@ -87,7 +87,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
     getVisibleBlocks,
   } = useSurveyForm();
 
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -165,7 +165,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
 
       {/* Header with back button and progress bar */}
       <div className="w-full py-4">
-        <div className="w-full max-w-2xl mx-auto px-4">
+        <div className="w-full max-w-2xl mx-auto px-2">
           {/* Back Button Row */}
           <div className="flex items-center justify-between mb-4">
             {/* Enhanced Previous Button with history indicator */}
@@ -269,7 +269,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
       </div>
 
       {/* Main Content Area - Blocks at the top with margin */}
-      <div className="flex flex-col mt-8">
+      <div className="flex flex-col mt-4">
         <div className="w-full max-w-2xl mx-auto px-4 flex-1 flex flex-col mt-8">
           <AnimatePresence mode="wait">
             <motion.div

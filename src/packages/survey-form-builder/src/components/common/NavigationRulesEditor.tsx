@@ -1,8 +1,8 @@
 import React from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectValue,
   SelectGroup,
   SelectLabel,
-} from "@/components/ui/select";
+} from "@survey-form-builder/components/ui/select";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import type { BlockData, NavigationRule } from "../../types";
 

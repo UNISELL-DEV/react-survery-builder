@@ -3,10 +3,10 @@ import { useSurveyForm } from '../../context/SurveyFormContext';
 import { NavigationButtons } from '../ui/NavigationButtons';
 import { BlockRenderer } from '../blocks/BlockRenderer';
 import { themes } from '../../themes';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
+import { Button } from '@survey-form-renderer/components/ui/button';
 import { DebugInfo } from '../ui/DebugInfo';
-import { cn } from '@/lib/utils';
+import { cn } from '@survey-form-renderer/lib/utils';
 import { CheckIcon } from 'lucide-react';
 
 interface StepperLayoutProps {
@@ -80,7 +80,7 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
     surveyData
   } = useSurveyForm();
 
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Get all survey pages

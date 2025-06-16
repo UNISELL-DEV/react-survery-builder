@@ -39,15 +39,17 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   className = '',
 }) => {
   // Debug log - helps diagnose issues with the survey data
-  console.log('SurveyForm rendering with survey data:', survey?.rootNode?.type || 'No survey data');
+  if (enableDebug) {
+    console.log('SurveyForm rendering with survey data:', survey?.rootNode?.type || 'No survey data');
+  }
 
   // Get the selected theme
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
-  // Container class based on theme
+  // Enhanced container class with better mobile responsiveness
   const containerClass = getThemeClass(
     theme,
-    `survey-form-container ${themeConfig.containerLayout}`,
+    `survey-form-container ${themeConfig.containerLayout} antialiased`,
     className
   );
 
@@ -81,7 +83,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   };
 
   return (
-    <div className={`${containerClass} ${themeConfig.background}`}>
+    <div className={`${containerClass} ${themeConfig.background} min-h-0`}>
       <SurveyFormProvider
         surveyData={survey}
         defaultValues={defaultValues}

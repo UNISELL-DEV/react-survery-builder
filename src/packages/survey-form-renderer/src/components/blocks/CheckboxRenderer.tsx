@@ -1,9 +1,9 @@
 import React, { forwardRef } from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { themes } from '../../themes';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Checkbox } from '@survey-form-renderer/components/ui/checkbox';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface CheckboxRendererProps {
   block: BlockData;
@@ -15,9 +15,9 @@ interface CheckboxRendererProps {
   theme?: string;
 }
 
-export const CheckboxRenderer = forwardRef<HTMLInputElement, CheckboxRendererProps>(
+export const CheckboxRenderer = forwardRef<HTMLButtonElement, CheckboxRendererProps>(
   ({ block, value = [], onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme] || themes.default;
+    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
     // Get labels and values arrays from the block
     const labels = block.labels || [];
@@ -65,7 +65,9 @@ export const CheckboxRenderer = forwardRef<HTMLInputElement, CheckboxRendererPro
           {labels.map((label, index) => {
             const optionValue = values[index];
             const id = `${block.fieldName}-${index}`;
-            const isChecked = value?.includes(optionValue) || false;
+            const isChecked = (typeof optionValue === 'string' || typeof optionValue === 'number') 
+            ? value?.includes(optionValue) || false 
+            : false;
 
             return (
               <div key={id} className="flex items-center space-x-2 py-1">
@@ -74,7 +76,7 @@ export const CheckboxRenderer = forwardRef<HTMLInputElement, CheckboxRendererPro
                   name={`${block.fieldName}[]`}
                   checked={isChecked}
                   disabled={disabled}
-                  onCheckedChange={(checked) => handleChange(optionValue, checked as boolean)}
+                  onCheckedChange={(checked: boolean) => handleChange(optionValue as string, checked as boolean)}
                   aria-invalid={!!error}
                   ref={index === 0 ? ref : undefined}
                 />

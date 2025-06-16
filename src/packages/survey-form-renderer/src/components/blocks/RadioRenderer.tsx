@@ -1,14 +1,14 @@
 import React from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { themes } from '../../themes';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { RadioGroup, RadioGroupItem } from '@survey-form-renderer/components/ui/radio-group';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface RadioRendererProps {
   block: BlockData;
   value?: string | number;
-  onChange?: (value: string | number) => void;
+  onChange?: (value: string | number | boolean) => void;
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
@@ -24,14 +24,14 @@ export const RadioRenderer: React.FC<RadioRendererProps> = ({
   disabled,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   // Get labels and values arrays from the block
   const labels = block.labels || [];
   const values = block.values || labels.map((_, i) => i);
 
   // Handle radio button change
-  const handleChange = (selectedValue: string | number) => {
+  const handleChange = (selectedValue: string | number | boolean) => {
     if (onChange) {
       onChange(selectedValue);
     }
@@ -59,18 +59,18 @@ export const RadioRenderer: React.FC<RadioRendererProps> = ({
       {/* Radio options */}
       <RadioGroup
         value={value?.toString()}
-        onValueChange={(val) => {
+        onValueChange={(val: string) => {
           // Convert back to original type if needed
           const originalValue = values[labels.findIndex(
-            (_, i) => values[i].toString() === val
+            (_: any, i: number) => values[i].toString() === val
           )];
           handleChange(originalValue);
         }}
         className="space-y-1 mt-2"
         disabled={disabled}
       >
-        {labels.map((label, index) => {
-          const optionValue = values[index];
+        {labels.map((label: any, index: string | number) => {
+          const optionValue = values[index as any];
           const id = `${block.fieldName}-${index}`;
           const stringValue = typeof optionValue === 'string'
             ? optionValue

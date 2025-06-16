@@ -1,23 +1,23 @@
 import React, { forwardRef } from 'react';
-import { BlockData } from '@/lib/survey/types';
 import { themes } from '../../themes';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Textarea } from '@survey-form-renderer/components/ui/textarea';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { cn } from '@survey-form-renderer/lib/utils';
+import { BlockData } from '@survey-form-renderer/types';
 
 interface TextareaRendererProps {
   block: BlockData;
   value?: string;
   onChange?: (value: string) => void;
   onBlur?: () => void;
-  error?: string;
+  error?: string | null; // Allow null values to match validation function return type
   disabled?: boolean;
   theme?: string;
 }
 
 export const TextareaRenderer = forwardRef<HTMLTextAreaElement, TextareaRendererProps>(
   ({ block, value, onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme] || themes.default;
+    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
     // Handle input change
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

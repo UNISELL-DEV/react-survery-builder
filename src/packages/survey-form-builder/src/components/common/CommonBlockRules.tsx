@@ -1,6 +1,6 @@
 import React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
+import { Label } from "@survey-form-builder/components/ui/label";
 // Re‑use the same BlockData type used across the builder
 import type { BlockData } from "../../types";
 
@@ -39,7 +39,8 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
   }, [data.isEndBlock]);
 
   return (
-    <div className="mt-4 space-y-2">
+    <div className="space-y-4 mt-4 mb-4">
+      <Label>Common Props</Label>
       <div className="flex items-center gap-2">
         <Checkbox
           id="is-end-block"
@@ -47,7 +48,7 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
           onCheckedChange={handleCheckedChange}
         />
         <Label htmlFor="is-end-block">Mark as end block</Label>
-      </div>
+      </div>      
     </div>
   );
 };

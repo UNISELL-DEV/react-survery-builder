@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Textarea } from "@survey-form-builder/components/ui/textarea";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
+import { Alert, AlertDescription } from "@survey-form-builder/components/ui/alert";
+import { Badge } from "@survey-form-builder/components/ui/badge";
+import { Separator } from "@survey-form-builder/components/ui/separator";
 import { Calculator, CheckCircle, Info } from "lucide-react";
 
 // Form component for editing the block configuration
@@ -265,7 +265,7 @@ const CalculatedFieldItem: React.FC<ContentBlockItemProps> = ({
               <div className="flex items-center gap-2 flex-wrap">
                 <Label className="text-sm font-medium">Depends on:</Label>
                 <div className="flex flex-wrap gap-1">
-                  {data.dependencies.map(dep => (
+                  {data.dependencies.map((dep: string) => (
                     <Badge key={dep} variant="secondary" className="text-xs">
                       {dep}
                     </Badge>
@@ -335,7 +335,7 @@ const CalculatedFieldItem: React.FC<ContentBlockItemProps> = ({
             <AlertDescription className="text-xs">
               <strong>This field will be calculated from:</strong>
               <br />
-              {data.dependencies.map(dep => (
+              {data.dependencies.map((dep: string) => (
                 <Badge key={dep} variant="outline" className="mr-1 mt-1 text-xs">
                   {dep}
                 </Badge>

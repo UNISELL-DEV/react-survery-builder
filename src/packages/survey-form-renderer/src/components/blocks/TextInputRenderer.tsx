@@ -1,10 +1,10 @@
 import React, { forwardRef } from 'react';
-import { BlockData } from '@/lib/survey/types';
 import { themes } from '../../themes';
 import { getLocalized } from '../../utils/surveyUtils';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Input } from '@survey-form-renderer/components/ui/input';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { cn } from '@survey-form-renderer/lib/utils';
+import { BlockData } from '@survey-form-renderer/types';
 
 interface TextInputRendererProps {
   block: BlockData;
@@ -18,7 +18,7 @@ interface TextInputRendererProps {
 
 export const TextInputRenderer = forwardRef<HTMLInputElement, TextInputRendererProps>(
   ({ block, value, onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme] || themes.default;
+    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
     // Handle input change
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

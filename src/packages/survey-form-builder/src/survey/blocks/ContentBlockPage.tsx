@@ -1,8 +1,8 @@
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Card, CardContent, CardHeader, CardFooter } from "@survey-form-builder/components/ui/card";
+import { Input } from "@survey-form-builder/components/ui/input";
 import { ContentBlockItem } from "./ContentBlockItem";
 import { v4 as uuidv4 } from "uuid";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";

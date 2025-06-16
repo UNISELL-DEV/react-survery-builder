@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { themes } from '../../themes';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Card } from '@/components/ui/card';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@survey-form-renderer/components/ui/radio-group';
+import { Card } from '@survey-form-renderer/components/ui/card';
 import { CheckSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface BoxOption {
   id: string;
@@ -32,7 +32,7 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
   disabled,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   
   // Parse options from block
   const options: BoxOption[] = block.options || [];
@@ -117,8 +117,7 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
                     </span>
                     {isSelected && showSelectionIndicator && (
                       <div className={cn(
-                        "flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground",
-                        themeConfig.container.activeIndicator
+                        "flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground", ""
                       )}>
                         <CheckSquare className="h-3 w-3" />
                       </div>

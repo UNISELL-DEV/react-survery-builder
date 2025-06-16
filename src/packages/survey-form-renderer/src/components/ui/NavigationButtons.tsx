@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 import { themes } from '../../themes';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from '@survey-form-renderer/components/ui/button';
+import { cn } from '@survey-form-renderer/lib/utils';
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
 
 interface NavigationButtonsProps {
@@ -43,7 +43,7 @@ export const NavigationButtons: React.FC<NavigationButtonsProps> = ({
   submitText = 'Submit',
 }) => {
   const { theme } = useSurveyForm();
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const isDarkMode = theme === 'dark';
 
   const {

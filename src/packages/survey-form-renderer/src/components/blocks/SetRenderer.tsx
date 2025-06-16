@@ -3,8 +3,8 @@ import { BlockRenderer } from './BlockRenderer';
 import type { BlockRendererProps } from '../../types';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 import { ValidationSummary } from '../ui/ValidationSummary';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
+import { cn } from '@survey-form-renderer/lib/utils';
 import { themes } from '../../themes';
 
 /**
@@ -26,7 +26,7 @@ export const SetRenderer: React.FC<BlockRendererProps> = ({
     evaluateCondition,
   } = useSurveyForm();
 
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   // Get the visible child items
   const items = block.items || [];
@@ -88,7 +88,7 @@ export const SetRenderer: React.FC<BlockRendererProps> = ({
                   }
                 }}
                 onBlur={onBlur}
-                error={childBlock.fieldName && error ? error[childBlock.fieldName] : undefined}
+                error={childBlock.fieldName && error ? error[childBlock.fieldName as any] : undefined}
                 disabled={disabled}
                 theme={theme}
                 customComponents={customComponents}

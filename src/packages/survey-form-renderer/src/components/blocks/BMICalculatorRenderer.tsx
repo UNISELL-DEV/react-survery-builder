@@ -2,16 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 import { themes } from '../../themes';
 import { calculateBMI } from '../../utils/conditionalUtils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Label } from '../ui/label';
+import { Input } from '../ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
+import { Separator } from '../ui/separator';
 import { Activity, Ruler, Weight, TrendingUp } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface BMICalculatorRendererProps {
   block: {
@@ -52,7 +52,7 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
   theme = 'default',
 }) => {
   const { setValue } = useSurveyForm();
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const initialRenderRef = useRef(true);
 
   // Extract field name from block
@@ -205,7 +205,7 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
         {/* Unit System Tabs */}
         <Tabs 
           value={unitSystem} 
-          onValueChange={(value) => {
+          onValueChange={(value: string) => {
             setUnitSystem(value);
             // Reset to reasonable defaults when switching units
             if (value === "metric") {
@@ -289,7 +289,7 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                 <div className="flex gap-2">
                   <Select 
                     value={imperialHeight.feet.toString()} 
-                    onValueChange={(value) => setImperialHeight(parseInt(value), imperialHeight.inches)}
+                    onValueChange={(value: string) => setImperialHeight(parseInt(value), imperialHeight.inches)}
                     disabled={disabled}
                   >
                     <SelectTrigger className="h-14">
@@ -305,7 +305,7 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
                   </Select>
                   <Select 
                     value={imperialHeight.inches.toString()} 
-                    onValueChange={(value) => setImperialHeight(imperialHeight.feet, parseInt(value))}
+                    onValueChange={(value: string) => setImperialHeight(imperialHeight.feet, parseInt(value))}
                     disabled={disabled}
                   >
                     <SelectTrigger className="h-14">

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { BlockData } from '@/lib/survey/types';
 import { themes } from '../../themes';
-import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { Calendar } from '@survey-form-renderer/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@survey-form-renderer/components/ui/popover';
+import { Button } from '@survey-form-renderer/components/ui/button';
+import { cn } from '@survey-form-renderer/lib/utils';
+import { format, formatDate } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
+import { BlockData } from '@survey-form-renderer/types';
 
 interface DatePickerRendererProps {
   block: BlockData;
@@ -39,7 +39,7 @@ export const DatePickerRenderer: React.FC<DatePickerRendererProps> = ({
   disabled,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   // State for the selected date
   const [date, setDate] = useState<Date | null>(
@@ -83,7 +83,7 @@ export const DatePickerRenderer: React.FC<DatePickerRendererProps> = ({
     if (!block.disabledDays) return undefined;
 
     try {
-      return block.disabledDays.split(",").map(d => parseInt(d.trim(), 10));
+      return block.disabledDays.split(",").map((d: string) => parseInt(d.trim(), 10));
     } catch {
       return undefined;
     }
@@ -129,7 +129,7 @@ export const DatePickerRenderer: React.FC<DatePickerRendererProps> = ({
       )}
 
       {/* Date picker using shadcn components */}
-      <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+      <Popover>
         <PopoverTrigger asChild>
           <Button
             id={block.fieldName}
@@ -160,7 +160,7 @@ export const DatePickerRenderer: React.FC<DatePickerRendererProps> = ({
                 handleDateSelect(newDate);
               }
             }}
-            disabled={(date) => {
+            disabled={(date: Date) => {
               // Check if date is within the min/max constraints
               if (dateConstraints.min && date < new Date(dateConstraints.min)) {
                 return true;

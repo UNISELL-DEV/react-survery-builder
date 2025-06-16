@@ -86,7 +86,7 @@ export const defaultTheme: ThemeDefinition = {
     border: "border-gray-200",
     activeBorder: "border-blue-500",
     activeBg: "bg-blue-50",
-    header: "bg-gray-50",
+    header: "bg-gray-50"
   },
   progress: {
     bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
@@ -120,7 +120,7 @@ export const minimalTheme: ThemeDefinition = {
   header: "mb-6",
   title: "text-2xl font-medium text-gray-900 mb-2",
   description: "text-base text-gray-600",
-  background: "bg-gray-50",
+  background: "bg-card",
   card: "bg-white p-6 mb-6",
   field: {
     label: "block text-sm font-normal text-gray-700 mb-1",
@@ -177,7 +177,7 @@ export const colorfulTheme: ThemeDefinition = {
   header: "mb-8",
   title: "text-3xl font-bold text-purple-900 mb-3",
   description: "text-lg text-purple-700",
-  background: "bg-gradient-to-br from-purple-50 to-pink-50",
+  background: "bg-card",
   card: "bg-white shadow-lg border border-purple-100 rounded-xl p-6 mb-6",
   container: {
     card: "bg-white border border-gray-200 rounded-lg",
@@ -230,7 +230,7 @@ export const colorfulTheme: ThemeDefinition = {
 // Modern theme - sleek and contemporary
 export const modernTheme: ThemeDefinition = {
   name: "modern",
-  containerLayout: "max-w-3xl mx-auto py-8 px-4 sm:px-6",
+  containerLayout: "max-w-3xl mx-auto py-2 px-2 sm:px-6",
   header: "mb-8",
   title: "text-3xl font-extrabold text-gray-900 mb-2",
   description: "text-lg text-gray-600",

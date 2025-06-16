@@ -62,16 +62,7 @@ export {
 } from './themes';
 
 // Types
-export type {
-  SurveyFormRendererProps,
-  SurveyTheme,
-  SurveyLayout,
-  ProgressBarOptions,
-  NavigationButtonsOptions,
-  BlockRendererProps,
-  PageRendererProps,
-  SurveyFormContextProps
-} from './types';
+export * from './types';
 
 export {
   // Main components

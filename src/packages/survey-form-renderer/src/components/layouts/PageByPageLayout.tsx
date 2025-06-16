@@ -6,8 +6,8 @@ import { BlockRenderer } from '../blocks/BlockRenderer';
 import { DebugInfo } from '../ui/DebugInfo';
 import { themes } from '../../themes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface PageByPageLayoutProps {
   progressBar?: boolean | {
@@ -79,7 +79,7 @@ export const PageByPageLayout: React.FC<PageByPageLayoutProps> = ({
     theme
   } = useSurveyForm();
 
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 

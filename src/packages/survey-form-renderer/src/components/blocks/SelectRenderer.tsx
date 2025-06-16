@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { themes } from '../../themes';
 import {
   Select,
@@ -7,23 +7,23 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+} from '@survey-form-renderer/components/ui/select';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface SelectRendererProps {
   block: BlockData;
   value?: string | number;
-  onChange?: (value: string | number) => void;
+  onChange?: (value: string | number | boolean) => void;
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
   theme?: string;
 }
 
-export const SelectRenderer = forwardRef<HTMLSelectElement, SelectRendererProps>(
+export const SelectRenderer = forwardRef<HTMLButtonElement, SelectRendererProps>(
   ({ block, value, onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme] || themes.default;
+    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
     // Handle input change
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

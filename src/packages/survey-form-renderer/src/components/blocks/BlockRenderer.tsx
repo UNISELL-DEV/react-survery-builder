@@ -24,9 +24,9 @@ import { useSurveyForm } from '../../context/SurveyFormContext';
 /**
  * A component that renders different types of blocks based on their type
  */
-export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((props, ref) => {
+export const BlockRenderer = forwardRef<HTMLElement, BlockRendererProps>((props, ref) => {
   const { block, value, onChange, onBlur, error, disabled, customComponents, theme = 'default', isVisible } = props;
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const { getVisibleBlocks } = useSurveyForm();
 
   // If the block has a visibility condition and is explicitly not visible, don't render it
@@ -34,20 +34,20 @@ export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((p
     return null;
   }
 
-  // Common props for all renderers
+  // Common props for all renderers (excluding ref since different components need different ref types)
+  const validationError = validateBlock(block);
   const commonProps = {
     value,
     onChange,
     onBlur,
-    error: error || validateBlock(block), // Use the validation from the original block
+    error: error ?? (validationError === null ? undefined : validationError),
     disabled,
-    ref,
     theme
   };
 
   // If there's a custom component for this block type, use it
   if (customComponents && customComponents[block.type]) {
-    const CustomComponent = customComponents[block.type];
+    const CustomComponent = customComponents[block.type] as React.FC<BlockRendererProps>;
     return <CustomComponent {...props} />;
   }
 
@@ -97,21 +97,21 @@ export const BlockRenderer = forwardRef<HTMLInputElement, BlockRendererProps>((p
   // Render the appropriate component based on block type
   switch (block.type) {
     case 'textfield':
-      return <TextInputRenderer block={block} {...commonProps} />;
+      return <TextInputRenderer block={block} {...commonProps} ref={ref as React.ForwardedRef<HTMLInputElement>} />;
     case 'textarea':
-      return <TextareaRenderer block={block} {...commonProps} />;
+      return <TextareaRenderer block={block} {...commonProps} ref={ref as React.ForwardedRef<HTMLTextAreaElement>} />;
     case 'radio':
       return <RadioRenderer block={block} {...commonProps} />;
     case 'checkbox':
       return <CheckboxRenderer block={block} {...commonProps} />;
     case 'select':
-      return <SelectRenderer block={block} {...commonProps} />;
+      return <SelectRenderer block={block} {...commonProps} ref={ref as React.ForwardedRef<HTMLButtonElement>} />;
     case 'range':
-      return <RangeRenderer block={block} {...commonProps} />;
+      return <RangeRenderer block={block} {...commonProps}/>;
     case 'datepicker':
-      return <DatePickerRenderer block={block} {...commonProps} />;
+      return <DatePickerRenderer block={block} {...commonProps}/>;
     case 'fileupload':
-      return <FileUploadRenderer block={block} {...commonProps} />;
+      return <FileUploadRenderer block={block} {...commonProps}/>;
     case 'matrix':
       return <MatrixRenderer block={block} {...commonProps} />;
     case 'selectablebox':

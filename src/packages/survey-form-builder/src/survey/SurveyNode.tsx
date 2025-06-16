@@ -1,6 +1,6 @@
 import type React from "react";
 import { SectionNode } from "./nodes/SectionNode";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@survey-form-builder/components/ui/alert";
 import { NodeData } from "../types";
 import { useSurveyBuilder } from "../context/SurveyBuilderContext";
 

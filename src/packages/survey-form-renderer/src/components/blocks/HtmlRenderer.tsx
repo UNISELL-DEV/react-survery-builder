@@ -1,5 +1,5 @@
 import React from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { themes } from '../../themes';
 
 interface HtmlRendererProps {
@@ -11,7 +11,7 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
   block,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   return (
     <div

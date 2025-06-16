@@ -57,7 +57,7 @@ export interface BlockDefinition {
   defaultData: BlockData;
   renderItem: (props: ContentBlockItemProps) => JSX.Element;
   renderFormFields: (props: ContentBlockItemProps) => JSX.Element;
-  renderPreview: (props: ContentBlockItemProps) => JSX.Element;
+  renderPreview: () => JSX.Element;
   validate?: (data: BlockData) => string | null;
 }
 

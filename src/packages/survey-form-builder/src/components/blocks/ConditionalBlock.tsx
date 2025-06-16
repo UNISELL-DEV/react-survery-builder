@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
+import { Input } from "@survey-form-builder/components/ui/input";
+import { Textarea } from "@survey-form-builder/components/ui/textarea";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
+import { Alert, AlertDescription } from "@survey-form-builder/components/ui/alert";
+import { Badge } from "@survey-form-builder/components/ui/badge";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@survey-form-builder/components/ui/select";
+import { Separator } from "@survey-form-builder/components/ui/separator";
 import { GitBranch, Eye, EyeOff, Code, Info, ChevronRight } from "lucide-react";
 
 // Form component for editing the block configuration
@@ -310,7 +310,7 @@ const ConditionalBlockItem: React.FC<ContentBlockItemProps> = ({
                 <SelectValue placeholder="Select an option" />
               </SelectTrigger>
               <SelectContent>
-                {childBlock.options?.map((option, index) => (
+                {childBlock.options?.map((option: string, index: number) => (
                   <SelectItem key={index} value={option}>
                     {option}
                   </SelectItem>
@@ -368,7 +368,7 @@ const ConditionalBlockItem: React.FC<ContentBlockItemProps> = ({
               {data.dependencies && data.dependencies.length > 0 && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-xs font-medium">Depends on:</span>
-                  {data.dependencies.map(dep => (
+                  {data.dependencies.map((dep: string) => (
                     <Badge key={dep} variant="outline" className="text-xs">
                       {dep}
                     </Badge>

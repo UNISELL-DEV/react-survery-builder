@@ -1,6 +1,6 @@
 import React from 'react';
-import { BlockData } from '@/lib/survey/types';
 import { themes } from '../../themes';
+import { BlockData } from '@survey-form-renderer/types';
 
 interface MarkdownRendererProps {
   block: BlockData;
@@ -52,7 +52,7 @@ const parseMarkdown = (markdown: string): string => {
 };
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ block, theme = 'default' }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   // Parse the markdown content to HTML
   const html = parseMarkdown(block.text || '');

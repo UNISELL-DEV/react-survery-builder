@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSurveyForm } from '../../context/SurveyFormContext';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from '@survey-form-renderer/components/ui/alert';
 import { X, AlertCircle } from 'lucide-react';
 
 interface ValidationSummaryProps {

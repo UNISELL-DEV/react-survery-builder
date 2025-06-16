@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import type { NodeData, BlockData, LocalizationMap } from "../../survey-form-builder/src/types";
+
+export type UUID = string;
 
 export interface SurveyFormRendererProps {
   survey: {
@@ -75,7 +76,8 @@ export interface BlockRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  customComponents?: Record<string, React.ComponentType<BlockRendererProps>>;
+  // Fixed: Use React.FC specifically instead of ComponentType
+  customComponents?: Record<string, React.FC<BlockRendererProps>>;
   theme?: SurveyTheme;
   // New props for conditional rendering
   isVisible?: boolean;
@@ -89,7 +91,7 @@ export interface PageRendererProps {
   onBlur?: (field: string) => void;
   errors: Record<string, string>;
   disabled?: boolean;
-  customComponents?: Record<string, React.ComponentType<BlockRendererProps>>;
+  customComponents?: Record<string, React.FC<BlockRendererProps>>;
   theme?: SurveyTheme;
 }
 
@@ -215,4 +217,53 @@ export interface SwipeDirection {
     endX: number;
     endY: number;
 }
-  
+
+
+export interface BlockData {
+  type: string;
+  name?: string;
+  label?: string;
+  description?: string;
+  fieldName?: string;
+  placeholder?: string;
+  text?: string;
+  html?: string;
+  items?: Array<BlockData>;
+  labels?: Array<string>;
+  values?: Array<string | number | boolean>;
+  defaultValue?: any;
+  className?: string;
+  showResults?: boolean;
+  navigationRules?: NavigationRule[];
+  visibleIf?: any;
+  isEndBlock?: boolean;
+  [key: string]: any;
+}
+
+export interface NodeData {
+  uuid?: UUID;
+  name?: string;
+  type: string;
+  items?: Array<BlockData>;
+  nodes?: Array<NodeData | UUID>;
+  navigationLogic?: string;
+  entryLogic?: string;
+  exitLogic?: string;
+  backLogic?: string;
+  [key: string]: any;
+}
+
+export interface LocalizationMap {
+  [key: string]: {
+    [key: string]: string;
+  };
+}
+
+export interface BlockDefinition {
+  type: string;
+  name: string;
+  description: string;
+  icon?: ReactNode;
+  defaultData: BlockData;
+  validate?: (data: BlockData) => string | null;
+}

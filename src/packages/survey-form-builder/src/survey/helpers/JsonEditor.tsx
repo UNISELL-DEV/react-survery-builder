@@ -1,9 +1,9 @@
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Textarea } from "@survey-form-builder/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@survey-form-builder/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@survey-form-builder/components/ui/tabs";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { NodeData } from "../../types";
 import { ensureNodeUuids } from "../../utils/nodeUtils";

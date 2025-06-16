@@ -4,8 +4,8 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { NavigationButtons } from '../ui/NavigationButtons';
 import { BlockRenderer } from '../blocks/BlockRenderer';
 import { themes } from '../../themes';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
+import { cn } from '@survey-form-renderer/lib/utils';
 import { DebugInfo } from '../ui/DebugInfo';
 
 interface ContinuousLayoutProps {
@@ -68,7 +68,7 @@ export const ContinuousLayout: React.FC<ContinuousLayoutProps> = ({
     theme
   } = useSurveyForm();
 
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Get all survey pages from the surveyData in context

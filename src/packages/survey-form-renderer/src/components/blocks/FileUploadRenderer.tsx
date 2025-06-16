@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { themes } from '../../themes';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { Button } from '@survey-form-renderer/components/ui/button';
 import { UploadCloud, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { BlockData } from '@/lib/survey/types';
+import { cn } from '@survey-form-renderer/lib/utils';
+import { BlockData } from '@survey-form-renderer/types';
 
 interface FileUploadRendererProps {
   block: BlockData;
@@ -25,7 +25,7 @@ export const FileUploadRenderer: React.FC<FileUploadRendererProps> = ({
   disabled,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize files state, handling both File[] and serialized string inputs

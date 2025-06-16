@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "aliases": {
+    "components": "@survey-form-builder/components",
+    "utils": "@survey-form-builder/lib/utils",
+    "ui": "@survey-form-builder/components/ui",
+    "lib": "@survey-form-builder/lib",
+    "hooks": "@survey-form-builder/hooks"
+  },
+  "iconLibrary": "lucide"
+}

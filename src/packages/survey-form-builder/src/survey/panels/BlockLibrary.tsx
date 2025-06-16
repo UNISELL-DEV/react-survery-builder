@@ -1,5 +1,5 @@
 import type React from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@survey-form-builder/components/ui/card";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 
 export const BlockLibrary: React.FC = () => {

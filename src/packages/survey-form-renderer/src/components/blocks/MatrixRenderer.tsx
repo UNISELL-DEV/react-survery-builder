@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BlockData } from '@/lib/survey/types';
+import { BlockData } from '@survey-form-renderer/types';
 import { themes } from '../../themes';
-import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@survey-form-renderer/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@survey-form-renderer/components/ui/radio-group';
 import {
   Table,
   TableBody,
@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { cn } from '@/lib/utils';
+} from '@survey-form-renderer/components/ui/table';
+import { cn } from '@survey-form-renderer/lib/utils';
 
 interface MatrixQuestion {
   id: string;
@@ -43,7 +43,7 @@ export const MatrixRenderer: React.FC<MatrixRendererProps> = ({
   disabled,
   theme = 'default'
 }) => {
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
 
   // Parse matrix data from block
   const questions: MatrixQuestion[] = block.questions || [];

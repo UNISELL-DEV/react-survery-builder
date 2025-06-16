@@ -3,9 +3,9 @@ import { useSurveyForm } from '../../context/SurveyFormContext';
 import { themes } from '../../themes';
 import { executeCalculation } from '../../utils/conditionalUtils';
 import type { CalculatedFieldProps } from '../../types';
-import { Card, CardContent } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from '../ui/card';
+import { Label } from '../ui/label';
+import { cn } from '../../lib/utils';
 import { AlertCircle } from 'lucide-react';
 
 /**
@@ -19,7 +19,7 @@ export const CalculatedFieldRenderer: React.FC<CalculatedFieldProps> = ({
   theme = 'default',
 }) => {
   const { values, computedValues, updateComputedValues } = useSurveyForm();
-  const themeConfig = themes[theme] || themes.default;
+  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const [error, setError] = useState<string | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("Waiting for inputs...");
 

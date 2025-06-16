@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@survey-form-builder/components/ui/textarea";
+import { Label } from "@survey-form-builder/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@survey-form-builder/components/ui/select";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Badge } from "@survey-form-builder/components/ui/badge";
+import { Progress } from "@survey-form-builder/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@survey-form-builder/components/ui/tabs";
+import { Separator } from "@survey-form-builder/components/ui/separator";
 import { Activity, Ruler, Weight, TrendingUp } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
+import { Input } from "@survey-form-builder/components/ui/input";
 
 // Form component for editing the block configuration
 const BMICalculatorForm: React.FC<ContentBlockItemProps> = ({
@@ -63,7 +63,7 @@ const BMICalculatorForm: React.FC<ContentBlockItemProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="defaultUnit">Default Unit System</Label>
-        <Select value={data.defaultUnit || "metric"} onValueChange={(value) => handleChange("defaultUnit", value)}>
+        <Select value={data.defaultUnit || "metric"} onValueChange={(value: string | boolean) => handleChange("defaultUnit", value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select default unit system" />
           </SelectTrigger>
@@ -76,7 +76,7 @@ const BMICalculatorForm: React.FC<ContentBlockItemProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="theme">Theme</Label>
-        <Select value={data.theme || "default"} onValueChange={(value) => handleChange("theme", value)}>
+        <Select value={data.theme || "default"} onValueChange={(value: string | boolean) => handleChange("theme", value)}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -101,7 +101,7 @@ const BMICalculatorForm: React.FC<ContentBlockItemProps> = ({
           <Checkbox
             id="showResults"
             checked={!!data.showResults}
-            onCheckedChange={(checked) => {
+            onCheckedChange={(checked: any) => {
               handleChange("showResults", !!checked);
             }}
           />
@@ -233,7 +233,7 @@ const BMICalculatorItem: React.FC<ContentBlockItemProps> = ({
 
       <CardContent className="space-y-8">
         {/* Unit System Tabs */}
-        <Tabs value={unitSystem} onValueChange={(value) => {
+        <Tabs value={unitSystem} onValueChange={(value: string) => {
           setUnitSystem(value);
           // Reset to reasonable defaults when switching units
           if (value === "metric") {
@@ -311,7 +311,7 @@ const BMICalculatorItem: React.FC<ContentBlockItemProps> = ({
                 <div className="flex gap-2">
                   <Select 
                     value={imperialHeight.feet.toString()} 
-                    onValueChange={(value) => setImperialHeight(parseInt(value), imperialHeight.inches)}
+                    onValueChange={(value: string) => setImperialHeight(parseInt(value), imperialHeight.inches)}
                   >
                     <SelectTrigger className="h-14">
                       <SelectValue />
@@ -326,7 +326,7 @@ const BMICalculatorItem: React.FC<ContentBlockItemProps> = ({
                   </Select>
                   <Select 
                     value={imperialHeight.inches.toString()} 
-                    onValueChange={(value) => setImperialHeight(imperialHeight.feet, parseInt(value))}
+                    onValueChange={(value: string) => setImperialHeight(imperialHeight.feet, parseInt(value))}
                   >
                     <SelectTrigger className="h-14">
                       <SelectValue />
