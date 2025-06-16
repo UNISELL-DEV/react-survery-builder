@@ -177,7 +177,7 @@ export const LocalizationEditor: React.FC = () => {
                   <div key={label} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col">
                       <Label className="mb-2">{langCode === "en" ? "Original Text" : "English"}</Label>
-                      <div className="p-2 bg-muted rounded-md">
+                      <div className="p-2 bg-muted rounded-md text-sm">
                         {langCode === "en" ? label : localizations.en[label] || label}
                       </div>
                     </div>
@@ -202,44 +202,72 @@ export const LocalizationEditor: React.FC = () => {
   );
 };
 
-// Helper function to extract all labels from a survey
+// Helper function to extract all labels from a survey - FIXED VERSION
 const extractLabelsFromSurvey = (node: any): string[] => {
   const labels: Set<string> = new Set();
 
   // Process the current node
   const processNode = (currentNode: any) => {
-    // Extract labels from items
+    if (!currentNode) return;
+
+    // console.log('Processing node:', { 
+    //   type: currentNode.type, 
+    //   name: currentNode.name, 
+    //   uuid: currentNode.uuid,
+    //   hasItems: !!currentNode.items,
+    //   itemsLength: currentNode.items?.length 
+    // });
+
+    // Extract text content from the current node itself
+    if (currentNode.name) labels.add(currentNode.name);
+    if (currentNode.questionTitle) labels.add(currentNode.questionTitle);
+    if (currentNode.description) labels.add(currentNode.description);
+    if (currentNode.label) labels.add(currentNode.label);
+    if (currentNode.text) labels.add(currentNode.text);
+    if (currentNode.html) labels.add(currentNode.html);
+    if (currentNode.placeholder) labels.add(currentNode.placeholder);
+
+    // Extract from options array (for selectablebox, radio, etc.)
+    if (currentNode.options && Array.isArray(currentNode.options)) {
+      for (const option of currentNode.options) {
+        if (option.label) labels.add(option.label);
+        if (option.text) labels.add(option.text);
+      }
+    }
+
+    // Extract from labels array (for radio buttons, dropdowns)
+    if (currentNode.labels && Array.isArray(currentNode.labels)) {
+      for (const label of currentNode.labels) {
+        if (typeof label === 'string') labels.add(label);
+      }
+    }
+
+    // Process items array - this handles both section->sets and set->form elements
     if (currentNode.items && Array.isArray(currentNode.items)) {
+      // console.log(`Processing ${currentNode.items.length} items for node:`, currentNode.type);
       for (const item of currentNode.items) {
-        // Text fields
-        if (item.label) labels.add(item.label);
-        if (item.text) labels.add(item.text);
-        if (item.html) labels.add(item.html);
-
-        // Radio buttons and dropdowns with label arrays
-        if (item.labels && Array.isArray(item.labels)) {
-          for (const label of item.labels) {
-            labels.add(label);
-          }
-        }
-
-        // Process nested items
-        if (item.items) {
-          processNode(item);
+        if (item && typeof item === 'object') {
+          processNode(item); // Recursively process each item
         }
       }
     }
 
-    // Process child nodes
+    // Process nodes array (old structure)
     if (currentNode.nodes && Array.isArray(currentNode.nodes)) {
+      // console.log(`Processing ${currentNode.nodes.length} child nodes for node:`, currentNode.type);
       for (const childNode of currentNode.nodes) {
-        if (typeof childNode !== "string") {
+        if (typeof childNode !== "string" && childNode) {
           processNode(childNode);
         }
       }
     }
   };
 
+  // console.log('Starting label extraction from:', node);
   processNode(node);
-  return Array.from(labels);
+  
+  const labelsArray = Array.from(labels);
+  // console.log('Final extracted labels:', labelsArray);
+  
+  return labelsArray;
 };

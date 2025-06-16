@@ -131,7 +131,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
                   <TabsTrigger value="json">JSON</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="blocks">
+                <TabsContent value="blocks" className="overflow-y-scroll">
                   <BlockLibrary />
                 </TabsContent>
 

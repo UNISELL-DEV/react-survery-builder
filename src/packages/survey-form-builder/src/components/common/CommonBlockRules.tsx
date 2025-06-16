@@ -24,7 +24,7 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
   // Keep local checkbox state in sync with incoming data
   const [isEndBlock, setIsEndBlock] = React.useState<boolean>(!!data.isEndBlock);
   const [autoContinueOnSelect, setAutoContinueOnSelect] = React.useState<boolean>(!!data.autoContinueOnSelect);
-  const [showContinueButton, setShowContinueButton] = React.useState<boolean>(!!data.showContinueButton);
+  const [showContinueButton, setShowContinueButton] = React.useState<boolean>(data.showContinueButton ?? true);
 
   // When the checkbox is toggled, update both local state and propagate the change
   const handleEndBlockChange = (checked: boolean) => {
@@ -61,7 +61,7 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
   return (
     <div className="space-y-4 mt-4 mb-4">
       <Label>Common Props</Label>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mt-4">
         <Checkbox
           id="is-end-block"
           checked={isEndBlock}
@@ -71,19 +71,19 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
       </div>      
       <div className="flex items-center gap-2">
         <Checkbox
-          id="is-end-block"
+          id="is-auto-block"
           checked={autoContinueOnSelect}
           onCheckedChange={handleAutoContinueChange}
         />
-        <Label htmlFor="is-end-block">Auto Continue To next?</Label>
+        <Label htmlFor="is-auto-block">Auto Continue To next?</Label>
       </div>
       <div className="flex items-center gap-2">
         <Checkbox
-          id="is-end-block"
+          id="is-show-block"
           checked={showContinueButton}
           onCheckedChange={handleShowContinueChange}
         />
-        <Label htmlFor="is-end-block">Show Next Button?</Label>
+        <Label htmlFor="is-show-block">Show Next Button?</Label>
       </div>
     </div>
   );

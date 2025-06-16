@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback, useMemo } from "react";
 import { NodeData, NavigationRule } from "../types";
 import { useSurveyBuilder } from "../context/SurveyBuilderContext";
-import { Plus, Trash2, Edit2, Save, X, ChevronRight, ChevronLeft, Settings, Link2, Unlink, ZoomIn, ZoomOut, Maximize2, Move, MousePointer } from 'lucide-react';
+import { Plus, Trash2, Edit2, Save, X, ChevronRight, ChevronLeft, Settings, Link2, Unlink, ZoomIn, ZoomOut, Maximize2, Move, MousePointer, Eye, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@survey-form-builder/components/ui/card';
 import { Button } from '@survey-form-builder/components/ui/button';
 import { Label } from '@survey-form-builder/components/ui/label';
@@ -28,6 +28,10 @@ interface FlowNode {
     itemType: string;
     originalData: any;
     hasConditionalFlow: boolean;
+    isPageNode: boolean;
+    isNavigationNode: boolean;
+    pageItems?: any[];
+    parentPageId?: string;
   };
 }
 
@@ -37,6 +41,7 @@ interface FlowEdge {
   target: string;
   label?: string;
   isConditional: boolean;
+  waypoints?: Array<{ x: number; y: number }>;
 }
 
 export const SurveyGraph: React.FC<SurveyGraphProps> = ({
@@ -51,7 +56,9 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
   const [nodes, setNodes] = useState<FlowNode[]>([]);
   const [edges, setEdges] = useState<FlowEdge[]>([]);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [hoveredEdge, setHoveredEdge] = useState<string | null>(null);
   const [editingRules, setEditingRules] = useState<string | null>(null);
+  const [expandedPages, setExpandedPages] = useState<Set<string>>(new Set());
   const [zoom, setZoom] = useState(0.8);
   const [pan, setPan] = useState({ x: 50, y: 50 });
   const [isDragging, setIsDragging] = useState(false);
@@ -62,12 +69,43 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [cursorMode, setCursorMode] = useState<'select' | 'pan'>('select');
 
+  // Improved layout constants
+  const LAYOUT_CONFIG = {
+    NODE_SPACING_X: 400,
+    NODE_SPACING_Y: 200,
+    LEVEL_SPACING: 500,
+    PAGE_CONTAINER_PADDING: 60,
+    NAV_NODE_OFFSET_X: 80,
+    NAV_NODE_OFFSET_Y: 100,
+    NAV_NODE_SPACING: 140,
+    MIN_NODE_WIDTH: 280,
+    MIN_NODE_HEIGHT: 120,
+    PAGE_NODE_MIN_HEIGHT: 160,
+  };
+
   // Color scheme for different node types
-  const getNodeColorByType = (type: string) => {
+  const getNodeColorByType = (type: string, isPageNode: boolean = false, isNavigationNode: boolean = false) => {
+    if (isPageNode) {
+      return { 
+        fill: '#f8fafc', 
+        stroke: '#64748b', 
+        darkFill: '#334155', 
+        darkStroke: '#94a3b8' 
+      };
+    }
+    
+    if (isNavigationNode) {
+      return { 
+        fill: '#fef3c7', 
+        stroke: '#f59e0b', 
+        darkFill: '#78350f', 
+        darkStroke: '#fbbf24' 
+      };
+    }
+    
     const colorMap: Record<string, any> = {
       'section': { fill: '#f0f9ff', stroke: '#0ea5e9', darkFill: '#0c4a6e', darkStroke: '#38bdf8' },
       'set': { fill: '#f0fdf4', stroke: '#22c55e', darkFill: '#14532d', darkStroke: '#4ade80' },
-      'page': { fill: '#f0fdf4', stroke: '#22c55e', darkFill: '#14532d', darkStroke: '#4ade80' },
       'selectablebox': { fill: '#fefce8', stroke: '#eab308', darkFill: '#713f12', darkStroke: '#facc15' },
       'textfield': { fill: '#faf5ff', stroke: '#a855f7', darkFill: '#581c87', darkStroke: '#c084fc' },
       'html': { fill: '#fdf2f8', stroke: '#ec4899', darkFill: '#831843', darkStroke: '#f472b6' },
@@ -78,10 +116,73 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
       'date': { fill: '#fef2f2', stroke: '#ef4444', darkFill: '#7f1d1d', darkStroke: '#f87171' },
       'time': { fill: '#f5f3ff', stroke: '#8b5cf6', darkFill: '#5b21b6', darkStroke: '#a78bfa' },
       'number': { fill: '#fefce8', stroke: '#eab308', darkFill: '#713f12', darkStroke: '#facc15' },
-      'block': { fill: '#f8fafc', stroke: '#64748b', darkFill: '#334155', darkStroke: '#94a3b8' },
     };
 
     return colorMap[type] || { fill: '#f8fafc', stroke: '#64748b', darkFill: '#334155', darkStroke: '#94a3b8' };
+  };
+
+  // Collision detection helper
+  const checkNodeCollision = (x: number, y: number, width: number, height: number, existingNodes: FlowNode[], excludeId?: string): boolean => {
+    const padding = 20;
+    return existingNodes.some(node => {
+      if (node.id === excludeId) return false;
+      return !(
+        x + width + padding < node.x ||
+        x > node.x + node.width + padding ||
+        y + height + padding < node.y ||
+        y > node.y + node.height + padding
+      );
+    });
+  };
+
+  // Find next available position
+  const findAvailablePosition = (
+    preferredX: number, 
+    preferredY: number, 
+    width: number, 
+    height: number, 
+    existingNodes: FlowNode[],
+    excludeId?: string
+  ): { x: number; y: number } => {
+    // Try preferred position first
+    if (!checkNodeCollision(preferredX, preferredY, width, height, existingNodes, excludeId)) {
+      return { x: preferredX, y: preferredY };
+    }
+
+    // Try positions in expanding search pattern
+    const searchRadius = 50;
+    const maxAttempts = 50;
+    
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const radius = attempt * searchRadius;
+      
+      // Try positions in a circle around preferred position
+      for (let angle = 0; angle < 360; angle += 45) {
+        const radian = (angle * Math.PI) / 180;
+        const x = preferredX + Math.cos(radian) * radius;
+        const y = preferredY + Math.sin(radian) * radius;
+        
+        if (!checkNodeCollision(x, y, width, height, existingNodes, excludeId)) {
+          return { x, y };
+        }
+      }
+    }
+
+    // Fallback to preferred position if no collision-free spot found
+    return { x: preferredX, y: preferredY };
+  };
+
+  // Toggle page expansion
+  const togglePageExpansion = (pageId: string) => {
+    setExpandedPages(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pageId)) {
+        newSet.delete(pageId);
+      } else {
+        newSet.add(pageId);
+      }
+      return newSet;
+    });
   };
 
   // Collect all field names and targets for navigation rules
@@ -141,20 +242,20 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
     return { pages, blocks };
   }, []);
 
-  // Enhanced layout algorithm with proper sequential flow handling
+  // Improved layout algorithm with better spacing and collision avoidance
   const layoutNodes = useCallback((rootNode: any): { nodes: FlowNode[], edges: FlowEdge[] } => {
     const flowNodes: FlowNode[] = [];
     const flowEdges: FlowEdge[] = [];
     const visited = new Set<string>();
-    const allNodes: any[] = [];
+    const nodeMap = new Map<string, any>();
+    const levelNodes = new Map<number, FlowNode[]>();
 
-    // First pass: collect all nodes in order
+    // First pass: collect all nodes and build lookup map
     const collectAllNodes = (node: any) => {
       if (!node || !node.uuid) return;
-      allNodes.push(node);
+      nodeMap.set(node.uuid, node);
       
-      // Collect from items array (new structure)
-      if (node.items) {
+      if (node.items && Array.isArray(node.items)) {
         node.items.forEach((item: any) => {
           if (item.uuid) {
             collectAllNodes(item);
@@ -162,7 +263,6 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
         });
       }
       
-      // Collect from nodes array (old structure)
       if (node.nodes) {
         node.nodes.forEach((childNode: any) => {
           if (typeof childNode !== "string" && childNode.uuid) {
@@ -174,153 +274,194 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
 
     collectAllNodes(rootNode);
 
-    const processNode = (node: any, x: number = 0, y: number = 0, level: number = 0) => {
+    const processNode = (
+      node: any, 
+      x: number = 0, 
+      y: number = 0, 
+      level: number = 0,
+      parentLevel: number = -1
+    ) => {
       if (!node.uuid || visited.has(node.uuid)) return { width: 0, height: 0 };
       visited.add(node.uuid);
 
-      // Determine the actual item type
-      let itemType = node.type;
-      if (node.items && node.items.length > 0 && node.items[0].type) {
-        itemType = node.items[0].type;
+      const isRootSection = node.type === "section" && level === 0;
+      const isPageNode = node.type === "set";
+      
+      // Determine if this page/section has items with navigation rules
+      const itemsWithNavRules = [];
+      if (node.items) {
+        node.items.forEach((item: any) => {
+          if (item.navigationRules && item.navigationRules.length > 0) {
+            itemsWithNavRules.push(item);
+          }
+        });
       }
+
+      // Calculate node dimensions
+      let nodeWidth = LAYOUT_CONFIG.MIN_NODE_WIDTH;
+      let nodeHeight = LAYOUT_CONFIG.MIN_NODE_HEIGHT;
+      
+      if (isRootSection) {
+        nodeWidth = 400;
+        nodeHeight = 100;
+      } else if (isPageNode) {
+        const itemCount = node.items ? node.items.length : 0;
+        nodeHeight = Math.max(LAYOUT_CONFIG.PAGE_NODE_MIN_HEIGHT, 100 + (itemCount * 25));
+      }
+
+      // Find available position for this node
+      const preferredPosition = findAvailablePosition(x, y, nodeWidth, nodeHeight, flowNodes);
 
       const flowNode: FlowNode = {
         id: node.uuid,
-        x,
-        y,
-        width: 240,
-        height: 100,
+        x: preferredPosition.x,
+        y: preferredPosition.y,
+        width: nodeWidth,
+        height: nodeHeight,
         data: {
           label: node.name || 'Unnamed',
-          description: node.items?.[0]?.questionTitle || node.items?.[0]?.label || '',
+          description: node.description || '',
           nodeType: node.type,
-          itemType: itemType,
+          itemType: node.type,
           originalData: node,
-          hasConditionalFlow: node.items?.some((item: any) => item.navigationRules && item.navigationRules.length > 0) || 
-                             (node.navigationRules && node.navigationRules.length > 0),
+          hasConditionalFlow: itemsWithNavRules.length > 0,
+          isPageNode: isPageNode || isRootSection,
+          isNavigationNode: false,
+          pageItems: node.items || [],
+          parentPageId: undefined,
         },
       };
       
       flowNodes.push(flowNode);
 
-      let maxChildWidth = 0;
-      let totalChildHeight = 0;
-      const childSpacing = 30;
-      const levelSpacing = 350;
+      // Track nodes by level for better organization
+      if (!levelNodes.has(level)) {
+        levelNodes.set(level, []);
+      }
+      levelNodes.get(level)!.push(flowNode);
 
-      // Check if this node has navigation rules
-      let hasNavigationRules = false;
-      const targetNodes: any[] = [];
+      // Process navigation rule items
+      if (isPageNode && itemsWithNavRules.length > 0) {
+        let navNodeX = flowNode.x + LAYOUT_CONFIG.NAV_NODE_OFFSET_X;
+        let navNodeY = flowNode.y + flowNode.height + LAYOUT_CONFIG.NAV_NODE_OFFSET_Y;
+        
+        itemsWithNavRules.forEach((item, index) => {
+          const navNodeId = `${item.uuid}_nav`;
+          
+          const navPosition = findAvailablePosition(
+            navNodeX, 
+            navNodeY + (index * LAYOUT_CONFIG.NAV_NODE_SPACING), 
+            280, 
+            80, 
+            flowNodes
+          );
+          
+          const navFlowNode: FlowNode = {
+            id: navNodeId,
+            x: navPosition.x,
+            y: navPosition.y,
+            width: 280,
+            height: 80,
+            data: {
+              label: item.fieldName || item.questionTitle || 'Navigation Item',
+              description: item.questionTitle || item.description || '',
+              nodeType: item.type,
+              itemType: item.type,
+              originalData: item,
+              hasConditionalFlow: true,
+              isPageNode: false,
+              isNavigationNode: true,
+              parentPageId: node.uuid,
+            },
+          };
+          
+          flowNodes.push(navFlowNode);
+          
+          // Create edge from page to navigation item
+          flowEdges.push({
+            id: `${node.uuid}-${navNodeId}`,
+            source: node.uuid,
+            target: navNodeId,
+            isConditional: false,
+          });
 
-      // Check navigation rules from items
-      if (node.items) {
-        node.items.forEach((item: any) => {
-          if (item.navigationRules && item.navigationRules.length > 0) {
-            hasNavigationRules = true;
+          // Create edges from navigation item to targets
+          if (item.navigationRules) {
             item.navigationRules.forEach((rule: NavigationRule) => {
               const edge: FlowEdge = {
-                id: `${node.uuid}-${rule.target}`,
-                source: node.uuid!,
+                id: `${navNodeId}-${rule.target}`,
+                source: navNodeId,
                 target: rule.target,
                 label: rule.condition === 'true' ? 'default' : rule.condition,
                 isConditional: rule.condition !== 'true' && !rule.isDefault,
               };
               flowEdges.push(edge);
-
-              // Find target node
-              const targetNode = findNodeByUuid(rootNode, rule.target);
-              if (targetNode && !visited.has(rule.target)) {
-                targetNodes.push(targetNode);
-              }
             });
           }
         });
       }
 
-      // Check navigation rules directly on the node
-      if (node.navigationRules && node.navigationRules.length > 0) {
-        hasNavigationRules = true;
-        node.navigationRules.forEach((rule: NavigationRule) => {
-          const edge: FlowEdge = {
-            id: `${node.uuid}-${rule.target}`,
-            source: node.uuid!,
-            target: rule.target,
-            label: rule.condition === 'true' ? 'default' : rule.condition,
-            isConditional: rule.condition !== 'true' && !rule.isDefault,
-          };
-          flowEdges.push(edge);
-
-          // Find target node
-          const targetNode = findNodeByUuid(rootNode, rule.target);
-          if (targetNode && !visited.has(rule.target)) {
-            targetNodes.push(targetNode);
-          }
-        });
-      }
-
-      // If no navigation rules, connect to next node in sequence
-      if (!hasNavigationRules) {
-        const currentIndex = allNodes.findIndex(n => n.uuid === node.uuid);
-        if (currentIndex !== -1 && currentIndex < allNodes.length - 1) {
-          const nextNode = allNodes[currentIndex + 1];
-          if (nextNode && !visited.has(nextNode.uuid)) {
-            const edge: FlowEdge = {
-              id: `${node.uuid}-${nextNode.uuid}`,
-              source: node.uuid!,
-              target: nextNode.uuid,
-              isConditional: false,
-            };
-            flowEdges.push(edge);
-            targetNodes.push(nextNode);
-          }
+      // Process child pages/sections with improved spacing
+      if (node.items && Array.isArray(node.items)) {
+        if (isRootSection) {
+          // For root section, lay out pages horizontally with proper spacing
+          let pageX = flowNode.x + flowNode.width + LAYOUT_CONFIG.NODE_SPACING_X;
+          const pageY = flowNode.y;
+          
+          node.items.forEach((item: any, index) => {
+            if (item.type === "set" && item.uuid && !visited.has(item.uuid)) {
+              const itemDimensions = processNode(item, pageX, pageY, level + 1, level);
+              pageX += LAYOUT_CONFIG.NODE_SPACING_X + nodeWidth;
+            }
+          });
         }
       }
 
-      // Layout target nodes
-      if (targetNodes.length > 0) {
-        let currentY = y;
-        targetNodes.forEach((targetNode, index) => {
-          const childDimensions = processNode(targetNode, x + levelSpacing, currentY, level + 1);
-          currentY += childDimensions.height + childSpacing;
-          totalChildHeight += childDimensions.height + (index > 0 ? childSpacing : 0);
-          maxChildWidth = Math.max(maxChildWidth, childDimensions.width);
+      // Process navigation rule targets with better positioning
+      if (itemsWithNavRules.length > 0) {
+        const allTargets = new Set<string>();
+        itemsWithNavRules.forEach(item => {
+          if (item.navigationRules) {
+            item.navigationRules.forEach((rule: NavigationRule) => {
+              allTargets.add(rule.target);
+            });
+          }
+        });
+
+        let targetX = flowNode.x + LAYOUT_CONFIG.LEVEL_SPACING;
+        let targetY = flowNode.y;
+        
+        Array.from(allTargets).forEach((targetId, index) => {
+          const targetNode = nodeMap.get(targetId);
+          if (targetNode && !visited.has(targetId)) {
+            const childPosition = findAvailablePosition(
+              targetX, 
+              targetY + (index * LAYOUT_CONFIG.NODE_SPACING_Y), 
+              nodeWidth, 
+              nodeHeight, 
+              flowNodes
+            );
+            
+            processNode(targetNode, childPosition.x, childPosition.y, level + 1, level);
+          }
         });
       }
 
       return {
-        width: flowNode.width + (maxChildWidth > 0 ? levelSpacing + maxChildWidth : 0),
-        height: Math.max(flowNode.height, totalChildHeight)
+        width: flowNode.width,
+        height: flowNode.height
       };
-    };
-
-    const findNodeByUuid = (node: any, uuid: string): any => {
-      if (node.uuid === uuid) return node;
-      if (node.items) {
-        for (const item of node.items) {
-          const found = findNodeByUuid(item, uuid);
-          if (found) return found;
-        }
-      }
-      if (node.nodes) {
-        for (const childNode of node.nodes) {
-          if (typeof childNode !== "string") {
-            const found = findNodeByUuid(childNode, uuid);
-            if (found) return found;
-          }
-        }
-      }
-      return null;
     };
 
     if (rootNode) {
       processNode(rootNode, 100, 100, 0);
     }
+    
     return { nodes: flowNodes, edges: flowEdges };
   }, []);
 
   // Convert survey data to flow nodes and edges
   useEffect(() => {
-    console.log('rootNode changed, regenerating layout:', rootNode);
     if (!rootNode) {
       setNodes([]);
       setEdges([]);
@@ -451,28 +592,36 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
     }
   };
 
-  // Generate curved path for edges
+  // Improved edge path generation with better routing
   const generateEdgePath = (edge: FlowEdge) => {
     const source = nodes.find(n => n.id === edge.source);
     const target = nodes.find(n => n.id === edge.target);
     
     if (!source || !target) return '';
 
+    // Calculate connection points
     const sx = source.x + source.width / 2;
     const sy = source.y + source.height;
     const tx = target.x + target.width / 2;
     const ty = target.y;
 
-    const dx = tx - sx;
-    const dy = ty - sy;
-    const dr = Math.sqrt(dx * dx + dy * dy) / 2;
+    // Calculate control points for better curve routing
+    const dx = Math.abs(tx - sx);
+    const dy = Math.abs(ty - sy);
+    
+    // Adaptive curve strength based on distance
+    const curveStrength = Math.min(dy * 0.5, 150);
+    
+    // Create more natural curves
+    const cp1x = sx;
+    const cp1y = sy + curveStrength;
+    const cp2x = tx;
+    const cp2y = ty - curveStrength;
 
-    return `M ${sx} ${sy} C ${sx} ${sy + dr}, ${tx} ${ty - dr}, ${tx} ${ty}`;
+    return `M ${sx} ${sy} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${tx} ${ty}`;
   };
 
   const saveNavigationRules = useCallback((nodeId: string, rules: NavigationRule[]) => {
-    console.log('Saving navigation rules:', { nodeId, rules });
-    
     // Update edges for visual representation
     setEdges(prev => {
       const otherEdges = prev.filter(e => e.source !== nodeId);
@@ -488,49 +637,21 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
 
     // Find the node data
     const selectedNodeData = nodes.find(n => n.id === nodeId);
-    if (!selectedNodeData?.data.originalData || !updateNode) {
-      console.error('Could not find node data or updateNode function', { nodeId, selectedNodeData, updateNode });
-      return;
-    }
+    if (!selectedNodeData?.data.originalData || !updateNode) return;
 
     const originalData = selectedNodeData.data.originalData;
-    
-    // Determine how to update the navigation rules based on node structure
-    let updatedNodeData: any;
-    
-    if (originalData.items && originalData.items.length > 0) {
-      // New structure: navigation rules are on the first item
-      const updatedItems = [...originalData.items];
-      updatedItems[0] = {
-        ...updatedItems[0],
-        navigationRules: rules
-      };
-      
-      updatedNodeData = {
-        ...originalData,
-        items: updatedItems
-      };
-      
-      console.log('Updating node with items structure:', updatedNodeData);
-    } else {
-      // Old structure: navigation rules are directly on the node
-      updatedNodeData = {
-        ...originalData,
-        navigationRules: rules
-      };
-      
-      console.log('Updating node with direct structure:', updatedNodeData);
-    }
+    const updatedNodeData = {
+      ...originalData,
+      navigationRules: rules
+    };
 
-    // Update the node in the context
     try {
       updateNode(nodeId, updatedNodeData);
-      console.log('Successfully updated node in context');
     } catch (error) {
       console.error('Error updating node in context:', error);
     }
 
-    // Update visual nodes to reflect the change immediately
+    // Update visual nodes
     setNodes(prev => prev.map(node => {
       if (node.id === nodeId) {
         return {
@@ -538,13 +659,12 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
           data: {
             ...node.data,
             hasConditionalFlow: rules.length > 0,
-            originalData: updatedNodeData, // Update the cached original data
+            originalData: updatedNodeData,
           },
         };
       }
       return node;
     }));
-    
   }, [nodes, updateNode]);
 
   const isDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -622,6 +742,20 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
             />
           </marker>
           
+          <marker
+            id="arrowhead-highlighted"
+            markerWidth="12"
+            markerHeight="9"
+            refX="12"
+            refY="4.5"
+            orient="auto"
+          >
+            <polygon
+              points="0 0, 12 4.5, 0 9"
+              fill={isDarkMode ? '#3b82f6' : '#2563eb'}
+            />
+          </marker>
+          
           <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
             <feOffset dx="0" dy="2" result="offsetblur"/>
@@ -632,42 +766,111 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
               <feMergeNode in="SourceGraphic"/>
             </feMerge>
           </filter>
+          
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
 
         <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`}>
 
-          {/* Edges */}
+          {/* Edges - Rendered with improved visibility */}
           {edges.map(edge => {
             const path = generateEdgePath(edge);
             const pathId = `path-${edge.id}`;
+            const isHighlighted = hoveredEdge === edge.id || 
+              (selectedNode && (edge.source === selectedNode || edge.target === selectedNode));
+            
             return (
               <g key={edge.id}>
                 <defs>
                   <path id={pathId} d={path} />
                 </defs>
+                
+                {/* Edge background for better visibility */}
                 <path
                   d={path}
                   fill="none"
-                  stroke={edge.isConditional ? (isDarkMode ? '#fb923c' : '#f97316') : (isDarkMode ? '#9ca3af' : '#6b7280')}
-                  strokeWidth="2"
-                  strokeDasharray={edge.isConditional ? '5,5' : ''}
-                  markerEnd={edge.isConditional ? 'url(#arrowhead-conditional)' : 'url(#arrowhead)'}
+                  stroke="white"
+                  strokeWidth={isHighlighted ? "6" : "4"}
+                  opacity="0.8"
                 />
+                
+                {/* Main edge */}
+                <path
+                  d={path}
+                  fill="none"
+                  stroke={
+                    isHighlighted 
+                      ? (isDarkMode ? '#3b82f6' : '#2563eb')
+                      : edge.isConditional 
+                        ? (isDarkMode ? '#fb923c' : '#f97316') 
+                        : (isDarkMode ? '#9ca3af' : '#6b7280')
+                  }
+                  strokeWidth={isHighlighted ? "3" : "2"}
+                  strokeDasharray={edge.isConditional ? '5,5' : ''}
+                  markerEnd={
+                    isHighlighted 
+                      ? 'url(#arrowhead-highlighted)'
+                      : edge.isConditional 
+                        ? 'url(#arrowhead-conditional)' 
+                        : 'url(#arrowhead)'
+                  }
+                  filter={isHighlighted ? 'url(#glow)' : ''}
+                  className="cursor-pointer"
+                  onMouseEnter={() => setHoveredEdge(edge.id)}
+                  onMouseLeave={() => setHoveredEdge(null)}
+                />
+                
+                {/* Edge label with background */}
                 {edge.label && (
-                  <text className="text-xs fill-gray-600 dark:fill-gray-400" dy="-5">
-                    <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
-                      {edge.label.length > 30 ? edge.label.substring(0, 27) + '...' : edge.label}
-                    </textPath>
-                  </text>
+                  <g>
+                    {/* Label background */}
+                    <rect
+                      x="0"
+                      y="0"
+                      width={edge.label.length * 6 + 8}
+                      height="16"
+                      rx="8"
+                      fill={isDarkMode ? '#1f2937' : 'white'}
+                      stroke={isDarkMode ? '#374151' : '#e5e7eb'}
+                      strokeWidth="1"
+                      opacity="0.95"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        type="translate"
+                        values="0,-8;0,-8"
+                        dur="1s"
+                      />
+                    </rect>
+                    
+                    {/* Label text */}
+                    <text 
+                      className="text-xs font-medium"
+                      fill={isHighlighted ? (isDarkMode ? '#60a5fa' : '#2563eb') : (isDarkMode ? '#d1d5db' : '#6b7280')}
+                      dy="4"
+                      dx="4"
+                    >
+                      <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
+                        {edge.label.length > 20 ? edge.label.substring(0, 17) + '...' : edge.label}
+                      </textPath>
+                    </text>
+                  </g>
                 )}
               </g>
             );
           })}
 
-          {/* Nodes */}
+          {/* Nodes - Rendered with improved spacing and collision avoidance */}
           {nodes.map(node => {
-            const colors = getNodeColorByType(node.data.itemType);
+            const colors = getNodeColorByType(node.data.itemType, node.data.isPageNode, node.data.isNavigationNode);
             const isSelected = selectedNode === node.id;
+            const isConnected = edges.some(e => e.source === node.id || e.target === node.id);
             
             return (
               <g
@@ -692,6 +895,17 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                     strokeWidth="2"
                     opacity="0.6"
                     filter="url(#shadow)"
+                  />
+                )}
+                
+                {/* Connection indicator */}
+                {isConnected && !isSelected && (
+                  <circle
+                    cx={node.width + 15}
+                    cy="15"
+                    r="4"
+                    fill={isDarkMode ? '#10b981' : '#059669'}
+                    opacity="0.7"
                   />
                 )}
                 
@@ -723,7 +937,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                 {/* Node header bar */}
                 <rect
                   width={node.width}
-                  height="28"
+                  height="32"
                   rx="8"
                   fill={isDarkMode ? colors.darkStroke : colors.stroke}
                   opacity="0.15"
@@ -732,7 +946,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                 {/* Node type badge */}
                 <rect
                   x="8"
-                  y="6"
+                  y="8"
                   width="auto"
                   height="16"
                   rx="8"
@@ -743,38 +957,94 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                 {/* Node type text */}
                 <text
                   x="12"
-                  y="17"
+                  y="19"
                   className="text-xs font-semibold"
                   fill="white"
                 >
-                  {node.data.itemType.toUpperCase()}
+                  {node.data.isNavigationNode ? 'RULE' : 
+                   node.data.isPageNode ? 'PAGE' : 
+                   node.data.itemType.toUpperCase()}
                 </text>
                 
                 {/* Node title */}
                 <text
                   x="12"
-                  y="48"
+                  y="50"
                   className="text-sm font-bold"
                   fill={isDarkMode ? '#f8fafc' : '#1e293b'}
                 >
-                  {node.data.label.length > 22 ? node.data.label.substring(0, 19) + '...' : node.data.label}
+                  {node.data.label.length > 30 
+                    ? node.data.label.substring(0, 27) + '...' 
+                    : node.data.label}
                 </text>
                 
-                {/* Node description */}
-                {node.data.description && (
+                {/* Page items list */}
+                {node.data.isPageNode && node.data.pageItems && node.data.pageItems.length > 0 && (
+                  <g>
+                    {/* Separator line */}
+                    <line
+                      x1="12"
+                      y1="68"
+                      x2={node.width - 12}
+                      y2="68"
+                      stroke={isDarkMode ? colors.darkStroke : colors.stroke}
+                      strokeOpacity="0.3"
+                    />
+                    
+                    {/* Items list */}
+                    {node.data.pageItems.slice(0, 4).map((item: any, index: number) => (
+                      <g key={item.uuid || index}>
+                        <text
+                          x="16"
+                          y={85 + index * 20}
+                          className="text-xs"
+                          fill={isDarkMode ? '#cbd5e1' : '#64748b'}
+                        >
+                          {`${index + 1}. ${(item.questionTitle || item.fieldName || item.type || 'Item').substring(0, 35)}${
+                            (item.questionTitle || item.fieldName || item.type || 'Item').length > 35 ? '...' : ''
+                          }`}
+                        </text>
+                        {item.navigationRules && item.navigationRules.length > 0 && (
+                          <circle
+                            cx={node.width - 20}
+                            cy={82 + index * 20}
+                            r="3"
+                            fill={isDarkMode ? '#fb923c' : '#f97316'}
+                          />
+                        )}
+                      </g>
+                    ))}
+                    
+                    {node.data.pageItems.length > 4 && (
+                      <text
+                        x="16"
+                        y={85 + 4 * 20}
+                        className="text-xs font-medium"
+                        fill={isDarkMode ? '#94a3b8' : '#6b7280'}
+                      >
+                        +{node.data.pageItems.length - 4} more items...
+                      </text>
+                    )}
+                  </g>
+                )}
+                
+                {/* Navigation node description */}
+                {node.data.isNavigationNode && node.data.description && (
                   <text
                     x="12"
-                    y="68"
+                    y="70"
                     className="text-xs"
                     fill={isDarkMode ? '#cbd5e1' : '#64748b'}
                   >
-                    {node.data.description.length > 30 ? node.data.description.substring(0, 27) + '...' : node.data.description}
+                    {node.data.description.length > 35 
+                      ? node.data.description.substring(0, 32) + '...' 
+                      : node.data.description}
                   </text>
                 )}
                 
                 {/* Status indicators */}
                 <g transform={`translate(${node.width - 40}, 8)`}>
-                  {/* Conditional flow indicator */}
+                  {/* Navigation rules indicator */}
                   {node.data.hasConditionalFlow && (
                     <g>
                       <circle 
@@ -796,7 +1066,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                   )}
                 </g>
                 
-                {/* Interaction hint for selected node */}
+                {/* Node ID for debugging */}
                 {isSelected && (
                   <text
                     x={node.width / 2}
@@ -805,7 +1075,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                     className="text-xs"
                     fill={isDarkMode ? '#94a3b8' : '#64748b'}
                   >
-                    Click settings to edit rules
+                    {node.data.isNavigationNode ? 'Click settings to edit rules' : 'Page overview'}
                   </text>
                 )}
               </g>
@@ -863,23 +1133,53 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
         </div>
       )}
 
+      {/* Legend */}
+      <div className="absolute bottom-4 right-4 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-3">
+        <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Legend</h4>
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-xs">
+            <div className="w-3 h-3 bg-green-100 dark:bg-green-900 border border-green-500 rounded"></div>
+            <span className="text-gray-600 dark:text-gray-400">Page</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className="w-3 h-3 bg-yellow-100 dark:bg-yellow-900 border border-yellow-500 rounded"></div>
+            <span className="text-gray-600 dark:text-gray-400">Navigation Rule</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className="w-3 h-px bg-gray-400"></div>
+            <span className="text-gray-600 dark:text-gray-400">Sequential Flow</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            <div className="w-3 h-px bg-orange-500 border-dashed border-b"></div>
+            <span className="text-gray-600 dark:text-gray-400">Conditional Flow</span>
+          </div>
+        </div>
+      </div>
+
       {/* Info Panel */}
       {selectedNode && selectedNodeData && (
-        <div className="absolute top-4 right-4 w-72 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50">
+        <div className="absolute top-4 right-4 w-80 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-700/50">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-t-xl border-b border-gray-200/50 dark:border-gray-600/50">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-sm font-bold text-gray-900 dark:text-white">Node Details</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Click to configure</p>
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                  {selectedNodeData.data.isNavigationNode ? 'Navigation Rule' : 
+                   selectedNodeData.data.isPageNode ? 'Page Details' : 'Item Details'}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {selectedNodeData.data.isNavigationNode ? 'Controls flow between pages' : 'Survey content'}
+                </p>
               </div>
-              <button
-                onClick={() => setEditingRules(selectedNode)}
-                className="flex items-center gap-1 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-md transition-colors"
-              >
-                <Settings className="w-3 h-3" />
-                Edit
-              </button>
+              {selectedNodeData.data.isNavigationNode && (
+                <button
+                  onClick={() => setEditingRules(selectedNode)}
+                  className="flex items-center gap-1 text-xs bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-md transition-colors"
+                >
+                  <Settings className="w-3 h-3" />
+                  Edit
+                </button>
+              )}
             </div>
           </div>
           
@@ -896,20 +1196,60 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                 <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border">
                   {selectedNodeData.data.nodeType}
                 </span>
-                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
-                  {selectedNodeData.data.itemType}
-                </span>
+                {selectedNodeData.data.isPageNode && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                    PAGE
+                  </span>
+                )}
+                {selectedNodeData.data.isNavigationNode && (
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-800">
+                    NAVIGATION
+                  </span>
+                )}
               </div>
             </div>
+            
+            {selectedNodeData.data.isPageNode && selectedNodeData.data.pageItems && (
+              <div>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Items ({selectedNodeData.data.pageItems.length})</label>
+                <div className="mt-2 space-y-1 max-h-32 overflow-y-auto">
+                  {selectedNodeData.data.pageItems.map((item: any, index: number) => (
+                    <div key={item.uuid || index} className="flex items-center justify-between text-xs">
+                      <span className="text-gray-600 dark:text-gray-300">
+                        {item.fieldName || item.questionTitle || item.type || 'Item'}
+                      </span>
+                      {item.navigationRules && item.navigationRules.length > 0 && (
+                        <div className="w-2 h-2 bg-orange-500 rounded-full" title="Has navigation rules"></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {selectedNodeData.data.description && (
               <div>
                 <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Description</label>
                 <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 leading-relaxed">
-                  {selectedNodeData.data.description.length > 80 ? selectedNodeData.data.description.substring(0, 77) + '...' : selectedNodeData.data.description}
+                  {selectedNodeData.data.description.length > 120 ? selectedNodeData.data.description.substring(0, 117) + '...' : selectedNodeData.data.description}
                 </p>
               </div>
             )}
+            
+            {/* Connection info */}
+            <div>
+              <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Connections</label>
+              <div className="mt-1 space-y-1">
+                {edges.filter(e => e.source === selectedNode || e.target === selectedNode).map(edge => (
+                  <div key={edge.id} className="text-xs text-gray-600 dark:text-gray-300">
+                    {edge.source === selectedNode ? '→' : '←'} {edge.label || 'Connection'}
+                  </div>
+                ))}
+                {edges.filter(e => e.source === selectedNode || e.target === selectedNode).length === 0 && (
+                  <span className="text-xs text-gray-400 dark:text-gray-500">No connections</span>
+                )}
+              </div>
+            </div>
             
             {/* Status */}
             <div>
@@ -938,17 +1278,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
           data={selectedNodeData.data.originalData}
           nodeId={editingRules}
           nodeName={selectedNodeData.data.label}
-          navigationRules={(() => {
-            // Extract navigation rules from the correct location
-            const originalData = selectedNodeData.data.originalData;
-            if (originalData.items && originalData.items.length > 0 && originalData.items[0].navigationRules) {
-              return originalData.items[0].navigationRules;
-            }
-            if (originalData.navigationRules) {
-              return originalData.navigationRules;
-            }
-            return [];
-          })()}
+          navigationRules={selectedNodeData.data.originalData.navigationRules || []}
           availableFields={fieldNames}
           availableTargets={targets}
           onSave={(rules: NavigationRule[]) => saveNavigationRules(editingRules, rules)}

@@ -26,6 +26,7 @@ export interface SurveyFormRendererProps {
   customValidators?: Record<string, CustomValidator>;
   debug?: boolean;
   enableDebug?: boolean;
+  logo?: any;
 }
 
 export type SurveyTheme =
@@ -128,6 +129,7 @@ export interface SurveyFormContextProps {
   getNextPageIndex: () => number | null;
   getVisibleBlocks: (blocks: BlockData[]) => BlockData[];
   validateField: (fieldName: string, value: any) => string | null;
+  logo?: any;
 }
 
 // New interfaces for conditional branching and validation

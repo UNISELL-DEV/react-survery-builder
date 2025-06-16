@@ -90,6 +90,7 @@ interface SurveyFormProviderProps {
   customValidators?: Record<string, CustomValidator>;
   debug?: boolean;
   enableDebug?: boolean;
+  logo?: any;
 }
 
 // Provider component
@@ -106,6 +107,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   customValidators = {},
   enableDebug = false,
   debug = false,
+  logo = null,
 }) => {
   // State for form values and errors
   const [values, setValues] = useState<Record<string, any>>(defaultValues);
@@ -599,6 +601,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         getActualProgress,
         getTotalVisibleSteps,
         getCurrentStepPosition,
+        logo
       }}
     >
       {children}

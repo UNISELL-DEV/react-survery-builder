@@ -36,6 +36,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   showSummary = false,
   submitText = 'Submit',
   enableDebug = false,
+  logo = null,
   className = '',
 }) => {
   // Debug log - helps diagnose issues with the survey data
@@ -63,6 +64,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
       autoFocus,
       showSummary,
       submitText,
+      logo
     };
 
     switch (layout) {
@@ -93,6 +95,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
         enableDebug={enableDebug}
         language={language}
         theme={theme}
+        logo={logo}
       >
         {renderLayout(enableDebug)}
       </SurveyFormProvider>
