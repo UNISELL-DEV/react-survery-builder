@@ -139,13 +139,19 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   const isLastPage = currentPage === totalPages - 1;
   const canGoBack = navigationHistory.length > 1;
 
+  // Ref to keep track of latest history for the popstate handler
+  const navigationHistoryRef = React.useRef(navigationHistory);
+  useEffect(() => {
+    navigationHistoryRef.current = navigationHistory;
+  }, [navigationHistory]);
+
   // Handle browser back/forward for mobile
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
       
       // Check if we have navigation history to go back to
-      if (canGoBack) {
+      if (navigationHistoryRef.current.length > 1) {
         goToPreviousBlock();
       } else {
         // If no history, allow normal browser behavior
@@ -162,7 +168,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [currentPage, currentBlockIndex, canGoBack]);
+  }, []);
 
   // Add navigation entry to history
   const addToNavigationHistory = useCallback((
