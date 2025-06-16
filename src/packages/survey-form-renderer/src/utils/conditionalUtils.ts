@@ -108,8 +108,6 @@ export function evaluateConditionRule(
 }
 
 function evaluateNavigationalRule(conditionalRule: NavigationRule, currentValues: CurrentValues): EvaluationResult {
-  console.log(conditionalRule)
-  console.log(currentValues)
   try {
     const { condition, target, isPage } = conditionalRule;
     

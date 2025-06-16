@@ -40,6 +40,10 @@ export interface BlockData {
   navigationRules?: NavigationRule[];
   visibleIf?: any;
   isEndBlock?: boolean;
+  /** If true, automatically continue to the next step when an option is selected */
+  autoContinueOnSelect?: boolean;
+  /** Whether to show the continue button for this block/page */
+  showContinueButton?: boolean;
   [key: string]: any;
 }
 

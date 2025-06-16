@@ -106,7 +106,7 @@ export interface SurveyFormContextProps {
   goToPage: (pageIndex: number) => void;
   goToNextPage: () => void;
   goToPreviousPage: () => void;
-  goToNextBlock: () => void;
+  goToNextBlock: (fValue? : Record<string, any>) => void;
   goToPreviousBlock: () => void;
   isFirstPage: boolean;
   isLastPage: boolean;

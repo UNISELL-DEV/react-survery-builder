@@ -173,8 +173,12 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
                   block={pages[currentPage][currentBlockIndex]}
                   value={pages[currentPage][currentBlockIndex].fieldName ? values[pages[currentPage][currentBlockIndex].fieldName as string] : undefined}
                   onChange={(value) => {
-                    const field = pages[currentPage][currentBlockIndex].fieldName;
+                    const currentBlock = pages[currentPage][currentBlockIndex];
+                    const field = currentBlock.fieldName;
                     if (field) setValue(field, value);
+                    if (currentBlock.autoContinueOnSelect) {
+                      goToNextBlock();
+                    }
                   }}
                   error={pages[currentPage][currentBlockIndex].fieldName ? errors[pages[currentPage][currentBlockIndex].fieldName as string] : undefined}
                   theme={theme}
@@ -192,7 +196,12 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
                 onNext={goToNextBlock}
                 onSubmit={isLastPage && currentBlockIndex === pages[currentPage].length - 1 ? submit : undefined}
                 isValid={isValid}
-                options={navigationButtons}
+                options={{
+                  ...navigationButtons,
+                  showNext:
+                    navigationButtons?.showNext !== false &&
+                    pages[currentPage][currentBlockIndex]?.showContinueButton !== false,
+                }}
                 submitText={submitText}
               />
             </div>

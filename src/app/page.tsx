@@ -26,6 +26,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "allergy-yes",

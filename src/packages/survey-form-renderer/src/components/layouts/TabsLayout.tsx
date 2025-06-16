@@ -139,7 +139,12 @@ export const TabsLayout: React.FC<TabsLayoutProps> = ({
                 key={block.uuid || `block-${index}`}
                 block={block}
                 value={block.fieldName ? values[block.fieldName] : undefined}
-                onChange={(value) => block.fieldName && setValue(block.fieldName, value)}
+                onChange={(value) => {
+                  if (block.fieldName) setValue(block.fieldName, value);
+                  if (block.autoContinueOnSelect) {
+                    goToNextPage();
+                  }
+                }}
                 error={block.fieldName ? errors[block.fieldName] : undefined}
                 theme={theme}
               />
@@ -152,7 +157,12 @@ export const TabsLayout: React.FC<TabsLayoutProps> = ({
             onNext={!isLastPage ? goToNextPage : undefined}
             onSubmit={isLastPage ? submit : undefined}
             isValid={isValid}
-            options={navigationButtons}
+            options={{
+              ...navigationButtons,
+              showNext:
+                navigationButtons?.showNext !== false &&
+                pages[currentPage][0]?.showContinueButton !== false,
+            }}
             submitText={submitText}
           />
         </div>

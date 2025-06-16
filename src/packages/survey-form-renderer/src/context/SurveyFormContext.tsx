@@ -426,15 +426,22 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   };
 
-  const goToNextBlock = () => {
+  const goToNextBlock = (fValue? : Record<string, any>) => {
     const pageBlocks = pages[currentPage] || [];
     const currentBlock = pageBlocks[currentBlockIndex];
+
+    if (currentBlock?.isEndBlock) {
+      submit();
+      return;
+    }
+
+    const currentValues = fValue ?? values;
 
     const target = getNextStepFromNavigationRules(
       currentBlock,
       pages,
       pageIds,
-      { ...values, ...computedValues }
+      { ...currentValues, ...computedValues }
     );
 
     if (target === 'submit') {

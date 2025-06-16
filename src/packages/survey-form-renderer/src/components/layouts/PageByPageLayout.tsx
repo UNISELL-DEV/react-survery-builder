@@ -157,7 +157,12 @@ export const PageByPageLayout: React.FC<PageByPageLayoutProps> = ({
                       key={block.uuid || `block-${index}`}
                       block={block}
                       value={block.fieldName ? values[block.fieldName] : undefined}
-                      onChange={(value) => block.fieldName && setValue(block.fieldName, value)}
+                      onChange={(value) => {
+                        if (block.fieldName) setValue(block.fieldName, value);
+                        if (block.autoContinueOnSelect) {
+                          goToNextPage();
+                        }
+                      }}
                       error={block.fieldName ? errors[block.fieldName] : undefined}
                       ref={index === 0 ? firstInputRef : undefined}
                       theme={theme}
@@ -175,7 +180,12 @@ export const PageByPageLayout: React.FC<PageByPageLayoutProps> = ({
                     onNext={!isLastPage ? goToNextPage : undefined}
                     onSubmit={isLastPage ? submit : undefined}
                     isValid={isValid}
-                    options={navigationButtons}
+                    options={{
+                      ...navigationButtons,
+                      showNext:
+                        navigationButtons?.showNext !== false &&
+                        currentPageBlocks[0]?.showContinueButton !== false,
+                    }}
                     submitText={submitText}
                   />
                 </div>

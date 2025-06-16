@@ -108,7 +108,10 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLastPage && currentBlockIndex === currentPageBlocks.length - 1) {
+    const currentBlock = currentPageBlocks[currentBlockIndex];
+    if (currentBlock?.isEndBlock) {
+      submit();
+    } else if (isLastPage && currentBlockIndex === currentPageBlocks.length - 1) {
       submit();
     } else {
       goToNextBlock();
@@ -130,6 +133,9 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
   // Get button text from navigationButtons or fallback
   const continueText = navigationButtons?.nextText || "Continue";
   const completeText = navigationButtons?.submitText || submitText;
+  const showNextButton =
+    navigationButtons?.showNext !== false &&
+    currentPageBlocks[currentBlockIndex]?.showContinueButton !== false;
 
   // Debug info (only shown when enableDebug is true)
   const debugInfo = enableDebug ? {
@@ -295,9 +301,13 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                           : undefined
                       }
                       onChange={(value) => {
-                        const field =
-                          currentPageBlocks[currentBlockIndex].fieldName;
+                        const currentBlock =
+                          currentPageBlocks[currentBlockIndex];
+                        const field = currentBlock.fieldName;
                         if (field) setValue(field, value);
+                        if (currentBlock.autoContinueOnSelect) {
+                          goToNextBlock(field ? { [field]: value } : undefined);
+                        }
                       }}
                       error={
                         currentPageBlocks[currentBlockIndex].fieldName
@@ -348,25 +358,27 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                 )}
 
               {/* Main Action Button */}
-              <Button
-                type="submit"
-                disabled={!isValid}
-                size="lg"
-                className={cn(
-                  "px-8 py-4 text-lg font-medium transition-all duration-200",
-                  "hover:scale-105 active:scale-95",
-                  "min-w-[160px] rounded-xl",
-                )}
-              >
-                {isLastPage &&
-                currentBlockIndex === currentPageBlocks.length - 1
-                  ? completeText
-                  : continueText}
-                {!(
-                  isLastPage &&
-                  currentBlockIndex === currentPageBlocks.length - 1
-                ) && <ArrowRight className="ml-2 w-5 h-5" />}
-              </Button>
+              {showNextButton && (
+                <Button
+                  type="submit"
+                  disabled={!isValid}
+                  size="lg"
+                  className={cn(
+                    "px-8 py-4 text-lg font-medium transition-all duration-200",
+                    "hover:scale-105 active:scale-95",
+                    "min-w-[160px] rounded-xl",
+                  )}
+                >
+                  {isLastPage &&
+                    currentBlockIndex === currentPageBlocks.length
+                    ? completeText
+                    : continueText}
+                  {!(
+                    isLastPage &&
+                    currentBlockIndex === currentPageBlocks.length - 1
+                  ) && <ArrowRight className="ml-2 w-5 h-5" />}
+                </Button>
+              )}                  
             </div>
           </form>
         </div>
