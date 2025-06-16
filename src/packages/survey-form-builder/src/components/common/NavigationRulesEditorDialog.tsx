@@ -219,18 +219,13 @@ export const NavigationRulesEditorDialog = ({
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Edit Navigation Rules</DialogTitle>
           <DialogDescription>
             Configure navigation rules for: <Badge variant="outline">{nodeName}</Badge>
           </DialogDescription>
         </DialogHeader>
-
-        <ScrollArea className="h-[50vh] pr-4">
-
-        </ScrollArea>
-
 
         <div className="space-y-4 mt-4">
           <Label>Navigation Rules</Label>
