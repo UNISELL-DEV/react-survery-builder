@@ -83,7 +83,7 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
         value={selectedValue} 
         onValueChange={handleSelect}
         disabled={disabled}
-        className={`space-y-${boxSpacing}`}
+        className={`space-y-${boxSpacing} my-8`}
       >
         {options.map((option) => {
           const isSelected = selectedValue === option.value;

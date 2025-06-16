@@ -15,7 +15,7 @@ const sampleSurvey =
     "items": [
       {
         "type": "set",
-        "name": "Page 1 - Allergy History",
+        "name": "Page 1 - Medical Safety & History",
         "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
           {
@@ -53,141 +53,7 @@ const sampleSurvey =
                 "isPage": true
               }
             ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 2 - Medication History",
-        "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b515",
-        "items": [
-          {
-            "type": "selectablebox",
-            "fieldName": "medicationHistory",
-            "questionTitle": "Are you currently taking or have you taken any of the following in the past?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "med-testosterone-injectable",
-                "label": "Testosterone Injectable",
-                "value": "testosterone-injectable"
-              },
-              {
-                "id": "med-testosterone-topical",
-                "label": "Testosterone Topical (Androgel, Testim, Bioidentical)",
-                "value": "testosterone-topical"
-              },
-              {
-                "id": "med-clomiphene",
-                "label": "Clomiphene (Clomid)",
-                "value": "clomiphene"
-              },
-              {
-                "id": "med-enclomiphene",
-                "label": "Enclomiphene",
-                "value": "enclomiphene"
-              },
-              {
-                "id": "med-hcg",
-                "label": "HCG (Human Chorionic Gonadotropin)",
-                "value": "hcg"
-              },
-              {
-                "id": "med-gonadorelin",
-                "label": "Gonadorelin",
-                "value": "gonadorelin"
-              },
-              {
-                "id": "med-anastrazole",
-                "label": "Anastrazole (Arimadex)",
-                "value": "anastrazole"
-              },
-              {
-                "id": "med-none",
-                "label": "No",
-                "value": "none"
-              }
-            ],
-            "uuid": "a775a4da-b947-4b4b-8067-df8b462ca635",
-            "navigationRules": [
-              {
-                "condition": "medicationHistory == \"none\"",
-                "target": "49e06e01-84d1-4d7b-84ef-4c067bda1b24",
-                "isPage": true
-              },
-              {
-                "condition": "medicationHistory != \"none\"",
-                "target": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
-                "isPage": true
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 3 - Medication Timing",
-        "uuid": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
-        "items": [
-          {
-            "type": "selectablebox",
-            "fieldName": "medicationTiming",
-            "questionTitle": "Are you currently taking this medication, or did you take it previously?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "timing-current",
-                "label": "Currently taking the medication",
-                "value": "current"
-              },
-              {
-                "id": "timing-previous",
-                "label": "Previously took this medication",
-                "value": "previous"
-              }
-            ],
-            "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c990",
-            "navigationRules": [
-              {
-                "condition": "medicationTiming == \"current\" || medicationTiming == \"previous\"",
-                "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
-                "isPage": true
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 4 - Medication Dose",
-        "uuid": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
-        "items": [
-          {
-            "type": "textfield",
-            "fieldName": "medicationDose",
-            "label": "What dose were you taking, or are you taking currently?",
-            "placeholder": "Enter dosage information",
-            "description": "",
-            "defaultValue": "",
-            "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 5 - Medical Advice",
-        "uuid": "49e06e01-84d1-4d7b-84ef-4c067bda1b24",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "medicalAdvice",
@@ -223,14 +89,7 @@ const sampleSurvey =
                 "isPage": true
               }
             ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 6 - Cancer History",
-        "uuid": "1c14950b-1171-4a9b-b076-209d58b86f10",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "cancerHistory",
@@ -266,14 +125,7 @@ const sampleSurvey =
                 "isPage": true
               }
             ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 7 - Polycythemia",
-        "uuid": "e1c14950b-1171-4a9b-b076-209d58b86f11",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "polycythemia",
@@ -309,14 +161,7 @@ const sampleSurvey =
                 "isPage": true
               }
             ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 8 - Medical Conditions",
-        "uuid": "g1c14950b-1171-4a9b-b076-209d58b86f12",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "medicalConditions",
@@ -398,7 +243,120 @@ const sampleSurvey =
       },
       {
         "type": "set",
-        "name": "Page 9 - Symptom Assessment",
+        "name": "Page 2 - Medication History",
+        "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b515",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "medicationHistory",
+            "questionTitle": "Are you currently taking or have you taken any of the following in the past?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
+            "options": [
+              {
+                "id": "med-testosterone-injectable",
+                "label": "Testosterone Injectable",
+                "value": "testosterone-injectable"
+              },
+              {
+                "id": "med-testosterone-topical",
+                "label": "Testosterone Topical (Androgel, Testim, Bioidentical)",
+                "value": "testosterone-topical"
+              },
+              {
+                "id": "med-clomiphene",
+                "label": "Clomiphene (Clomid)",
+                "value": "clomiphene"
+              },
+              {
+                "id": "med-enclomiphene",
+                "label": "Enclomiphene",
+                "value": "enclomiphene"
+              },
+              {
+                "id": "med-hcg",
+                "label": "HCG (Human Chorionic Gonadotropin)",
+                "value": "hcg"
+              },
+              {
+                "id": "med-gonadorelin",
+                "label": "Gonadorelin",
+                "value": "gonadorelin"
+              },
+              {
+                "id": "med-anastrazole",
+                "label": "Anastrazole (Arimadex)",
+                "value": "anastrazole"
+              },
+              {
+                "id": "med-none",
+                "label": "No",
+                "value": "none"
+              }
+            ],
+            "uuid": "a775a4da-b947-4b4b-8067-df8b462ca635",
+            "navigationRules": [
+              {
+                "condition": "medicationHistory == \"none\"",
+                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "isPage": true
+              },
+              {
+                "condition": "medicationHistory != \"none\"",
+                "target": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
+                "isPage": true
+              }
+            ]
+          },
+          {
+            "type": "selectablebox",
+            "fieldName": "medicationTiming",
+            "questionTitle": "Are you currently taking this medication, or did you take it previously?",
+            "description": "Only answer if you selected a medication above (not 'No')",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
+            "options": [
+              {
+                "id": "timing-current",
+                "label": "Currently taking the medication",
+                "value": "current"
+              },
+              {
+                "id": "timing-previous",
+                "label": "Previously took this medication",
+                "value": "previous"
+              }
+            ],
+            "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c990",
+            "navigationRules": [
+              {
+                "condition": "medicationTiming == \"current\" || medicationTiming == \"previous\"",
+                "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
+                "isPage": true
+              }
+            ]
+          },
+          {
+            "type": "textfield",
+            "fieldName": "medicationDose",
+            "label": "What dose were you taking, or are you taking currently?",
+            "placeholder": "Enter dosage information (leave blank if not applicable)",
+            "description": "Only fill this out if you selected a medication in the first question",
+            "defaultValue": "",
+            "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 3 - Sexual Health Assessment",
         "uuid": "i1c14950b-1171-4a9b-b076-209d58b86f13",
         "items": [
           {
@@ -439,14 +397,7 @@ const sampleSurvey =
               }
             ],
             "uuid": "j4197f31-8da6-450c-af52-5ec8f664f5c2"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 10 - Erection Strength",
-        "uuid": "k1c14950b-1171-4a9b-b076-209d58b86f14",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "erectionStrength",
@@ -490,7 +441,7 @@ const sampleSurvey =
       },
       {
         "type": "set",
-        "name": "Page 11 - Energy Level",
+        "name": "Page 4 - Mental Health & Well-being Assessment",
         "uuid": "m1c14950b-1171-4a9b-b076-209d58b86f15",
         "items": [
           {
@@ -531,14 +482,7 @@ const sampleSurvey =
               }
             ],
             "uuid": "n4197f31-8da6-450c-af52-5ec8f664f5c4"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 12 - Enjoyment of Life",
-        "uuid": "o1c14950b-1171-4a9b-b076-209d58b86f16",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "enjoymentOfLife",
@@ -577,14 +521,7 @@ const sampleSurvey =
               }
             ],
             "uuid": "p4197f31-8da6-450c-af52-5ec8f664f5c5"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 13 - Depression Feelings",
-        "uuid": "q1c14950b-1171-4a9b-b076-209d58b86f17",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "depressionFeelings",
@@ -623,14 +560,7 @@ const sampleSurvey =
               }
             ],
             "uuid": "r4197f31-8da6-450c-af52-5ec8f664f5c6"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 14 - Anxiety Feelings",
-        "uuid": "s1c14950b-1171-4a9b-b076-209d58b86f18",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "anxietyFeelings",
@@ -674,7 +604,7 @@ const sampleSurvey =
       },
       {
         "type": "set",
-        "name": "Page 15 - Strength and Endurance",
+        "name": "Page 5 - Physical Performance Assessment",
         "uuid": "u1c14950b-1171-4a9b-b076-209d58b86f19",
         "items": [
           {
@@ -715,14 +645,7 @@ const sampleSurvey =
               }
             ],
             "uuid": "v4197f31-8da6-450c-af52-5ec8f664f5c8"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 16 - Sports Ability",
-        "uuid": "w1c14950b-1171-4a9b-b076-209d58b86f20",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "sportsAbility",
@@ -761,14 +684,7 @@ const sampleSurvey =
               }
             ],
             "uuid": "x4197f31-8da6-450c-af52-5ec8f664f5c9"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 17 - Height Loss",
-        "uuid": "y1c14950b-1171-4a9b-b076-209d58b86f21",
-        "items": [
+          },
           {
             "type": "selectablebox",
             "fieldName": "heightLoss",
@@ -797,7 +713,7 @@ const sampleSurvey =
       },
       {
         "type": "set",
-        "name": "Page 18 - Fertility Concerns",
+        "name": "Page 6 - Treatment Preferences",
         "uuid": "aa1c14950b-1171-4a9b-b076-209d58b86f22",
         "items": [
           {
@@ -849,7 +765,7 @@ const sampleSurvey =
             "variableName": "",
             "className": "",
             "uuid": "disq-allergy-html-uuid",
-            "isEndBlock": true,
+            "isEndBlock": true
           }
         ]
       },

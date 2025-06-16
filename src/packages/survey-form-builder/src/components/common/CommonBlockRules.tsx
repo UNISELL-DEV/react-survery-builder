@@ -23,13 +23,33 @@ export interface CommonBlockRulesProps {
 export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpdate }) => {
   // Keep local checkbox state in sync with incoming data
   const [isEndBlock, setIsEndBlock] = React.useState<boolean>(!!data.isEndBlock);
+  const [autoContinueOnSelect, setAutoContinueOnSelect] = React.useState<boolean>(!!data.autoContinueOnSelect);
+  const [showContinueButton, setShowContinueButton] = React.useState<boolean>(!!data.showContinueButton);
 
   // When the checkbox is toggled, update both local state and propagate the change
-  const handleCheckedChange = (checked: boolean) => {
+  const handleEndBlockChange = (checked: boolean) => {
     setIsEndBlock(checked);
     onUpdate?.({
       ...data,
       isEndBlock: checked,
+    });
+  };
+
+  // When the checkbox is toggled, update both local state and propagate the change
+  const handleAutoContinueChange = (checked: boolean) => {
+    setAutoContinueOnSelect(checked);
+    onUpdate?.({
+      ...data,
+      autoContinueOnSelect: checked,
+    });
+  };
+
+  // When the checkbox is toggled, update both local state and propagate the change
+  const handleShowContinueChange = (checked: boolean) => {
+    setShowContinueButton(checked);
+    onUpdate?.({
+      ...data,
+      showContinueButton: checked,
     });
   };
 
@@ -45,10 +65,26 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
         <Checkbox
           id="is-end-block"
           checked={isEndBlock}
-          onCheckedChange={handleCheckedChange}
+          onCheckedChange={handleEndBlockChange}
         />
-        <Label htmlFor="is-end-block">Mark as end block</Label>
+        <Label htmlFor="is-end-block">Mark as end block?</Label>
       </div>      
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="is-end-block"
+          checked={autoContinueOnSelect}
+          onCheckedChange={handleAutoContinueChange}
+        />
+        <Label htmlFor="is-end-block">Auto Continue To next?</Label>
+      </div>
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="is-end-block"
+          checked={showContinueButton}
+          onCheckedChange={handleShowContinueChange}
+        />
+        <Label htmlFor="is-end-block">Show Next Button?</Label>
+      </div>
     </div>
   );
 };
