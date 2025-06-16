@@ -1,8 +1,21 @@
 import type React from "react";
 import { useState } from "react";
 import { Button } from "@survey-form-builder/components/ui/button";
-import { Card, CardContent, CardHeader, CardFooter } from "@survey-form-builder/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardFooter,
+} from "@survey-form-builder/components/ui/card";
 import { Input } from "@survey-form-builder/components/ui/input";
+import {
+  Root as Sortable,
+  Content as SortableContent,
+  Item as SortableItem,
+  ItemHandle as SortableItemHandle,
+} from "@survey-form-builder/components/ui/sortable";
+import { arrayMove } from "@dnd-kit/sortable";
+import { GripVertical } from "lucide-react";
 import { ContentBlockItem } from "./ContentBlockItem";
 import { v4 as uuidv4 } from "uuid";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
@@ -63,6 +76,18 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
     });
   };
 
+  const handleBlockMove = (
+    activeIndex: number,
+    overIndex: number,
+  ) => {
+    if (activeIndex === overIndex) return;
+    const newItems = arrayMove(data.items || [], activeIndex, overIndex);
+    onUpdate({
+      ...data,
+      items: newItems,
+    });
+  };
+
   return (
     <Card className="mb-4 content-block-page">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -96,15 +121,32 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
         <CardContent>
           <div className="space-y-4">
             {/* Render the content block items */}
-            {(data.items || []).map((block, index) => (
-              <ContentBlockItem
-                key={block.uuid || index}
-                data={block}
-                onUpdate={(updatedBlock) => handleBlockUpdate(index, updatedBlock)}
-                onRemove={() => handleBlockRemove(index)}
-              />
-            ))}
-
+            <Sortable<BlockData>
+              value={data.items || []}
+              onMove={({ activeIndex, overIndex }) =>
+                handleBlockMove(activeIndex, overIndex)
+              }
+              getItemValue={(item) => item.uuid as string}
+            >
+              <SortableContent className="space-y-4">
+                {(data.items || []).map((block, index) => (
+                  <SortableItem key={block.uuid || index} value={block.uuid as string}>
+                    <div className="relative">
+                      <SortableItemHandle className="absolute -left-5 top-2 cursor-grab text-muted-foreground">
+                        <GripVertical className="h-4 w-4" />
+                      </SortableItemHandle>
+                      <ContentBlockItem
+                        data={block}
+                        onUpdate={(updatedBlock) =>
+                          handleBlockUpdate(index, updatedBlock)
+                        }
+                        onRemove={() => handleBlockRemove(index)}
+                      />
+                    </div>
+                  </SortableItem>
+                ))}
+              </SortableContent>
+            </Sortable>
             {/* Menu to add new blocks */}
             <div className="mt-4">
               <h4 className="text-sm font-medium mb-2">Add Item</h4>
