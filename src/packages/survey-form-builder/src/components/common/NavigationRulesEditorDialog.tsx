@@ -175,9 +175,14 @@ export const NavigationRulesEditorDialog = ({
     return (navigationRules || []).map(parseRule);
   });
 
+  const update = (rules: NavigationRule[]) => {
+    onSave?.(rules);
+    onClose();
+  }
+
   React.useEffect(() => {
     const converted = rules.map(buildRule);
-    onUpdate?.({ ...data, navigationRules: converted });
+    onSave?.(converted);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rules]);
 
@@ -221,10 +226,7 @@ export const NavigationRulesEditorDialog = ({
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-scroll">
         <DialogHeader>
-          <DialogTitle>Edit Navigation Rules</DialogTitle>
-          <DialogDescription>
-            Configure navigation rules for: <Badge variant="outline">{nodeName}</Badge>
-          </DialogDescription>
+          <DialogTitle>Edit Navigation Rules <Badge variant="outline">{nodeName}</Badge></DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
@@ -345,6 +347,14 @@ export const NavigationRulesEditorDialog = ({
             Add Rule
           </Button>
         </div>
+        <DialogFooter className="mt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="button" onClick={() => update(rules.map(buildRule))}>
+            Save
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
 

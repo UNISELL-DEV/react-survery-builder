@@ -320,6 +320,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
 
   // Convert survey data to flow nodes and edges
   useEffect(() => {
+    console.log('rootNode changed, regenerating layout:', rootNode);
     if (!rootNode) {
       setNodes([]);
       setEdges([]);
@@ -469,8 +470,9 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
     return `M ${sx} ${sy} C ${sx} ${sy + dr}, ${tx} ${ty - dr}, ${tx} ${ty}`;
   };
 
-  // Save navigation rules
-  const saveNavigationRules = (nodeId: string, rules: NavigationRule[]) => {
+  const saveNavigationRules = useCallback((nodeId: string, rules: NavigationRule[]) => {
+    console.log('Saving navigation rules:', { nodeId, rules });
+    
     // Update edges for visual representation
     setEdges(prev => {
       const otherEdges = prev.filter(e => e.source !== nodeId);
@@ -484,31 +486,51 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
       return [...otherEdges, ...newEdges];
     });
 
-    // Update the actual node data in context
+    // Find the node data
     const selectedNodeData = nodes.find(n => n.id === nodeId);
-    if (selectedNodeData?.data.originalData && updateNode) {
-      // For nodes that have items (new structure), update the first item's navigation rules
-      if (selectedNodeData.data.originalData.items && selectedNodeData.data.originalData.items.length > 0) {
-        const updatedItems = [...selectedNodeData.data.originalData.items];
-        updatedItems[0] = {
-          ...updatedItems[0],
-          navigationRules: rules
-        };
-        
-        updateNode(nodeId, {
-          ...selectedNodeData.data.originalData,
-          items: updatedItems
-        });
-      } else {
-        // For nodes without items, update the node directly
-        updateNode(nodeId, {
-          ...selectedNodeData.data.originalData,
-          navigationRules: rules
-        });
-      }
+    if (!selectedNodeData?.data.originalData || !updateNode) {
+      console.error('Could not find node data or updateNode function', { nodeId, selectedNodeData, updateNode });
+      return;
     }
 
-    // Update visual nodes
+    const originalData = selectedNodeData.data.originalData;
+    
+    // Determine how to update the navigation rules based on node structure
+    let updatedNodeData: any;
+    
+    if (originalData.items && originalData.items.length > 0) {
+      // New structure: navigation rules are on the first item
+      const updatedItems = [...originalData.items];
+      updatedItems[0] = {
+        ...updatedItems[0],
+        navigationRules: rules
+      };
+      
+      updatedNodeData = {
+        ...originalData,
+        items: updatedItems
+      };
+      
+      console.log('Updating node with items structure:', updatedNodeData);
+    } else {
+      // Old structure: navigation rules are directly on the node
+      updatedNodeData = {
+        ...originalData,
+        navigationRules: rules
+      };
+      
+      console.log('Updating node with direct structure:', updatedNodeData);
+    }
+
+    // Update the node in the context
+    try {
+      updateNode(nodeId, updatedNodeData);
+      console.log('Successfully updated node in context');
+    } catch (error) {
+      console.error('Error updating node in context:', error);
+    }
+
+    // Update visual nodes to reflect the change immediately
     setNodes(prev => prev.map(node => {
       if (node.id === nodeId) {
         return {
@@ -516,12 +538,14 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
           data: {
             ...node.data,
             hasConditionalFlow: rules.length > 0,
+            originalData: updatedNodeData, // Update the cached original data
           },
         };
       }
       return node;
     }));
-  };
+    
+  }, [nodes, updateNode]);
 
   const isDarkMode = typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
 

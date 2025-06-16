@@ -10,29 +10,29 @@ import { ContentBlockPage } from "../blocks/ContentBlockPage";
 import { v4 as uuidv4 } from "uuid";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { NodeData } from "../../types";
-
-interface SectionNodeProps {
+import {
+  Root as Sortable,
+  Content as SortableContent,
+  Item as SortableItem,
+  ItemHandle as SortableItemHandle,
+} from "@survey-form-builder/components/ui/sortable";
+import { arrayMove } from "@dnd-kit/sortable";
+import { GripVertical } from "lucide-react";interface SectionNodeProps {
   data: NodeData;
   onUpdate: (data: NodeData) => void;
   onRemove: () => void;
-}
-
-export const SectionNode: React.FC<SectionNodeProps> = ({
+}export const SectionNode: React.FC<SectionNodeProps> = ({
   data,
   onUpdate,
   onRemove,
 }) => {
   const { createNode } = useSurveyBuilder();
-  const [collapsed, setCollapsed] = useState(false);
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [collapsed, setCollapsed] = useState(false);  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onUpdate({
       ...data,
       name: e.target.value,
     });
-  };
-
-  const handleScriptChange = (
+  };  const handleScriptChange = (
     type: "entryLogic" | "exitLogic" | "navigationLogic" | "backLogic",
     value: string
   ) => {
@@ -40,9 +40,7 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
       ...data,
       [type]: value,
     });
-  };
-
-  const handleAddPage = () => {
+  };  const handleAddPage = () => {
     // Add a new page (content block) to the section
     onUpdate({
       ...data,
@@ -56,33 +54,35 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
         },
       ],
     });
-  };
-
-  const handleUpdatePage = (index: number, pageData: any) => {
+  };  const handleUpdatePage = (index: number, pageData: any) => {
     const newItems = [...(data.items || [])];
     newItems[index] = pageData;
     onUpdate({
       ...data,
       items: newItems,
     });
-  };
-
-  const handleRemovePage = (index: number) => {
+  };  const handleRemovePage = (index: number) => {
     const newItems = [...(data.items || [])];
     newItems.splice(index, 1);
     onUpdate({
       ...data,
       items: newItems,
     });
-  };
-
-  const handleAddChildSection = () => {
+  };  const handleAddChildSection = () => {
     if (data.uuid) {
       createNode(data.uuid, "section");
     }
-  };
-
-  return (
+  };  const handlePageMove = (
+    activeIndex: number,
+    overIndex: number,
+  ) => {
+    if (activeIndex === overIndex) return;
+    const newItems = arrayMove(data.items || [], activeIndex, overIndex);
+    onUpdate({
+      ...data,
+      items: newItems,
+    });
+  };  return (
     <Card className="mb-4 section-node">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="flex gap-2 items-center">
@@ -111,28 +111,40 @@ export const SectionNode: React.FC<SectionNodeProps> = ({
             Remove
           </Button>
         </div>
-      </CardHeader>
-
-      {!collapsed && (
+      </CardHeader>      {!collapsed && (
         <CardContent>
           <Tabs defaultValue="pages">
             <TabsList className="mb-4">
               <TabsTrigger value="pages">Pages</TabsTrigger>
               <TabsTrigger value="scripts">Scripts</TabsTrigger>
               <TabsTrigger value="children">Child Nodes</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="pages">
+            </TabsList>            <TabsContent value="pages">
               <div className="space-y-4">
-                {(data.items || []).map((page, index) => (
-                  <ContentBlockPage
-                    key={page.uuid || index}
-                    data={page}
-                    onUpdate={(updatedPage) => handleUpdatePage(index, updatedPage)}
-                    onRemove={() => handleRemovePage(index)}
-                  />
-                ))}
-
+                <Sortable<NodeData>
+                  value={data.items || []}
+                  onMove={({ activeIndex, overIndex }) =>
+                    handlePageMove(activeIndex, overIndex)
+                  }
+                  getItemValue={(item) => item.uuid as string}
+                >
+                  <SortableContent className="space-y-4">
+                    {(data.items || []).map((page, index) => (
+                      <SortableItem key={page.uuid || index} value={page.uuid as string}>
+                        <div className="relative">
+                          <SortableItemHandle className="absolute -left-5 top-2 cursor-grab text-muted-foreground">
+                            <GripVertical className="h-4 w-4" />
+                          </SortableItemHandle>
+                          <ContentBlockPage
+                            key={page.uuid || index}
+                            data={page}
+                            onUpdate={(updatedPage) => handleUpdatePage(index, updatedPage)}
+                            onRemove={() => handleRemovePage(index)}
+                          />
+                        </div>
+                      </SortableItem>
+                    ))}
+                  </SortableContent>
+                </Sortable>                
                 <Button type="button" onClick={handleAddPage}>Add Page</Button>
               </div>
             </TabsContent>

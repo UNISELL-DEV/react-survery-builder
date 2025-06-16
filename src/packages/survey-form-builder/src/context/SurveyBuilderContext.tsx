@@ -83,15 +83,35 @@ const surveyBuilderReducer = (
           };
         }
 
-        if (!node.nodes) return node;
+        // Check items array (new structure) - items contain BlockData
+        if (node.items) {
+          const updatedItems = node.items.map((item: any) => {
+            if (typeof item === "object" && item.uuid) {
+              return addNodeToParent(item);
+            }
+            return item;
+          });
+          
+          // Check if any item was updated
+          if (updatedItems !== node.items) {
+            return { ...node, items: updatedItems };
+          }
+        }
 
-        return {
-          ...node,
-          nodes: node.nodes.map((childNode) => {
+        // Check nodes array (old structure)
+        if (node.nodes) {
+          const updatedNodes = node.nodes.map((childNode) => {
             if (typeof childNode === "string") return childNode;
             return addNodeToParent(childNode);
-          }),
-        };
+          });
+          
+          // Check if any node was updated
+          if (updatedNodes !== node.nodes) {
+            return { ...node, nodes: updatedNodes };
+          }
+        }
+
+        return node;
       };
 
       return {
@@ -105,21 +125,50 @@ const surveyBuilderReducer = (
 
       const { uuid, nodeData } = action.payload;
 
-      // Helper function to update node
+      // Helper function to update node - now handles both items and nodes arrays
       const updateNode = (node: NodeData): NodeData => {
         if (node.uuid === uuid) {
           return { ...node, ...nodeData, uuid };
         }
 
-        if (!node.nodes) return node;
+        let updated = false;
+        let updatedNode = { ...node };
 
-        return {
-          ...node,
-          nodes: node.nodes.map((childNode) => {
+        // Handle items array (new structure) - items are BlockData
+        if (node.items) {
+          const updatedItems = node.items.map((item: any) => {
+            if (typeof item === "object" && item.uuid) {
+              const updatedItem = updateNode(item);
+              if (updatedItem !== item) {
+                updated = true;
+              }
+              return updatedItem;
+            }
+            return item;
+          });
+          
+          if (updated) {
+            updatedNode.items = updatedItems;
+          }
+        }
+
+        // Handle nodes array (old structure) - only if items didn't already update
+        if (!updated && node.nodes) {
+          const updatedNodes = node.nodes.map((childNode) => {
             if (typeof childNode === "string") return childNode;
-            return updateNode(childNode);
-          }),
-        };
+            const updatedChildNode = updateNode(childNode);
+            if (updatedChildNode !== childNode) {
+              updated = true;
+            }
+            return updatedChildNode;
+          });
+          
+          if (updated) {
+            updatedNode.nodes = updatedNodes;
+          }
+        }
+
+        return updated ? updatedNode : node;
       };
 
       return {
@@ -133,27 +182,64 @@ const surveyBuilderReducer = (
 
       const uuid = action.payload;
 
-      // Helper function to remove node
+      // Helper function to remove node - now handles both items and nodes arrays
       const removeNode = (node: NodeData): NodeData | null => {
         if (node.uuid === uuid) {
           return null;
         }
 
-        if (!node.nodes) return node;
+        let updatedNode = { ...node };
+        let hasChanges = false;
 
-        const updatedNodes = node.nodes
-          .map((childNode) => {
-            if (typeof childNode === "string") {
-              return childNode === uuid ? null : childNode;
-            }
-            return removeNode(childNode);
-          })
-          .filter(Boolean) as Array<NodeData | UUID>;
+        // Handle items array (new structure) - items are BlockData
+        if (node.items) {
+          const updatedItems = node.items
+            .map((item: any) => {
+              if (typeof item === "object" && item.uuid === uuid) {
+                hasChanges = true;
+                return null;
+              }
+              if (typeof item === "object" && item.uuid) {
+                const result = removeNode(item);
+                if (result !== item) {
+                  hasChanges = true;
+                }
+                return result;
+              }
+              return item;
+            })
+            .filter(Boolean);
 
-        return {
-          ...node,
-          nodes: updatedNodes,
-        };
+          if (hasChanges) {
+            updatedNode.items = updatedItems;
+          }
+        }
+
+        // Handle nodes array (old structure)
+        if (node.nodes) {
+          const updatedNodes = node.nodes
+            .map((childNode) => {
+              if (typeof childNode === "string") {
+                if (childNode === uuid) {
+                  hasChanges = true;
+                  return null;
+                }
+                return childNode;
+              }
+              const result = removeNode(childNode);
+              if (result !== childNode) {
+                hasChanges = true;
+              }
+              return result;
+            })
+            .filter(Boolean) as Array<NodeData | UUID>;
+
+          if (hasChanges) {
+            updatedNode.nodes = updatedNodes;
+          }
+        }
+
+        return hasChanges ? updatedNode : node;
       };
 
       return {
