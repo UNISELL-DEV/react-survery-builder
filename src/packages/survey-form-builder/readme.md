@@ -1,0 +1,168 @@
+# React Survey Builder
+
+A flexible and customizable React library for building dynamic surveys and forms with a visual editor.
+
+## Features
+
+- **Visual Survey Builder**: Intuitive drag-and-drop interface for constructing surveys
+- **Multiple Question Types**: Text, Textarea, Radio, Checkbox, HTML, Markdown, and more
+- **Conditional Logic**: Add navigation logic to create dynamic flows based on responses
+- **Localization Support**: Built-in tools for multi-language surveys
+- **Customizable Design**: Styled with Tailwind CSS and Shadcn UI for a modern look
+- **Extensible**: Easy to add custom question types and components
+- **Export/Import**: Save and load surveys in JSON format
+- **TypeScript Support**: Full type definitions for better development experience
+
+## Installation
+
+```bash
+# Using npm
+npm install react-survey-builder
+
+# Using yarn
+yarn add react-survey-builder
+
+# Using pnpm
+pnpm add react-survey-builder
+
+# Using bun
+bun add react-survey-builder
+```
+
+## Quick Start
+
+```jsx
+import { SurveyBuilder, StandardBlocks, StandardNodes } from 'react-survey-builder';
+import 'react-survey-builder/dist/styles.css'; // Import styles
+
+function App() {
+  const handleDataChange = (data) => {
+    console.log('Survey data:', data);
+  };
+
+  return (
+    <div style={{ height: '800px' }}>
+      <SurveyBuilder
+        blockDefinitions={StandardBlocks}
+        nodeDefinitions={StandardNodes}
+        onDataChange={handleDataChange}
+      />
+    </div>
+  );
+}
+```
+
+## Creating Custom Question Types
+
+You can extend the survey builder with your own custom block types:
+
+```jsx
+import { BlockDefinition } from 'react-survey-builder';
+import { CreditCard } from 'lucide-react';
+
+// Create a custom credit card input block
+const CreditCardBlock = {
+  type: 'credit-card',
+  name: 'Credit Card Input',
+  description: 'Collect credit card information',
+  icon: <CreditCard className="w-4 h-4" />,
+  defaultData: {
+    type: 'credit-card',
+    fieldName: 'cardNumber',
+    label: 'Card Number',
+    placeholder: 'XXXX XXXX XXXX XXXX',
+  },
+  renderItem: ({ data }) => (
+    <div className="space-y-2">
+      <label>{data.label}</label>
+      <input
+        type="text"
+        name={data.fieldName}
+        placeholder={data.placeholder}
+        className="w-full p-2 border rounded-md"
+      />
+    </div>
+  ),
+  renderFormFields: ({ data, onUpdate }) => (
+    <div>
+      {/* Form to customize this block */}
+      <input
+        value={data.label || ''}
+        onChange={(e) => onUpdate({ ...data, label: e.target.value })}
+      />
+    </div>
+  ),
+  renderPreview: () => (
+    <div className="p-2 bg-muted flex items-center justify-center">
+      <input
+        type="text"
+        placeholder="XXXX XXXX XXXX XXXX"
+        className="w-4/5 p-1 border"
+        disabled
+      />
+    </div>
+  ),
+};
+
+// Add your custom block to the SurveyBuilder
+function App() {
+  return (
+    <SurveyBuilder
+      blockDefinitions={[...StandardBlocks, CreditCardBlock]}
+      nodeDefinitions={StandardNodes}
+    />
+  );
+}
+```
+
+## API Reference
+
+### SurveyBuilder Component
+
+The main component for the survey builder interface.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `initialData` | `object` | Optional initial survey data |
+| `blockDefinitions` | `array` | Array of block definition objects |
+| `nodeDefinitions` | `array` | Array of node definition objects |
+| `onDataChange` | `function` | Callback when survey data changes |
+
+### BlockDefinition Interface
+
+Interface for defining custom question/content blocks.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `type` | `string` | Unique identifier for the block type |
+| `name` | `string` | Display name in the UI |
+| `description` | `string` | Description of the block |
+| `icon` | `ReactNode` | Icon to display in the UI |
+| `defaultData` | `object` | Default properties for new instances |
+| `renderItem` | `function` | React component to render the block |
+| `renderFormFields` | `function` | React component to render the editor form |
+| `renderPreview` | `function` | React component to render a preview |
+| `validate` | `function` | Optional validation function |
+
+## Migrating from Vanilla JS Version
+
+This library is a complete rewrite of a vanilla JavaScript survey builder, now using React and modern web technologies. If you're migrating from the vanilla JS version:
+
+1. Replace script imports with React component imports
+2. Convert your block definitions to the new format
+3. Use the `SurveyBuilder` component instead of direct DOM manipulation
+4. Update any custom UI to use React components
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
