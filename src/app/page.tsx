@@ -69,6 +69,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "med-testosterone-injectable",
@@ -140,6 +142,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "timing-current",
@@ -192,6 +196,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "advice-yes",
@@ -233,6 +239,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "cancer-yes",
@@ -274,6 +282,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "poly-yes",
@@ -315,6 +325,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "multiSelect": true,
             "options": [
               {
@@ -397,6 +409,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "libido-1",
@@ -441,6 +455,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "erection-1",
@@ -485,6 +501,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "energy-1",
@@ -529,6 +547,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "enjoyment-1",
@@ -573,6 +593,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "depression-1",
@@ -617,6 +639,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "anxiety-1",
@@ -661,6 +685,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "strength-1",
@@ -705,6 +731,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "sports-1",
@@ -749,6 +777,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "height-yes",
@@ -778,6 +808,8 @@ const sampleSurvey =
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
             "options": [
               {
                 "id": "fertility-yes",
@@ -816,7 +848,8 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your allergy history with testosterone or related medications, we cannot safely provide TRT treatment at this time.</p><p class=\"text-sm text-gray-500\">We recommend consulting with your healthcare provider for alternative treatment options.</p></div></div>",
             "variableName": "",
             "className": "",
-            "uuid": "disq-allergy-html-uuid"
+            "uuid": "disq-allergy-html-uuid",
+            "isEndBlock": true,
           }
         ]
       },
@@ -830,6 +863,7 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on medical advice you've received to avoid hormone replacement therapy, we cannot provide TRT treatment at this time.</p><p class=\"text-sm text-gray-500\">Please follow your healthcare provider's recommendations regarding hormone replacement therapy.</p></div></div>",
             "variableName": "",
             "className": "",
+            "isEndBlock": true,
             "uuid": "disq-medical-html-uuid"
           }
         ]
@@ -844,6 +878,7 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Due to your history of prostate, breast, or testicular cancer, TRT treatment is not recommended and could be unsafe.</p><p class=\"text-sm text-gray-500\">Please consult with your oncologist for appropriate treatment options.</p></div></div>",
             "variableName": "",
             "className": "",
+            "isEndBlock": true,
             "uuid": "disq-cancer-html-uuid"
           }
         ]
@@ -858,6 +893,7 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Your history of polycythemia (high red blood cell count) makes TRT treatment unsafe, as it can further increase red blood cell production.</p><p class=\"text-sm text-gray-500\">Please work with your hematologist to manage your condition.</p></div></div>",
             "variableName": "",
             "className": "",
+            "isEndBlock": true,
             "uuid": "disq-poly-html-uuid"
           }
         ]
@@ -872,6 +908,7 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your medical history, TRT treatment may not be safe for you at this time. Your existing conditions require careful management.</p><p class=\"text-sm text-gray-500\">Please consult with your healthcare provider about alternative treatment options that are appropriate for your medical conditions.</p></div></div>",
             "variableName": "",
             "className": "",
+            "isEndBlock": true,
             "uuid": "disq-conditions-html-uuid"
           }
         ]
@@ -886,6 +923,7 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your responses, you appear to be a good candidate for Testosterone Replacement Therapy. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">What happens next:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Medical review of your responses</li><li>• Lab work coordination</li><li>• Treatment plan development</li><li>• Medication delivery setup</li></ul></div></div></div>",
             "variableName": "",
             "className": "",
+            "isEndBlock": true,
             "uuid": "qualified-test-html-uuid"
           }
         ]
@@ -900,6 +938,7 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for Enclomiphene</h2><p class=\"text-gray-600 mb-6\">Based on your fertility concerns, we recommend Enclomiphene treatment, which can help boost testosterone while preserving fertility. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Benefits of Enclomiphene:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Increases natural testosterone production</li><li>• Preserves fertility and sperm production</li><li>• Oral medication (no injections)</li><li>• Fewer side effects than traditional TRT</li></ul></div></div></div>",
             "variableName": "",
             "className": "",
+            "isEndBlock": true,
             "uuid": "qualified-enclo-html-uuid"
           }
         ]

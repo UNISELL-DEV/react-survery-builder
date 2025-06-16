@@ -419,7 +419,6 @@ export function getNextStepFromNavigationRules(
   if (!block.navigationRules) return null;
 
   for (const rule of block.navigationRules) {
-    console.log(evaluateNavigationalRule(rule, fieldValues))
     // evaluateNavigationalRule(rule, fieldValues)
     const evaluate = evaluateNavigationalRule(rule, fieldValues);
     if(evaluate.matched) {
