@@ -443,13 +443,16 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       return;
     }
 
-    const currentValues = fValue ?? values;
+    const mergedValues = fValue ? { ...values, ...fValue } : values;
+    if (fValue) {
+      setValues(prev => ({ ...prev, ...fValue }));
+    }
 
     const target = getNextStepFromNavigationRules(
       currentBlock,
       pages,
       pageIds,
-      { ...currentValues, ...computedValues }
+      { ...mergedValues, ...computedValues }
     );
 
     if (target === 'submit') {

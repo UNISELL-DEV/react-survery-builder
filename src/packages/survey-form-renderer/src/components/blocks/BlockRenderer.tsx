@@ -17,6 +17,7 @@ import { SetRenderer } from './SetRenderer';
 import { ConditionalBlock } from './ConditionalBlock';
 import { CalculatedFieldRenderer } from './CalculatedFieldRenderer';
 import { BMICalculatorRenderer } from './BMICalculatorRenderer';
+import { AuthRenderer } from './AuthRenderer';
 import { themes } from '../../themes';
 import { blockTypeMap, validateBlock } from '../../utils/blockAdapter';
 import { useSurveyForm } from '../../context/SurveyFormContext';
@@ -120,6 +121,8 @@ export const BlockRenderer = forwardRef<HTMLElement, BlockRendererProps>((props,
       return <MarkdownRenderer block={block} {...commonProps} />;
     case 'html':
       return <HtmlRenderer block={block} {...commonProps} />;
+    case 'auth':
+      return <AuthRenderer block={block} {...commonProps} />;
     case 'script':
       return <ScriptRenderer block={block} theme={theme} />;
     case 'set':
