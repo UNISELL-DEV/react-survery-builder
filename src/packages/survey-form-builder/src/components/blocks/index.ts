@@ -5,6 +5,7 @@ import { CheckboxBlock } from "./CheckboxBlock";
 import { MarkdownBlock } from "./MarkdownBlock";
 import { HtmlBlock } from "./HtmlBlock";
 import { ScriptBlock } from "./ScriptBlock";
+import { AuthBlock } from "./AuthBlock";
 import { SelectBlock } from "./SelectBlock";
 import { RangeBlock } from "./RangeBlock";
 import { DatePickerBlock } from "./DatePickerBlock";
@@ -36,6 +37,7 @@ export const StandardBlocks: BlockDefinition[] = [
   HtmlBlock,
 
   // Logic blocks
+  AuthBlock,
   ScriptBlock,
 
   // Advanced calculation and conditional blocks
@@ -53,6 +55,7 @@ export {
   MarkdownBlock,
   HtmlBlock,
   ScriptBlock,
+  AuthBlock,
   SelectBlock,
   RangeBlock,
   DatePickerBlock,

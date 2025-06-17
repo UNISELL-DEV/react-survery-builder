@@ -1,6 +1,6 @@
 import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
 import { Activity } from "lucide-react";
-import { TextInputBlock, TextareaBlock, SelectBlock, RadioBlock, CheckboxBlock, RangeBlock, DatePickerBlock, FileUploadBlock, MatrixBlock, SelectableBoxQuestionBlock, MarkdownBlock, HtmlBlock, ScriptBlock } from "./blockdefinations";
+import { TextInputBlock, TextareaBlock, SelectBlock, RadioBlock, CheckboxBlock, RangeBlock, DatePickerBlock, FileUploadBlock, MatrixBlock, SelectableBoxQuestionBlock, MarkdownBlock, HtmlBlock, ScriptBlock, AuthBlock } from "./blockdefinations";
 
 // Export the block definition
 export const BMICalculatorBlock: BlockDefinition = {
@@ -49,6 +49,7 @@ export const blockTypeMap: Record<string, any> = {
   // Content blocks
   markdown: MarkdownBlock,
   html: HtmlBlock,
+  auth: AuthBlock,
 
   // Logic blocks
   script: ScriptBlock,

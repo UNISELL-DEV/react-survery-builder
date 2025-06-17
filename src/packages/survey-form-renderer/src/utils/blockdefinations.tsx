@@ -1,5 +1,5 @@
 import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
-import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload } from "lucide-react";
+import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload, UserCheck } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
 // Export the block definition
@@ -182,6 +182,29 @@ export const HtmlBlock: BlockDefinition = {
     if (!data.html) return "HTML content is required";
     return null;
   },
+};
+
+export const AuthBlock: BlockDefinition = {
+  type: "auth",
+  name: "Authentication",
+  description: "Authenticate user before continuing",
+  icon: <UserCheck className="w-4 h-4" />,
+  defaultData: {
+    type: "auth",
+    loginUrl: "",
+    signupUrl: "",
+    useOtp: false,
+    sendOtpUrl: "",
+    verifyOtpUrl: "",
+    tokenField: "token",
+    tokenStorageKey: "authToken",
+    validateTokenUrl: "",
+    requireName: false,
+    requireEmail: true,
+    nameLabel: "Name",
+    emailLabel: "Email",
+  },
+  validate: () => null,
 };
 
 // Export the block definition

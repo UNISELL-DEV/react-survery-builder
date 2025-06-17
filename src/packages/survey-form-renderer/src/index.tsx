@@ -15,6 +15,7 @@ import { MatrixRenderer } from './components/blocks/MatrixRenderer';
 import { SelectableBoxRenderer } from './components/blocks/SelectableBoxRenderer';
 import { ScriptRenderer } from './components/blocks/ScriptRenderer';
 import { SetRenderer } from './components/blocks/SetRenderer';
+import { AuthRenderer } from './components/blocks/AuthRenderer';
 import { DebugInfo } from './components/ui/DebugInfo';
 
 // New conditional components
@@ -86,6 +87,7 @@ export {
   SelectableBoxRenderer,
   ScriptRenderer,
   SetRenderer,
+  AuthRenderer,
 
   // UI components
   DebugInfo,

@@ -115,6 +115,38 @@ function App() {
 }
 ```
 
+## Authentication Block
+
+The `AuthBlock` allows you to authenticate users before they continue the survey.
+Configure the following fields in the block editor:
+
+- **loginUrl** – endpoint for login requests
+- **signupUrl** – optional endpoint for creating new accounts
+- **useOtp** – enable passwordless authentication
+  - **sendOtpUrl** – endpoint to request the OTP
+  - **verifyOtpUrl** – endpoint to verify the OTP
+- **tokenField** – name of the property containing the token in the API response
+- **tokenStorageKey** – key used to store the token in `localStorage` (default `authToken`)
+- **validateTokenUrl** – optional endpoint to validate an existing token when the block mounts
+- **requireName** – prompt for the user's name
+- **requireEmail** – prompt for the user's email
+- **nameLabel** – label for the name field
+- **emailLabel** – label for the email field
+
+All data returned from your authentication APIs is stored in the form context and included in the final submission JSON.
+
+After successful authentication, the token is saved and the survey automatically continues.
+
+### API Structure
+
+Each endpoint should accept and return JSON. A typical login request sends `{ name, email }` and expects a response containing at least the property defined by `tokenField` (default `token`). When `useOtp` is enabled, `sendOtpUrl` receives `{ name, email }` and `verifyOtpUrl` should verify `{ email, otp }`.
+
+Any extra data returned from these APIs is merged into the form context and can be used later in your survey or submission handler.
+
+### Testing Endpoints
+
+The AuthBlock editor includes a **Test Endpoints** button which issues a simple `GET` request to each configured URL and reports whether it responds successfully. Use this to confirm your URLs are reachable while building your survey.
+
 ## API Reference
 
 ### SurveyBuilder Component
