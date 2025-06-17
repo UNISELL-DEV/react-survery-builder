@@ -60,7 +60,7 @@ export const CommonBlockRules: React.FC<CommonBlockRulesProps> = ({ data, onUpda
 
   return (
     <div className="space-y-4 mt-4 mb-4">
-      <Label>Common Props</Label>
+      <Label>Base Settings</Label>
       <div className="flex items-center gap-2 mt-4">
         <Checkbox
           id="is-end-block"
