@@ -463,7 +463,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                   </div>
 
                   {/* Skip if Logged In Option */}
-                  <Card className="p-4 bg-blue-50 border-blue-200">
+                  <Card className="p-4 border-blue-200">
                     <div className="flex items-center space-x-2 mb-3">
                       <Checkbox
                         id="skipIfLoggedIn"
@@ -639,7 +639,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                   </p>
 
                   {data.useOtp && (
-                    <div className="space-y-4 p-4 bg-blue-50 rounded-lg">
+                    <div className="space-y-4 p-4 rounded-lg">
                       {data.requireEmail && (
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
@@ -740,7 +740,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                     Add Header
                   </Button>
 
-                  <div className="p-3 bg-blue-50 rounded text-sm">
+                  <div className="p-3 rounded text-sm">
                     <strong>Common headers:</strong>
                     <ul className="mt-1 space-y-1">
                       <li>• <code>X-Merchant-ID</code> → <code>123</code> (for merchant identification)</li>
@@ -800,7 +800,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                     Add Parameter
                   </Button>
 
-                  <div className="p-3 bg-green-50 rounded text-sm">
+                  <div className="p-3 rounded text-sm">
                     <strong>Common parameters:</strong>
                     <ul className="mt-1 space-y-1">
                       <li>• <code>merchant_id</code> → <code>123</code> (for merchant identification)</li>
@@ -861,7 +861,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                     Add Mapping
                   </Button>
 
-                  <div className="p-3 bg-blue-50 rounded text-sm">
+                  <div className="p-3 rounded text-sm">
                     <strong>Example mappings:</strong>
                     <ul className="mt-1 space-y-1">
                       <li>• <code>user.id</code> → <code>userId</code></li>
@@ -946,7 +946,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                   )}
 
                   {testResults.length > 0 && (
-                    <div className="p-4 bg-gray-50 rounded">
+                    <div className="p-4 ounded">
                       <h4 className="font-medium mb-2">Test Results:</h4>
                       <pre className="text-sm whitespace-pre-wrap font-mono max-h-96 overflow-y-auto">
                         {testResults.join('\n')}
@@ -958,7 +958,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
             </TabsContent>
 
             <TabsContent value="docs" className="space-y-4">
-              <Card>
+              <Card className="max-w-2xl">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="w-4 h-4" />
@@ -969,7 +969,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                   <div className="prose prose-sm max-w-none">
                     <h3>Authentication Flow Overview</h3>
                     
-                    <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="p-4 rounded-lg">
                       <h4 className="text-blue-800 font-medium">Step-by-Step User Experience:</h4>
                       <ol className="text-blue-700 mt-2 space-y-1">
                         <li>1. User enters name (if required)</li>
@@ -982,7 +982,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                     </div>
 
                     {data.skipIfLoggedIn && (
-                      <div className="bg-green-50 p-4 rounded-lg">
+                      <div className="p-4 rounded-lg">
                         <h4 className="text-green-800 font-medium">Skip if Logged In Behavior:</h4>
                         <ul className="text-green-700 mt-2 space-y-1">
                           <li>• If a valid token exists in storage, this block will be automatically skipped</li>
@@ -994,7 +994,7 @@ const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemo
                     )}
 
                     <h4>1. Direct Authentication (OTP Disabled)</h4>
-                    <div className="bg-gray-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>Login/Signup Request:</strong>
                       <pre className="mt-2 bg-gray-800 text-green-400 p-2 rounded overflow-x-auto">
 {`POST /api/login
@@ -1008,7 +1008,7 @@ Content-Type: application/json
                       </pre>
                     </div>
 
-                    <div className="bg-gray-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>Success Response:</strong>
                       <pre className="mt-2 bg-gray-800 text-green-400 p-2 rounded overflow-x-auto">
 {`{
@@ -1027,7 +1027,7 @@ Content-Type: application/json
 
                     <h4>2. OTP Authentication Flow</h4>
                     
-                    <div className="bg-gray-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>Send OTP Request:</strong>
                       <pre className="mt-2 bg-gray-800 text-green-400 p-2 rounded overflow-x-auto">
 {`POST /api/send-email-otp  // or /api/send-mobile-otp
@@ -1044,7 +1044,7 @@ X-Merchant-ID: 123
                       </pre>
                     </div>
 
-                    <div className="bg-gray-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>Verify OTP Request:</strong>
                       <pre className="mt-2 bg-gray-800 text-green-400 p-2 rounded overflow-x-auto">
 {`POST /api/verify-email-otp  // or /api/verify-mobile-otp
@@ -1061,7 +1061,7 @@ X-Merchant-ID: 123
                       </pre>
                     </div>
 
-                    <div className="bg-gray-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>OTP Verification Success Response:</strong>
                       <pre className="mt-2 bg-gray-800 text-green-400 p-2 rounded overflow-x-auto">
 {`{
@@ -1079,7 +1079,7 @@ X-Merchant-ID: 123
                     </div>
 
                     <h4>3. Token Validation (Optional)</h4>
-                    <div className="bg-gray-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>Request:</strong>
                       <pre className="mt-2 bg-gray-800 text-green-400 p-2 rounded overflow-x-auto">
 {`POST /api/validate-token
@@ -1095,7 +1095,7 @@ X-Merchant-ID: 123
                     </div>
 
                     <h4>4. Error Response Format</h4>
-                    <div className="bg-red-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <strong>All endpoints should return errors in this format:</strong>
                       <pre className="mt-2 bg-gray-800 text-red-400 p-2 rounded overflow-x-auto">
 {`{
@@ -1107,7 +1107,7 @@ X-Merchant-ID: 123
                     </div>
 
                     <h4>5. Data Storage</h4>
-                    <div className="bg-green-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <p className="text-green-800">
                         The authentication data will be stored in the form results under the field name you specified.
                         The stored data includes all user information, token, and mapped fields from your API response.
@@ -1115,7 +1115,7 @@ X-Merchant-ID: 123
                     </div>
 
                     <h4>6. Custom Headers & Body Parameters</h4>
-                    <div className="bg-purple-50 p-3 rounded text-sm">
+                    <div className="p-3 rounded text-sm">
                       <p className="text-purple-800 mb-2">
                         <strong>Custom Headers:</strong> All configured custom headers are sent with every API request. 
                         Common use cases include merchant identification, API keys, and version tracking.

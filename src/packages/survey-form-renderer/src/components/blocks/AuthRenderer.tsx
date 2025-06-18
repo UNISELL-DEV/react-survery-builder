@@ -383,8 +383,8 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
         : (block as any).verifyMobileOtpUrl;
       
       const baseBody = type === 'email' 
-        ? { email, otp } 
-        : { mobile, otp };
+        ? { name, email, otp } 
+        : { name, mobile, otp };
 
       const headers = buildRequestHeaders();
       const requestBody = buildRequestBody(baseBody);
