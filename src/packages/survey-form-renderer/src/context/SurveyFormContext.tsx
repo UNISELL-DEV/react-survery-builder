@@ -1,4 +1,4 @@
-// Enhanced SurveyFormContext with Navigation History
+// Enhanced SurveyFormContext with Navigation History and Skip-Aware Back Navigation
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
@@ -144,6 +144,68 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   useEffect(() => {
     navigationHistoryRef.current = navigationHistory;
   }, [navigationHistory]);
+
+  // Helper function to check if a block should be skipped when navigating back
+  const shouldSkipBlockOnBack = useCallback((pageIndex: number, blockIndex: number): boolean => {
+    if (pageIndex < 0 || pageIndex >= pages.length) return false;
+    
+    const pageBlocks = pages[pageIndex] || [];
+    const block = pageBlocks[blockIndex];
+    
+    if (!block || block.type !== 'auth') return false;
+    
+    // Check if this is an auth block with skipIfLoggedIn enabled
+    const skipIfLoggedIn = (block as any).skipIfLoggedIn;
+    if (!skipIfLoggedIn) return false;
+    
+    // Check if user is actually logged in
+    const storageKey = (block as any).tokenStorageKey || 'authToken';
+    const existingToken = localStorage.getItem(storageKey);
+    
+    return !!existingToken; // Skip if token exists
+  }, [pages]);
+
+  // Helper function to find the previous non-skippable block
+  const findPreviousNonSkippableBlock = useCallback((startPageIndex: number, startBlockIndex: number): { pageIndex: number; blockIndex: number } | null => {
+    // Start from the entry before the current one in navigation history
+    let historyIndex = navigationHistory.length - 2; // -1 is current, -2 is previous
+    
+    while (historyIndex >= 0) {
+      const entry = navigationHistory[historyIndex];
+      const { pageIndex, blockIndex } = entry;
+      
+      // Check if this block should be skipped
+      if (!shouldSkipBlockOnBack(pageIndex, blockIndex)) {
+        return { pageIndex, blockIndex };
+      }
+      
+      historyIndex--;
+    }
+    
+    // If we can't find a suitable entry in history, fall back to linear search
+    let pageIndex = startPageIndex;
+    let blockIndex = startBlockIndex - 1;
+    
+    while (pageIndex >= 0) {
+      const pageBlocks = pages[pageIndex] || [];
+      
+      while (blockIndex >= 0) {
+        if (!shouldSkipBlockOnBack(pageIndex, blockIndex)) {
+          return { pageIndex, blockIndex };
+        }
+        blockIndex--;
+      }
+      
+      // Move to previous page
+      pageIndex--;
+      if (pageIndex >= 0) {
+        const prevPageBlocks = pages[pageIndex] || [];
+        blockIndex = prevPageBlocks.length - 1;
+      }
+    }
+    
+    return null; // No valid previous block found
+  }, [navigationHistory, shouldSkipBlockOnBack, pages]);
 
   // Handle browser back/forward for mobile
   useEffect(() => {
@@ -495,30 +557,75 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   };
 
-  // Enhanced goToPreviousBlock using navigation history
+  // Enhanced goToPreviousBlock with skip-aware navigation
   const goToPreviousBlock = () => {
     if (navigationHistory.length <= 1) {
       return; // No history to go back to
     }
 
-    // Remove current entry and get previous entry
-    const newHistory = [...navigationHistory];
-    newHistory.pop(); // Remove current position
-    const previousEntry = newHistory[newHistory.length - 1];
-
-    if (previousEntry) {
+    // Find the previous non-skippable block
+    const target = findPreviousNonSkippableBlock(currentPage, currentBlockIndex);
+    
+    if (target) {
+      // Update navigation history - remove entries until we reach the target
+      const newHistory = [...navigationHistory];
+      let found = false;
+      
+      // Remove entries from the end until we find the target entry
+      while (newHistory.length > 1 && !found) {
+        newHistory.pop(); // Remove current position
+        const lastEntry = newHistory[newHistory.length - 1];
+        
+        if (lastEntry && 
+            lastEntry.pageIndex === target.pageIndex && 
+            lastEntry.blockIndex === target.blockIndex) {
+          found = true;
+        }
+      }
+      
+      // If we didn't find the exact entry, create a new one
+      if (!found && newHistory.length > 0) {
+        newHistory.push({
+          pageIndex: target.pageIndex,
+          blockIndex: target.blockIndex,
+          timestamp: Date.now(),
+          trigger: 'back'
+        });
+      }
+      
       setNavigationHistory(newHistory);
-      setCurrentPage(previousEntry.pageIndex);
-      setCurrentBlockIndex(previousEntry.blockIndex);
+      setCurrentPage(target.pageIndex);
+      setCurrentBlockIndex(target.blockIndex);
 
       // Update browser history
       window.history.pushState({ 
-        surveyPage: previousEntry.pageIndex, 
-        surveyBlock: previousEntry.blockIndex 
+        surveyPage: target.pageIndex, 
+        surveyBlock: target.blockIndex 
       }, '');
 
       if (onPageChange) {
-        onPageChange(previousEntry.pageIndex, totalPages);
+        onPageChange(target.pageIndex, totalPages);
+      }
+    } else {
+      // Fallback to simple previous block navigation if no suitable target found
+      const newHistory = [...navigationHistory];
+      newHistory.pop(); // Remove current position
+      const previousEntry = newHistory[newHistory.length - 1];
+
+      if (previousEntry) {
+        setNavigationHistory(newHistory);
+        setCurrentPage(previousEntry.pageIndex);
+        setCurrentBlockIndex(previousEntry.blockIndex);
+
+        // Update browser history
+        window.history.pushState({ 
+          surveyPage: previousEntry.pageIndex, 
+          surveyBlock: previousEntry.blockIndex 
+        }, '');
+
+        if (onPageChange) {
+          onPageChange(previousEntry.pageIndex, totalPages);
+        }
       }
     }
   };

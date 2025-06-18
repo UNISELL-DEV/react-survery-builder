@@ -19,23 +19,32 @@ const sampleSurvey =
         "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
           {
+            "showContinueButton": false,
             "type": "auth",
-            "loginUrl": "",
-            "signupUrl": "",
-            "useOtp": false,
-            "sendOtpUrl": "",
-            "verifyOtpUrl": "",
+            "fieldName": "authResults",
+            "loginUrl": "http://127.0.0.1:8000/api/patient/login",
+            "signupUrl": "http://127.0.0.1:8000/api/patient/login",
+            "useOtp": true,
+            "sendEmailOtpUrl": "http://127.0.0.1:8000/api/patient/send-email-otp",
+            "verifyEmailOtpUrl": "http://127.0.0.1:8000/api/patient/verify-email-otp",
+            "sendMobileOtpUrl": "",
+            "verifyMobileOtpUrl": "",
             "tokenField": "token",
             "tokenStorageKey": "authToken",
             "validateTokenUrl": "",
             "requireName": true,
             "requireEmail": true,
+            "requireMobile": false,
             "nameLabel": "Name",
             "emailLabel": "Email",
+            "mobileLabel": "Mobile Number",
             "fieldMappings": {},
-            "uuid": "d8c889ad-0861-4d6b-ad82-a3f82de9f35f",
-            "navigationRules": [],
-            "requireMobile": true
+            "customHeaders": {
+              "X-Merchant-ID": "1"
+            },
+            "additionalBodyParams": {},
+            "uuid": "0ade2ca1-e1c9-46fd-9d0f-21a77ca3d39a",
+            "navigationRules": []
           },
           {
             "type": "selectablebox",
@@ -902,6 +911,10 @@ export default function FormRendererExample() {
         }, 5000);
     };
 
+    const handleChange = (data: Record<string, any>) => {
+      console.log(data)
+  };
+
     return (
         <div className="container mx-auto p-4 mt-4">
             <div className="flex items-center justify-center mb-8">
@@ -923,6 +936,7 @@ export default function FormRendererExample() {
                     <SurveyForm
                         survey={sampleSurvey}
                         onSubmit={handleSubmit}
+                        onChange={handleChange}
                         layout='fullpage'
                         theme={activeTheme as any}
                         enableDebug={false}
