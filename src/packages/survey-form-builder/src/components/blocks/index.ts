@@ -15,6 +15,7 @@ import { SelectableBoxQuestionBlock } from "./SelectableBoxQuestionBlock"
 import { BMICalculatorBlock } from "./BMICalculatorBlock";
 import { CalculatedFieldBlock } from "./CalculatedFieldBlock";
 import { ConditionalBlock } from "./ConditionalBlock";
+import { CheckoutBlock } from "./CheckoutBlock";
 import type { BlockDefinition } from "../../types";
 
 // Export all standard block definitions
@@ -44,6 +45,7 @@ export const StandardBlocks: BlockDefinition[] = [
   BMICalculatorBlock,
   CalculatedFieldBlock,
   ConditionalBlock,
+  CheckoutBlock,
 ];
 
 // Export individual blocks for direct imports
@@ -65,4 +67,5 @@ export {
   BMICalculatorBlock,
   CalculatedFieldBlock,
   ConditionalBlock,
+  CheckoutBlock,
 };

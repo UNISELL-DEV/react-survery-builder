@@ -1,5 +1,5 @@
 import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
-import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload, UserCheck } from "lucide-react";
+import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload, UserCheck, ShoppingCart } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
 // Export the block definition
@@ -20,6 +20,28 @@ export const BMICalculatorBlock: BlockDefinition = {
   },
   validate: (data) => {
     if (!data.label) return "Label is required";
+    if (!data.fieldName) return "Field name is required";
+    return null;
+  },
+};
+
+export const CheckoutBlock: BlockDefinition = {
+  type: "checkout",
+  name: "Checkout Form",
+  description: "Collect shipping, billing and contact details",
+  icon: <ShoppingCart className="w-4 h-4" />,
+  defaultData: {
+    type: "checkout",
+    fieldName: `checkout${uuidv4().substring(0,4)}`,
+    label: "Checkout",
+    description: "",
+    showShippingAddress: true,
+    showBillingAddress: false,
+    requireEmail: true,
+    requirePhone: false,
+    className: "",
+  },
+  validate: (data) => {
     if (!data.fieldName) return "Field name is required";
     return null;
   },

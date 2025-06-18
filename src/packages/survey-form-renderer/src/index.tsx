@@ -22,6 +22,7 @@ import { DebugInfo } from './components/ui/DebugInfo';
 import { ConditionalBlock } from './components/blocks/ConditionalBlock';
 import { CalculatedFieldRenderer } from './components/blocks/CalculatedFieldRenderer';
 import { BMICalculatorRenderer } from './components/blocks/BMICalculatorRenderer';
+import { CheckoutRenderer } from './components/blocks/CheckoutRenderer';
 import { ValidationSummary } from './components/ui/ValidationSummary';
 
 // Utility functions
@@ -96,6 +97,7 @@ export {
   ConditionalBlock,
   CalculatedFieldRenderer,
   BMICalculatorRenderer,
+  CheckoutRenderer,
   ValidationSummary,
 
   // Utility functions

@@ -17,6 +17,7 @@ import { SetRenderer } from './SetRenderer';
 import { ConditionalBlock } from './ConditionalBlock';
 import { CalculatedFieldRenderer } from './CalculatedFieldRenderer';
 import { BMICalculatorRenderer } from './BMICalculatorRenderer';
+import { CheckoutRenderer } from './CheckoutRenderer';
 import { AuthRenderer } from './AuthRenderer';
 import { themes } from '../../themes';
 import { blockTypeMap, validateBlock } from '../../utils/blockAdapter';
@@ -55,7 +56,7 @@ export const BlockRenderer = forwardRef<HTMLElement, BlockRendererProps>((props,
   // Check if we have a built-in renderer for this block type or special types
   if (
     !blockTypeMap[block.type] &&
-    !['conditional', 'calculated', 'bmiCalculator'].includes(block.type)
+    !['conditional', 'calculated', 'bmiCalculator', 'checkout'].includes(block.type)
   ) {
     // For any unhandled types, render a placeholder
     return (
@@ -93,6 +94,11 @@ export const BlockRenderer = forwardRef<HTMLElement, BlockRendererProps>((props,
   // Special handling for BMI calculator
   if (block.type === 'bmiCalculator') {
     return <BMICalculatorRenderer {...props} />;
+  }
+
+  // Special handling for Checkout form
+  if (block.type === 'checkout') {
+    return <CheckoutRenderer {...props} />;
   }
 
   // Render the appropriate component based on block type

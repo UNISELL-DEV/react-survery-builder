@@ -47,6 +47,19 @@ const sampleSurvey =
             "navigationRules": []
           },
           {
+            "type": "checkout",
+            "fieldName": "checkout8aa4",
+            "label": "Checkout",
+            "description": "",
+            "showShippingAddress": true,
+            "showBillingAddress": true,
+            "requireEmail": true,
+            "requirePhone": true,
+            "className": "",
+            "uuid": "5f7da81c-f447-4f54-af4c-ec5866d8fae2",
+            "navigationRules": []
+          },
+          {
             "type": "selectablebox",
             "fieldName": "allergyHistory",
             "questionTitle": "Have you ever had an adverse or allergic reaction to testosterone or testosterone replacement support medications?",

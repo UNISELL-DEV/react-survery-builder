@@ -1,0 +1,876 @@
+diff --git a/src/packages/survey-form-builder/src/components/blocks/CheckoutBlock.tsx b/src/packages/survey-form-builder/src/components/blocks/CheckoutBlock.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..60146b1c577b1173c508d5234ae53f260cbb702f
+--- /dev/null
++++ b/src/packages/survey-form-builder/src/components/blocks/CheckoutBlock.tsx
+@@ -0,0 +1,163 @@
++import React from "react";
++import type { BlockDefinition, ContentBlockItemProps } from "../../types";
++import { Input } from "@survey-form-builder/components/ui/input";
++import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
++import { Label } from "@survey-form-builder/components/ui/label";
++import { ShoppingCart } from "lucide-react";
++import { v4 as uuidv4 } from "uuid";
++
++// Form component for editing the block configuration
++const CheckoutBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate }) => {
++  const handleChange = (field: string, value: string | boolean) => {
++    onUpdate?.({
++      ...data,
++      [field]: value,
++    });
++  };
++
++  return (
++    <div className="space-y-4">
++      <div className="grid grid-cols-2 gap-4">
++        <div className="space-y-2">
++          <Label htmlFor="fieldName">Field Name</Label>
++          <Input
++            id="fieldName"
++            value={data.fieldName || ""}
++            onChange={(e) => handleChange("fieldName", e.target.value)}
++            placeholder="checkout"
++          />
++          <p className="text-xs text-muted-foreground">
++            Unique identifier for storing checkout data
++          </p>
++        </div>
++        <div className="space-y-2">
++          <Label htmlFor="label">Label</Label>
++          <Input
++            id="label"
++            value={data.label || ""}
++            onChange={(e) => handleChange("label", e.target.value)}
++            placeholder="Checkout"
++          />
++        </div>
++      </div>
++
++      <div className="space-y-2">
++        <Label htmlFor="description">Description</Label>
++        <Input
++          id="description"
++          value={data.description || ""}
++          onChange={(e) => handleChange("description", e.target.value)}
++          placeholder="Provide your details"
++        />
++      </div>
++
++      <div className="grid grid-cols-2 gap-4">
++        <div className="flex items-center space-x-2 pt-6">
++          <Checkbox
++            id="showShippingAddress"
++            checked={!!data.showShippingAddress}
++            onCheckedChange={(checked) => handleChange("showShippingAddress", !!checked)}
++          />
++          <Label htmlFor="showShippingAddress">Show Shipping Address</Label>
++        </div>
++        <div className="flex items-center space-x-2 pt-6">
++          <Checkbox
++            id="showBillingAddress"
++            checked={!!data.showBillingAddress}
++            onCheckedChange={(checked) => handleChange("showBillingAddress", !!checked)}
++          />
++          <Label htmlFor="showBillingAddress">Show Billing Address</Label>
++        </div>
++      </div>
++
++      <div className="grid grid-cols-2 gap-4">
++        <div className="flex items-center space-x-2 pt-6">
++          <Checkbox
++            id="requireEmail"
++            checked={!!data.requireEmail}
++            onCheckedChange={(checked) => handleChange("requireEmail", !!checked)}
++          />
++          <Label htmlFor="requireEmail">Require Email</Label>
++        </div>
++        <div className="flex items-center space-x-2 pt-6">
++          <Checkbox
++            id="requirePhone"
++            checked={!!data.requirePhone}
++            onCheckedChange={(checked) => handleChange("requirePhone", !!checked)}
++          />
++          <Label htmlFor="requirePhone">Require Phone</Label>
++        </div>
++      </div>
++
++      <div className="space-y-2">
++        <Label htmlFor="className">CSS Class Names</Label>
++        <Input
++          id="className"
++          value={data.className || ""}
++          onChange={(e) => handleChange("className", e.target.value)}
++          placeholder="checkout-form"
++        />
++      </div>
++    </div>
++  );
++};
++
++// Component to render the block in the builder canvas
++const CheckoutBlockItem: React.FC<ContentBlockItemProps> = ({ data }) => {
++  return (
++    <div className="space-y-4">
++      {data.label && <Label className="text-lg font-medium">{data.label}</Label>}
++      {data.requireEmail && (
++        <Input disabled placeholder="Email" className="w-full" />
++      )}
++      {data.requirePhone && (
++        <Input disabled placeholder="Phone" className="w-full" />
++      )}
++      {data.showShippingAddress && (
++        <Input disabled placeholder="Shipping address" className="w-full" />
++      )}
++      {data.showBillingAddress && (
++        <Input disabled placeholder="Billing address" className="w-full" />
++      )}
++    </div>
++  );
++};
++
++// Preview component shown in the block library
++const CheckoutBlockPreview: React.FC = () => {
++  return (
++    <div className="w-full flex items-center justify-center py-1">
++      <div className="space-y-2 w-4/5 max-w-full">
++        <Input disabled placeholder="Email" />
++        <Input disabled placeholder="Phone" />
++      </div>
++    </div>
++  );
++};
++
++export const CheckoutBlock: BlockDefinition = {
++  type: "checkout",
++  name: "Checkout Form",
++  description: "Collect shipping, billing and contact details",
++  icon: <ShoppingCart className="w-4 h-4" />,
++  defaultData: {
++    type: "checkout",
++    fieldName: `checkout${uuidv4().substring(0,4)}`,
++    label: "Checkout",
++    description: "",
++    showShippingAddress: true,
++    showBillingAddress: false,
++    requireEmail: true,
++    requirePhone: false,
++    className: "",
++  },
++  renderItem: (props) => <CheckoutBlockItem {...props} />,
++  renderFormFields: (props) => <CheckoutBlockForm {...props} />,
++  renderPreview: () => <CheckoutBlockPreview />,
++  validate: (data) => {
++    if (!data.fieldName) return "Field name is required";
++    return null;
++  },
++};
++
++export default CheckoutBlock;
+diff --git a/src/packages/survey-form-builder/src/components/blocks/index.ts b/src/packages/survey-form-builder/src/components/blocks/index.ts
+index 1bcb7acc5d0552ff6239d974a9b049c394deba98..af5cbedb41b6f16e71b477e579ca6e2588c0b285 100644
+--- a/src/packages/survey-form-builder/src/components/blocks/index.ts
++++ b/src/packages/survey-form-builder/src/components/blocks/index.ts
+@@ -1,68 +1,71 @@
+ import { TextInputBlock } from "./TextInputBlock";
+ import { TextareaBlock } from "./TextareaBlock";
+ import { RadioBlock } from "./RadioBlock";
+ import { CheckboxBlock } from "./CheckboxBlock";
+ import { MarkdownBlock } from "./MarkdownBlock";
+ import { HtmlBlock } from "./HtmlBlock";
+ import { ScriptBlock } from "./ScriptBlock";
+ import { AuthBlock } from "./AuthBlock";
+ import { SelectBlock } from "./SelectBlock";
+ import { RangeBlock } from "./RangeBlock";
+ import { DatePickerBlock } from "./DatePickerBlock";
+ import { FileUploadBlock } from "./FileUploadBlock";
+ import { MatrixBlock } from "./MatrixBlock";
+ import { SelectableBoxQuestionBlock } from "./SelectableBoxQuestionBlock"
+ import { BMICalculatorBlock } from "./BMICalculatorBlock";
+ import { CalculatedFieldBlock } from "./CalculatedFieldBlock";
+ import { ConditionalBlock } from "./ConditionalBlock";
++import { CheckoutBlock } from "./CheckoutBlock";
+ import type { BlockDefinition } from "../../types";
+ 
+ // Export all standard block definitions
+ export const StandardBlocks: BlockDefinition[] = [
+   // Basic input blocks
+   TextInputBlock,
+   TextareaBlock,
+   SelectBlock,
+   RadioBlock,
+   CheckboxBlock,
+ 
+   // Advanced input blocks
+   RangeBlock,
+   DatePickerBlock,
+   FileUploadBlock,
+   MatrixBlock,
+   SelectableBoxQuestionBlock,
+   // Content blocks
+   MarkdownBlock,
+   HtmlBlock,
+ 
+   // Logic blocks
+   AuthBlock,
+   ScriptBlock,
+ 
+   // Advanced calculation and conditional blocks
+   BMICalculatorBlock,
+   CalculatedFieldBlock,
+   ConditionalBlock,
++  CheckoutBlock,
+ ];
+ 
+ // Export individual blocks for direct imports
+ export {
+   TextInputBlock,
+   TextareaBlock,
+   RadioBlock,
+   CheckboxBlock,
+   MarkdownBlock,
+   HtmlBlock,
+   ScriptBlock,
+   AuthBlock,
+   SelectBlock,
+   RangeBlock,
+   DatePickerBlock,
+   FileUploadBlock,
+   MatrixBlock,
+   SelectableBoxQuestionBlock,
+   BMICalculatorBlock,
+   CalculatedFieldBlock,
+   ConditionalBlock,
++  CheckoutBlock,
+ };
+diff --git a/src/packages/survey-form-renderer/src/components/blocks/BlockRenderer.tsx b/src/packages/survey-form-renderer/src/components/blocks/BlockRenderer.tsx
+index 2076f78def3645cd8eb63884631ff403a43075fa..7422a4e128ef48117edd901f12df8adbb2f43b00 100644
+--- a/src/packages/survey-form-renderer/src/components/blocks/BlockRenderer.tsx
++++ b/src/packages/survey-form-renderer/src/components/blocks/BlockRenderer.tsx
+@@ -1,122 +1,128 @@
+ import React, { forwardRef } from 'react';
+ import type { BlockRendererProps } from '../../types';
+ import { TextInputRenderer } from './TextInputRenderer';
+ import { TextareaRenderer } from './TextareaRenderer';
+ import { RadioRenderer } from './RadioRenderer';
+ import { CheckboxRenderer } from './CheckboxRenderer';
+ import { SelectRenderer } from './SelectRenderer';
+ import { MarkdownRenderer } from './MarkdownRenderer';
+ import { HtmlRenderer } from './HtmlRenderer';
+ import { RangeRenderer } from './RangeRenderer';
+ import { DatePickerRenderer } from './DatePickerRenderer';
+ import { FileUploadRenderer } from './FileUploadRenderer';
+ import { MatrixRenderer } from './MatrixRenderer';
+ import { SelectableBoxRenderer } from './SelectableBoxRenderer'
+ import { ScriptRenderer } from './ScriptRenderer';
+ import { SetRenderer } from './SetRenderer';
+ import { ConditionalBlock } from './ConditionalBlock';
+ import { CalculatedFieldRenderer } from './CalculatedFieldRenderer';
+ import { BMICalculatorRenderer } from './BMICalculatorRenderer';
++import { CheckoutRenderer } from './CheckoutRenderer';
+ import { AuthRenderer } from './AuthRenderer';
+ import { themes } from '../../themes';
+ import { blockTypeMap, validateBlock } from '../../utils/blockAdapter';
+ import { useSurveyForm } from '../../context/SurveyFormContext';
+ 
+ /**
+  * A component that renders different types of blocks based on their type
+  */
+ export const BlockRenderer = forwardRef<HTMLElement, BlockRendererProps>((props, ref) => {
+   const { block, value, onChange, onBlur, error, disabled, customComponents, theme = 'default', isVisible } = props;
+   const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+   const { getVisibleBlocks } = useSurveyForm();
+ 
+   // If the block has a visibility condition and is explicitly not visible, don't render it
+   if (isVisible === false) {
+     return null;
+   }
+ 
+   // Common props for all renderers (excluding ref since different components need different ref types)
+   const validationError = validateBlock(block);
+   const commonProps = {
+     value,
+     onChange,
+     onBlur,
+     error: error ?? (validationError === null ? undefined : validationError),
+     disabled,
+     theme
+   };
+ 
+   // If there's a custom component for this block type, use it
+   if (customComponents && customComponents[block.type]) {
+     const CustomComponent = customComponents[block.type] as React.FC<BlockRendererProps>;
+     return <CustomComponent {...props} />;
+   }
+ 
+   // Check if we have a built-in renderer for this block type or special types
+   if (
+     !blockTypeMap[block.type] &&
+-    !['conditional', 'calculated', 'bmiCalculator'].includes(block.type)
++    !['conditional', 'calculated', 'bmiCalculator', 'checkout'].includes(block.type)
+   ) {
+     // For any unhandled types, render a placeholder
+     return (
+       <div className="p-4 border border-gray-300 rounded">
+         <p className="text-sm text-gray-500">
+           Unknown block type: {block.type}
+         </p>
+       </div>
+     );
+   }
+ 
+   // Special handling for conditional blocks
+   if (block.type === 'conditional' && block.condition) {
+     return (
+       <ConditionalBlock
+         {...props}
+         condition={block.condition}
+         block={block.childBlock || { type: 'html', html: 'No child block specified' }}
+       />
+     );
+   }
+ 
+   // Special handling for calculated fields
+   if (block.type === 'calculated' && block.formula) {
+     return (
+       <CalculatedFieldRenderer
+         {...props}
+         formula={block.formula}
+         dependencies={block.dependencies || []}
+         format={block.format}
+       />
+     );
+   }
+ 
+   // Special handling for BMI calculator
+   if (block.type === 'bmiCalculator') {
+     return <BMICalculatorRenderer {...props} />;
+   }
+ 
++  // Special handling for Checkout form
++  if (block.type === 'checkout') {
++    return <CheckoutRenderer {...props} />;
++  }
++
+   // Render the appropriate component based on block type
+   switch (block.type) {
+     case 'textfield':
+       return <TextInputRenderer block={block} {...commonProps} ref={ref as React.ForwardedRef<HTMLInputElement>} />;
+     case 'textarea':
+       return <TextareaRenderer block={block} {...commonProps} ref={ref as React.ForwardedRef<HTMLTextAreaElement>} />;
+     case 'radio':
+       return <RadioRenderer block={block} {...commonProps} />;
+     case 'checkbox':
+       return <CheckboxRenderer block={block} {...commonProps} />;
+     case 'select':
+       return <SelectRenderer block={block} {...commonProps} ref={ref as React.ForwardedRef<HTMLButtonElement>} />;
+     case 'range':
+       return <RangeRenderer block={block} {...commonProps}/>;
+     case 'datepicker':
+       return <DatePickerRenderer block={block} {...commonProps}/>;
+     case 'fileupload':
+       return <FileUploadRenderer block={block} {...commonProps}/>;
+     case 'matrix':
+       return <MatrixRenderer block={block} {...commonProps} />;
+     case 'selectablebox':
+       return <SelectableBoxRenderer block={block} {...commonProps} />;      
+     case 'markdown':
+       return <MarkdownRenderer block={block} {...commonProps} />;
+     case 'html':
+diff --git a/src/packages/survey-form-renderer/src/components/blocks/CheckoutRenderer.tsx b/src/packages/survey-form-renderer/src/components/blocks/CheckoutRenderer.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..6fc2e296e83f2065ab8b7d4da5d9a2dec96ce90d
+--- /dev/null
++++ b/src/packages/survey-form-renderer/src/components/blocks/CheckoutRenderer.tsx
+@@ -0,0 +1,137 @@
++import React, { useEffect, useState } from 'react';
++import { themes } from '../../themes';
++import { Input } from '../ui/input';
++import { Label } from '../ui/label';
++import { cn } from '@survey-form-renderer/lib/utils';
++import { useSurveyForm } from '../../context/SurveyFormContext';
++import type { BlockData } from '@survey-form-renderer/types';
++
++interface CheckoutRendererProps {
++  block: BlockData;
++  value?: any;
++  onChange?: (value: any) => void;
++  onBlur?: () => void;
++  error?: string;
++  disabled?: boolean;
++  theme?: string;
++}
++
++export const CheckoutRenderer: React.FC<CheckoutRendererProps> = ({
++  block,
++  value = {},
++  onChange,
++  onBlur,
++  error,
++  disabled = false,
++  theme = 'default',
++}) => {
++  const { setValue } = useSurveyForm();
++  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
++
++  const fieldName = block.fieldName || 'checkout';
++
++  const [formState, setFormState] = useState({
++    email: value.email || '',
++    phone: value.phone || '',
++    shippingAddress: value.shippingAddress || '',
++    billingAddress: value.billingAddress || '',
++  });
++
++  useEffect(() => {
++    onChange?.(formState);
++    setValue(fieldName, formState);
++  }, [formState]);
++
++  const handleChange = (field: string, val: string) => {
++    setFormState((prev) => ({ ...prev, [field]: val }));
++  };
++
++  return (
++    <div className={cn('survey-checkout space-y-4', block.className)}>
++      {block.label && (
++        <Label className={cn('text-base', themeConfig.field.label)}>
++          {block.label}
++        </Label>
++      )}
++      {block.description && (
++        <div className={cn('text-sm text-muted-foreground', themeConfig.field.description)}>
++          {block.description}
++        </div>
++      )}
++
++      {block.requireEmail && (
++        <div className="space-y-2">
++          <Label htmlFor={`${fieldName}-email`} className={cn(themeConfig.field.label)}>
++            Email
++          </Label>
++          <Input
++            id={`${fieldName}-email`}
++            type="email"
++            value={formState.email}
++            onChange={(e) => handleChange('email', e.target.value)}
++            onBlur={onBlur}
++            disabled={disabled}
++            className={cn(error && 'border-destructive', themeConfig.field.input)}
++          />
++        </div>
++      )}
++
++      {block.requirePhone && (
++        <div className="space-y-2">
++          <Label htmlFor={`${fieldName}-phone`} className={cn(themeConfig.field.label)}>
++            Phone
++          </Label>
++          <Input
++            id={`${fieldName}-phone`}
++            type="tel"
++            value={formState.phone}
++            onChange={(e) => handleChange('phone', e.target.value)}
++            onBlur={onBlur}
++            disabled={disabled}
++            className={cn(error && 'border-destructive', themeConfig.field.input)}
++          />
++        </div>
++      )}
++
++      {block.showShippingAddress && (
++        <div className="space-y-2">
++          <Label htmlFor={`${fieldName}-shipping`} className={cn(themeConfig.field.label)}>
++            Shipping Address
++          </Label>
++          <Input
++            id={`${fieldName}-shipping`}
++            value={formState.shippingAddress}
++            onChange={(e) => handleChange('shippingAddress', e.target.value)}
++            onBlur={onBlur}
++            disabled={disabled}
++            className={cn(error && 'border-destructive', themeConfig.field.input)}
++          />
++        </div>
++      )}
++
++      {block.showBillingAddress && (
++        <div className="space-y-2">
++          <Label htmlFor={`${fieldName}-billing`} className={cn(themeConfig.field.label)}>
++            Billing Address
++          </Label>
++          <Input
++            id={`${fieldName}-billing`}
++            value={formState.billingAddress}
++            onChange={(e) => handleChange('billingAddress', e.target.value)}
++            onBlur={onBlur}
++            disabled={disabled}
++            className={cn(error && 'border-destructive', themeConfig.field.input)}
++          />
++        </div>
++      )}
++
++      {error && (
++        <div className={cn('text-sm font-medium text-destructive', themeConfig.field.error)}>
++          {error}
++        </div>
++      )}
++    </div>
++  );
++};
++
++export default CheckoutRenderer;
+diff --git a/src/packages/survey-form-renderer/src/index.tsx b/src/packages/survey-form-renderer/src/index.tsx
+index 00ee51abbc97c5a2157f02598bfd6474a1f409d2..c708d0b7c1c02f009d894dae08bd068d9b2b07ca 100644
+--- a/src/packages/survey-form-renderer/src/index.tsx
++++ b/src/packages/survey-form-renderer/src/index.tsx
+@@ -1,49 +1,50 @@
+ import { SurveyForm } from './components/SurveyForm';
+ import { SurveyFormProvider, useSurveyForm } from './context/SurveyFormContext';
+ import { BlockRenderer } from './components/blocks/BlockRenderer';
+ import { TextInputRenderer } from './components/blocks/TextInputRenderer';
+ import { TextareaRenderer } from './components/blocks/TextareaRenderer';
+ import { RadioRenderer } from './components/blocks/RadioRenderer';
+ import { CheckboxRenderer } from './components/blocks/CheckboxRenderer';
+ import { SelectRenderer } from './components/blocks/SelectRenderer';
+ import { MarkdownRenderer } from './components/blocks/MarkdownRenderer';
+ import { HtmlRenderer } from './components/blocks/HtmlRenderer';
+ import { RangeRenderer } from './components/blocks/RangeRenderer';
+ import { DatePickerRenderer } from './components/blocks/DatePickerRenderer';
+ import { FileUploadRenderer } from './components/blocks/FileUploadRenderer';
+ import { MatrixRenderer } from './components/blocks/MatrixRenderer';
+ import { SelectableBoxRenderer } from './components/blocks/SelectableBoxRenderer';
+ import { ScriptRenderer } from './components/blocks/ScriptRenderer';
+ import { SetRenderer } from './components/blocks/SetRenderer';
+ import { AuthRenderer } from './components/blocks/AuthRenderer';
+ import { DebugInfo } from './components/ui/DebugInfo';
+ 
+ // New conditional components
+ import { ConditionalBlock } from './components/blocks/ConditionalBlock';
+ import { CalculatedFieldRenderer } from './components/blocks/CalculatedFieldRenderer';
+ import { BMICalculatorRenderer } from './components/blocks/BMICalculatorRenderer';
++import { CheckoutRenderer } from './components/blocks/CheckoutRenderer';
+ import { ValidationSummary } from './components/ui/ValidationSummary';
+ 
+ // Utility functions
+ import {
+   evaluateCondition,
+   evaluateSimpleCondition,
+   isBlockVisible,
+   executeCalculation,
+   calculateBMI
+ } from './utils/conditionalUtils';
+ 
+ import {
+   evaluateLogic,
+   getSurveyPages,
+   getSurveyPageIds,
+   getLocalized,
+   getThemeClass,
+   formatFieldName
+ } from './utils/surveyUtils';
+ 
+ import {
+   blockTypeMap,
+   validateBlock,
+   isContentBlock,
+   isInputBlock,
+@@ -74,50 +75,51 @@ export {
+   // Block renderers
+   BlockRenderer,
+   TextInputRenderer,
+   TextareaRenderer,
+   RadioRenderer,
+   CheckboxRenderer,
+   SelectRenderer,
+   MarkdownRenderer,
+   HtmlRenderer,
+   RangeRenderer,
+   DatePickerRenderer,
+   FileUploadRenderer,
+   MatrixRenderer,
+   SelectableBoxRenderer,
+   ScriptRenderer,
+   SetRenderer,
+   AuthRenderer,
+ 
+   // UI components
+   DebugInfo,
+ 
+   // New conditional components
+   ConditionalBlock,
+   CalculatedFieldRenderer,
+   BMICalculatorRenderer,
++  CheckoutRenderer,
+   ValidationSummary,
+ 
+   // Utility functions
+   evaluateLogic,
+   getSurveyPages,
+   getLocalized,
+   getThemeClass,
+   formatFieldName,
+   blockTypeMap,
+   validateBlock,
+   isContentBlock,
+   isInputBlock,
+ 
+   // Conditional utility functions
+   evaluateCondition,
+   evaluateSimpleCondition,
+   isBlockVisible,
+   executeCalculation,
+   calculateBMI,
+   supportsConditionalRendering,
+   supportsBranchingLogic,
+   getSurveyPageIds
+ };
+ 
+ export default SurveyForm;
+diff --git a/src/packages/survey-form-renderer/src/utils/blockAdapter.tsx b/src/packages/survey-form-renderer/src/utils/blockAdapter.tsx
+index 58e460bd33e3512d99b68970d38adbd442a12ecf..502d0831cd03b318803138f9f27430c1befbea1d 100644
+--- a/src/packages/survey-form-renderer/src/utils/blockAdapter.tsx
++++ b/src/packages/survey-form-renderer/src/utils/blockAdapter.tsx
+@@ -1,52 +1,75 @@
+ import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
+-import { Activity } from "lucide-react";
+-import { TextInputBlock, TextareaBlock, SelectBlock, RadioBlock, CheckboxBlock, RangeBlock, DatePickerBlock, FileUploadBlock, MatrixBlock, SelectableBoxQuestionBlock, MarkdownBlock, HtmlBlock, ScriptBlock, AuthBlock } from "./blockdefinations";
++import { Activity, ShoppingCart } from "lucide-react";
++import { v4 as uuidv4 } from "uuid";
++import { TextInputBlock, TextareaBlock, SelectBlock, RadioBlock, CheckboxBlock, RangeBlock, DatePickerBlock, FileUploadBlock, MatrixBlock, SelectableBoxQuestionBlock, MarkdownBlock, HtmlBlock, ScriptBlock, AuthBlock, CheckoutBlock } from "./blockdefinations";
+ 
+ // Export the block definition
+ export const BMICalculatorBlock: BlockDefinition = {
+   type: "bmiCalculator",
+   name: "BMI Calculator",
+   description: "Modern BMI calculator with sleek design and intuitive controls",
+   icon: <Activity className="w-4 h-4" />,
+   defaultData: {
+     type: "bmiCalculator",
+     label: "BMI Calculator",
+     description: "Calculate your Body Mass Index",
+     fieldName: "bmiResult",
+     defaultUnit: "metric",
+     showResults: false,
+     theme: "default",
+     className: "",
+   },
+   validate: (data) => {
+     if (!data.label) return "Label is required";
+     if (!data.fieldName) return "Field name is required";
+     return null;
+   },
+ };
+ 
++export const CheckoutBlockDefinition: BlockDefinition = {
++  type: 'checkout',
++  name: 'Checkout Form',
++  description: 'Collect shipping, billing and contact details',
++  icon: <ShoppingCart className="w-4 h-4" />,
++  defaultData: {
++    type: 'checkout',
++    fieldName: `checkout${uuidv4().substring(0,4)}`,
++    label: 'Checkout',
++    description: '',
++    showShippingAddress: true,
++    showBillingAddress: false,
++    requireEmail: true,
++    requirePhone: false,
++    className: '',
++  },
++  validate: (data) => {
++    if (!data.fieldName) return 'Field name is required';
++    return null;
++  },
++};
++
+ 
+ 
+ /**
+  * Maps survey builder block types to the appropriate renderer components
+  * This allows us to re-use the validation and properties from the original blocks
+  */
+ export const blockTypeMap: Record<string, any> = {
+   // Basic input blocks
+   textfield: TextInputBlock,
+   textarea: TextareaBlock,
+   select: SelectBlock,
+   radio: RadioBlock,
+   checkbox: CheckboxBlock,
+ 
+   // Advanced input blocks
+   range: RangeBlock,
+   datepicker: DatePickerBlock,
+   fileupload: FileUploadBlock,
+   matrix: MatrixBlock,
+   selectablebox: SelectableBoxQuestionBlock,
+ 
+   // Content blocks
+   markdown: MarkdownBlock,
+   html: HtmlBlock,
+   auth: AuthBlock,
+@@ -63,51 +86,54 @@ export const blockTypeMap: Record<string, any> = {
+     validate: (block: BlockData) => {
+       if (!block.condition) return 'Condition is required';
+       if (!block.childBlock) return 'Child block is required';
+       return null;
+     }
+   },
+ 
+   // Calculated blocks
+   calculated: {
+     type: 'calculated',
+     validate: (block: BlockData) => {
+       if (!block.formula) return 'Formula is required';
+       if (!block.dependencies || !Array.isArray(block.dependencies))
+         return 'Dependencies array is required';
+       return null;
+     }
+   },
+ 
+   // BMI Calculator block
+   bmiCalculator: {
+     type: 'bmiCalculator',
+     validate: (block: BlockData) => {
+       // BMI Calculator has no specific validation
+       return null;
+     }
+-  }
++  },
++
++  // Checkout block
++  checkout: CheckoutBlockDefinition
+ };
+ 
+ /**
+  * Validates a block using its original validation function from the survey builder
+  */
+ export function validateBlock(block: BlockData): string | null {
+   const blockDefinition = blockTypeMap[block.type];
+   if (blockDefinition && typeof blockDefinition.validate === 'function') {
+     return blockDefinition.validate(block);
+   }
+   return null;
+ }
+ 
+ /**
+  * Gets the default properties for a block type
+  */
+ export function getDefaultBlockProperties(blockType: string): Partial<BlockData> {
+   const blockDefinition = blockTypeMap[blockType];
+   if (blockDefinition) {
+     return blockDefinition.defaultData || {};
+   }
+   return {};
+ }
+ 
+ /**
+@@ -115,27 +141,27 @@ export function getDefaultBlockProperties(blockType: string): Partial<BlockData>
+  */
+ export function isContentBlock(blockType: string): boolean {
+   return ['markdown', 'html', 'script', 'calculated'].includes(blockType);
+ }
+ 
+ /**
+  * Checks if a block is an input block (collects data)
+  */
+ export function isInputBlock(blockType: string): boolean {
+   return !isContentBlock(blockType);
+ }
+ 
+ /**
+  * Checks if a block supports conditional rendering
+  */
+ export function supportsConditionalRendering(blockType: string): boolean {
+   // All block types can be conditionally rendered
+   return true;
+ }
+ 
+ /**
+  * Checks if a block supports branching logic
+  */
+ export function supportsBranchingLogic(blockType: string): boolean {
+   // Only certain blocks can have branching logic
+-  return ['radio', 'select', 'checkbox', 'range', 'textfield', 'bmiCalculator'].includes(blockType);
++  return ['radio', 'select', 'checkbox', 'range', 'textfield', 'bmiCalculator', 'checkout'].includes(blockType);
+ }
+diff --git a/src/packages/survey-form-renderer/src/utils/blockdefinations.tsx b/src/packages/survey-form-renderer/src/utils/blockdefinations.tsx
+index 07b7201e0f7cfb753e692202f0efbedf7f8877ed..6f6e3ac93f93d668e206c39c1d9f59a411a50f1a 100644
+--- a/src/packages/survey-form-renderer/src/utils/blockdefinations.tsx
++++ b/src/packages/survey-form-renderer/src/utils/blockdefinations.tsx
+@@ -1,52 +1,74 @@
+ import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
+-import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload, UserCheck } from "lucide-react";
++import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload, UserCheck, ShoppingCart } from "lucide-react";
+ import { v4 as uuidv4 } from "uuid";
+ 
+ // Export the block definition
+ export const BMICalculatorBlock: BlockDefinition = {
+   type: "bmiCalculator",
+   name: "BMI Calculator",
+   description: "Modern BMI calculator with sleek design and intuitive controls",
+   icon: <Activity className="w-4 h-4" />,
+   defaultData: {
+     type: "bmiCalculator",
+     label: "BMI Calculator",
+     description: "Calculate your Body Mass Index",
+     fieldName: "bmiResult",
+     defaultUnit: "metric",
+     showResults: false,
+     theme: "default",
+     className: "",
+   },
+   validate: (data) => {
+     if (!data.label) return "Label is required";
+     if (!data.fieldName) return "Field name is required";
+     return null;
+   },
+ };
+ 
++export const CheckoutBlock: BlockDefinition = {
++  type: "checkout",
++  name: "Checkout Form",
++  description: "Collect shipping, billing and contact details",
++  icon: <ShoppingCart className="w-4 h-4" />,
++  defaultData: {
++    type: "checkout",
++    fieldName: `checkout${uuidv4().substring(0,4)}`,
++    label: "Checkout",
++    description: "",
++    showShippingAddress: true,
++    showBillingAddress: false,
++    requireEmail: true,
++    requirePhone: false,
++    className: "",
++  },
++  validate: (data) => {
++    if (!data.fieldName) return "Field name is required";
++    return null;
++  },
++};
++
+ 
+ // Export the block definition
+ export const CalculatedFieldBlock: BlockDefinition = {
+     type: "calculatedField",
+     name: "Calculated Field",
+     description: "Display a value calculated from a formula based on other fields",
+     icon: <Calculator className="w-4 h-4" />,
+     defaultData: {
+       type: "calculatedField",
+       label: "Calculated Result",
+       description: "This field is automatically calculated using custom logic",
+       fieldName: "calculatedResult",
+       formula: `// Example: BMI risk assessment
+   if (!bmiCalculator) return "Please complete BMI calculation";
+   const bmi = Number(bmiCalculator.bmi);
+   if (isNaN(bmi)) return "Invalid BMI value";
+   if (bmi >= 30) return "High Risk";
+   if (bmi >= 25) return "Moderate Risk";
+   return "Low Risk";`,
+       dependencies: ["bmiCalculator"],
+       note: "Based on your BMI calculation",
+       displayFormat: "",
+       resultType: "string",
+       className: "",
+     },
