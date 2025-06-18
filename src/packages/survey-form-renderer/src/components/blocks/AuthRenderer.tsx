@@ -70,86 +70,94 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
     const isBackNav = checkIfBackNavigation();
     setIsManualNavigation(isBackNav);
 
-    const existing = localStorage.getItem(storageKey);
-    
-    if (existing) {
-      setLoading(true);
-      
-      // If skip is enabled and this is not a manual back navigation, 
-      // and no validation URL is configured, skip immediately
-      if (skipIfLoggedIn && !isBackNav && !(block as any).validateTokenUrl) {
-        // Auto-skip without validation
-        setTimeout(() => {
-          const authResults = {
-            token: existing,
-            isAuthenticated: true,
-            timestamp: new Date().toISOString(),
-            skipped: true,
-            skipReason: 'Already logged in (no validation required)'
-          };
-          setValue(fieldName, authResults);
-          setLoading(false);
-          goToNextBlock();
-        }, 100); // Small delay to show loading state
-        return;
-      }
+    try {
+      const user = JSON.parse(localStorage.getItem(storageKey));
+      if(user) {
+        const existing = user[tokenField];
+        if (existing) {
+          setLoading(true);
 
-      // If validation URL is configured, validate the token
-      if ((block as any).validateTokenUrl) {
-        const headers = buildRequestHeaders();
-        const baseBody = { [tokenField]: existing };
-        const requestBody = buildRequestBody(baseBody);
-        
-        fetch((block as any).validateTokenUrl, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(requestBody)
-        })
-          .then((res) => res.ok ? res.json() : Promise.reject())
-          .then((data) => {
-            const processedData = applyFieldMappings(data);
-            
-            // If skip is enabled and this is not manual navigation, skip after successful validation
-            if (skipIfLoggedIn && !isBackNav) {
+          
+          // If skip is enabled and this is not a manual back navigation, 
+          // and no validation URL is configured, skip immediately
+          if (skipIfLoggedIn && !isBackNav && !(block as any).validateTokenUrl) {
+            // Auto-skip without validation
+            setTimeout(() => {
               const authResults = {
-                ...processedData,
-                name: data?.name || '',
-                email: data?.email || '',
-                mobile: data?.mobile || '',
                 token: existing,
                 isAuthenticated: true,
                 timestamp: new Date().toISOString(),
                 skipped: true,
-                skipReason: 'Already logged in (validation passed)'
+                skipReason: 'Already logged in (no validation required)'
               };
-              setValue(fieldName, authResults);
+              setValue(fieldName, user);
               setLoading(false);
               goToNextBlock();
-              return;
+            }, 100); // Small delay to show loading state
+            return;
+          }
+    
+          // If validation URL is configured, validate the token
+          if ((block as any).validateTokenUrl) {
+            const headers = buildRequestHeaders();
+            const baseBody = { [tokenField]: existing };
+            const requestBody = buildRequestBody(baseBody);
+            
+            fetch((block as any).validateTokenUrl, {
+              method: 'POST',
+              headers,
+              body: JSON.stringify(requestBody)
+            })
+              .then((res) => res.ok ? res.json() : Promise.reject())
+              .then((data) => {
+                const processedData = applyFieldMappings(data);
+                
+                // If skip is enabled and this is not manual navigation, skip after successful validation
+                if (!isBackNav) {
+                  const authResults = {
+                    ...processedData,
+                    name: data?.name || '',
+                    email: data?.email || '',
+                    mobile: data?.mobile || '',
+                    token: existing,
+                    isAuthenticated: true,
+                    timestamp: new Date().toISOString(),
+                    skipped: true,
+                    skipReason: 'Already logged in (validation passed)'
+                  };
+                  setValue(fieldName, data);
+                  setLoading(false);
+                  goToNextBlock();
+                  return;
+                }
+    
+                // Otherwise show welcome screen
+                saveToFieldName(processedData, existing);
+                setCurrentStep('welcome');
+                if (data?.name) setName(data.name);
+                if (data?.email) setEmail(data.email);
+                if (data?.mobile) setMobile(data.mobile);
+                setLoading(false);
+              })
+              .catch(() => {
+                localStorage.removeItem(storageKey);
+                determineFirstStep();
+                setLoading(false);
+              });
+          } else {
+            // No validation URL, show welcome screen if manual navigation or skip not enabled
+            if (isBackNav || !skipIfLoggedIn) {
+              setCurrentStep('welcome');
+              setValue(fieldName, user);
+              setLoading(false);
             }
-
-            // Otherwise show welcome screen
-            saveToFieldName(processedData, existing);
-            setCurrentStep('welcome');
-            if (data?.name) setName(data.name);
-            if (data?.email) setEmail(data.email);
-            if (data?.mobile) setMobile(data.mobile);
-            setLoading(false);
-          })
-          .catch(() => {
-            localStorage.removeItem(storageKey);
-            determineFirstStep();
-            setLoading(false);
-          });
-      } else {
-        // No validation URL, show welcome screen if manual navigation or skip not enabled
-        if (isBackNav || !skipIfLoggedIn) {
-          setCurrentStep('welcome');
-          setLoading(false);
-        }
-        // If skip is enabled and not manual navigation, the earlier code already handled skipping
-      }
-    } else {
+            // If skip is enabled and not manual navigation, the earlier code already handled skipping
+          }
+        } else {
+          determineFirstStep();
+        }  
+      }  
+    } catch (e: any) {
       determineFirstStep();
     }
   }, []);
@@ -212,7 +220,7 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
       skipped: false
     };
     
-    setValue(fieldName, authResults);
+    setValue(fieldName, data);
   };
 
   const handleStepSubmit = async () => {
@@ -356,7 +364,7 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
           const processedData = applyFieldMappings(data);
           
           if (data[tokenField]) {
-            localStorage.setItem(storageKey, data[tokenField]);
+            localStorage.setItem(storageKey, JSON.stringify(data));
           }
           
           saveToFieldName(processedData, data[tokenField]);
@@ -401,7 +409,7 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
         const processedData = applyFieldMappings(data);
         
         if (data[tokenField]) {
-          localStorage.setItem(storageKey, data[tokenField]);
+          localStorage.setItem(storageKey, JSON.stringify(data));
         }
         
         saveToFieldName(processedData, data[tokenField]);
