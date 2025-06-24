@@ -128,7 +128,20 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
               }
               getItemValue={(item) => item.uuid as string}
             >
-              <SortableContent className="space-y-4">
+              <SortableContent
+                className="space-y-4"
+                onDragOver={(e) => {
+                  if (e.dataTransfer.types.includes("application/x-block-type")) {
+                    e.preventDefault();
+                  }
+                }}
+                onDrop={(e) => {
+                  const type = e.dataTransfer.getData("application/x-block-type");
+                  if (type) {
+                    handleAddBlockItem(type);
+                  }
+                }}
+              >
                 {(data.items || []).map((block, index) => (
                   <SortableItem key={block.uuid || index} value={block.uuid as string}>
                     <div className="relative">
@@ -152,11 +165,16 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
               <h4 className="text-sm font-medium mb-2">Add Item</h4>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                 {Object.entries(state.definitions.blocks).map(([type, definition]) => (
-                  <Button type="button"
+                  <Button
+                    type="button"
                     key={type}
                     variant="outline"
                     size="sm"
                     onClick={() => handleAddBlockItem(type)}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("application/x-block-type", type);
+                    }}
                     className="justify-start"
                   >
                     {definition.icon && <span className="mr-2">{definition.icon}</span>}

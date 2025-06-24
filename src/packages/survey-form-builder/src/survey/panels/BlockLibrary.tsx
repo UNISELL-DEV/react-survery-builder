@@ -15,7 +15,14 @@ export const BlockLibrary: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Object.entries(state.definitions.blocks).map(([type, definition]) => (
-            <Card key={type} className="hover:bg-accent/10 cursor-pointer transition-colors">
+            <Card
+              key={type}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("application/x-block-type", type);
+              }}
+              className="hover:bg-accent/10 cursor-pointer transition-colors"
+            >
               <CardHeader className="p-3">
                 <CardTitle className="text-sm flex items-center gap-2">
                   {definition.icon && <span>{definition.icon}</span>}
