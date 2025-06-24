@@ -19,7 +19,6 @@ const sampleSurvey =
         "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
           {
-            "showContinueButton": false,
             "type": "auth",
             "fieldName": "authResults",
             "loginUrl": "http://127.0.0.1:8000/api/patient/login",
@@ -43,21 +42,10 @@ const sampleSurvey =
               "X-Merchant-ID": "1"
             },
             "additionalBodyParams": {},
-            "uuid": "0ade2ca1-e1c9-46fd-9d0f-21a77ca3d39a",
-            "navigationRules": []
-          },
-          {
-            "type": "checkout",
-            "fieldName": "checkout8aa4",
-            "label": "Checkout",
-            "description": "",
-            "showShippingAddress": true,
-            "showBillingAddress": true,
-            "requireEmail": true,
-            "requirePhone": true,
-            "className": "",
-            "uuid": "5f7da81c-f447-4f54-af4c-ec5866d8fae2",
-            "navigationRules": []
+            "skipIfLoggedIn": false,
+            "uuid": "0b71c62a-c481-4c96-aea9-fafcc072bcc3",
+            "navigationRules": [],
+            "showContinueButton": false
           },
           {
             "type": "selectablebox",
@@ -880,7 +868,14 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your responses, you appear to be a good candidate for Testosterone Replacement Therapy. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">What happens next:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Medical review of your responses</li><li>• Lab work coordination</li><li>• Treatment plan development</li><li>• Medication delivery setup</li></ul></div></div></div>",
             "variableName": "",
             "className": "",
-            "isEndBlock": true,
+            "showContinueButton": true,
+            "navigationRules": [
+              {
+                "condition": "true",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              }
+            ],
             "uuid": "qualified-test-html-uuid"
           }
         ]
@@ -895,8 +890,39 @@ const sampleSurvey =
             "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for Enclomiphene</h2><p class=\"text-gray-600 mb-6\">Based on your fertility concerns, we recommend Enclomiphene treatment, which can help boost testosterone while preserving fertility. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Benefits of Enclomiphene:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Increases natural testosterone production</li><li>• Preserves fertility and sperm production</li><li>• Oral medication (no injections)</li><li>• Fewer side effects than traditional TRT</li></ul></div></div></div>",
             "variableName": "",
             "className": "",
-            "isEndBlock": true,
+            "showContinueButton": true,
+            "navigationRules": [
+              {
+                "condition": "true",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              }
+            ],
             "uuid": "qualified-enclo-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 14",
+        "uuid": "40bf913e-76ac-432a-bac8-981acdad2712",
+        "items": [
+          {
+            "type": "checkout",
+            "fieldName": "checkout6897",
+            "label": "Checkout Information",
+            "description": "Please provide your contact and shipping details",
+            "showContactInfo": true,
+            "showShippingAddress": true,
+            "showBillingAddress": false,
+            "sameAsBilling": true,
+            "requireEmail": true,
+            "requirePhone": true,
+            "collectFullName": true,
+            "allowCompany": false,
+            "defaultCountry": "US",
+            "className": "",
+            "uuid": "a4d78c0b-4ac2-4196-a043-32f59c17e5a7"
           }
         ]
       }
