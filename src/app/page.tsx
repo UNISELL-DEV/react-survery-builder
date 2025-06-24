@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Check, Upload, AlertCircle } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 // Example survey data from the builder
 const sampleSurvey = 
@@ -22,35 +23,35 @@ const sampleSurvey =
         "name": "Page 1 - Medical Safety & History",
         "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
-          {
-            "type": "auth",
-            "fieldName": "authResults",
-            "loginUrl": "http://127.0.0.1:8000/api/patient/login",
-            "signupUrl": "http://127.0.0.1:8000/api/patient/login",
-            "useOtp": true,
-            "sendEmailOtpUrl": "http://127.0.0.1:8000/api/patient/send-email-otp",
-            "verifyEmailOtpUrl": "http://127.0.0.1:8000/api/patient/verify-email-otp",
-            "sendMobileOtpUrl": "",
-            "verifyMobileOtpUrl": "",
-            "tokenField": "token",
-            "tokenStorageKey": "authToken",
-            "validateTokenUrl": "",
-            "requireName": true,
-            "requireEmail": true,
-            "requireMobile": false,
-            "nameLabel": "Name",
-            "emailLabel": "Email",
-            "mobileLabel": "Mobile Number",
-            "fieldMappings": {},
-            "customHeaders": {
-              "X-Merchant-ID": "1"
-            },
-            "additionalBodyParams": {},
-            "skipIfLoggedIn": false,
-            "uuid": "0b71c62a-c481-4c96-aea9-fafcc072bcc3",
-            "navigationRules": [],
-            "showContinueButton": false
-          },
+          // {
+          //   "type": "auth",
+          //   "fieldName": "authResults",
+          //   "loginUrl": "http://127.0.0.1:8000/api/patient/login",
+          //   "signupUrl": "http://127.0.0.1:8000/api/patient/login",
+          //   "useOtp": true,
+          //   "sendEmailOtpUrl": "http://127.0.0.1:8000/api/patient/send-email-otp",
+          //   "verifyEmailOtpUrl": "http://127.0.0.1:8000/api/patient/verify-email-otp",
+          //   "sendMobileOtpUrl": "",
+          //   "verifyMobileOtpUrl": "",
+          //   "tokenField": "token",
+          //   "tokenStorageKey": "authToken",
+          //   "validateTokenUrl": "",
+          //   "requireName": true,
+          //   "requireEmail": true,
+          //   "requireMobile": false,
+          //   "nameLabel": "Name",
+          //   "emailLabel": "Email",
+          //   "mobileLabel": "Mobile Number",
+          //   "fieldMappings": {},
+          //   "customHeaders": {
+          //     "X-Merchant-ID": "1"
+          //   },
+          //   "additionalBodyParams": {},
+          //   "skipIfLoggedIn": false,
+          //   "uuid": "0b71c62a-c481-4c96-aea9-fafcc072bcc3",
+          //   "navigationRules": [],
+          //   "showContinueButton": false
+          // },
           {
             "type": "selectablebox",
             "fieldName": "allergyHistory",
@@ -1004,8 +1005,8 @@ export default function FormRendererExample() {
   };
 
   return (
-      <div className="container mx-auto p-4 mt-4">
-          <div className="flex items-center justify-between mb-8">
+      <div className="container-fluid mx-auto p-4 bg-[#f8f8f8]">
+          {/* <div className="flex items-center justify-between mb-8">
               <h1 className="text-3xl font-bold">IVYRX</h1>
               
               <div className="flex items-center gap-2">
@@ -1094,7 +1095,7 @@ export default function FormRendererExample() {
                       </SheetContent>
                   </Sheet>
               </div>
-          </div>
+          </div> */}
           
           {showAlert && (
               <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
@@ -1109,6 +1110,7 @@ export default function FormRendererExample() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               <div className="lg:col-span-12">
                   <SurveyForm
+                      logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
                       survey={currentSurvey}
                       onSubmit={handleSubmit}
                       onChange={handleChange}

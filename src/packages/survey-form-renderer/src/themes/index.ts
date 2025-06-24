@@ -23,6 +23,7 @@ export interface ThemeDefinition {
     text: string;
     activeText: string;
     placeholder: string;
+    boxBorder?: string;
   };
   container: {
     card: string;
@@ -228,54 +229,56 @@ export const colorfulTheme: ThemeDefinition = {
 };
 
 // Modern theme - sleek and contemporary
+// Modern theme - sleek and contemporary with large crisp fonts and Hims-style design
 export const modernTheme: ThemeDefinition = {
   name: "modern",
-  containerLayout: "max-w-3xl mx-auto py-2 px-2 sm:px-6",
+  containerLayout: "max-w-2xl mx-auto py-4 px-4 sm:px-6",
   header: "mb-8",
-  title: "text-3xl font-extrabold text-gray-900 mb-2",
-  description: "text-lg text-gray-600",
-  background: "bg-white",
-  card: "bg-white shadow-lg rounded-2xl p-6 mb-6",
+  title: "text-4xl font-light text-[#E67E4D] mb-6 text-start leading-tight",
+  description: "text-xl text-gray-900 leading-relaxed font-normal text-start max-w-md mx-auto",
+  background: "bg-transparent",
+  card: "bg-white p-8 mb-8",
   container: {
-    card: "bg-white border border-gray-200 rounded-lg",
-    border: "border-gray-200",
-    activeBorder: "border-blue-500",
-    activeBg: "bg-blue-50",
-    header: "bg-gray-50",
+    card: "bg-white border border-gray-100 rounded-xl",
+    border: "border-gray-100",
+    activeBorder: "border-[#E67E4D]",
+    activeBg: "bg-[#E67E4D]/5",
+    header: "bg-white",
   },
   field: {
-    label: "block text-sm font-medium text-gray-900 mb-1",
-    input: "w-full rounded-xl border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
-    description: "mt-1 text-sm text-gray-500",
-    error: "mt-1 text-sm text-red-600 font-medium",
-    radio: "focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300",
-    checkbox: "focus:ring-indigo-500 h-5 w-5 text-indigo-600 border-gray-300 rounded-md",
-    select: "w-full rounded-xl border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
-    textarea: "w-full rounded-xl border-gray-200 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
-    file: "w-full text-sm text-gray-900 border border-gray-200 rounded-xl cursor-pointer bg-gray-50",
-    matrix: "border-collapse w-full text-sm rounded-lg overflow-hidden",
-    range: "accent-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500",
-    text: "text-gray-700",
-    activeText: "text-blue-600",
+    label: "block text-xl font-medium text-gray-900 mb-4 text-start text-[#C48A66]",
+    input: "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
+    description: "mt-2 text-base text-gray-600 text-start",
+    error: "mt-2 text-sm text-red-600 font-medium text-start",
+    radio: "focus:ring-[#E67E4D] h-5 w-5 text-[#E67E4D] border-gray-300",
+    checkbox: "focus:ring-[#E67E4D] h-5 w-5 text-[#E67E4D] border-gray-300 rounded-md",
+    select: "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
+    textarea: "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
+    file: "w-full text-base text-gray-900 border border-gray-200 rounded-xl cursor-pointer bg-gray-50 py-4 px-4",
+    matrix: "border-collapse w-full text-base rounded-lg overflow-hidden",
+    range: "accent-[#E67E4D] focus:outline-none focus:ring-2 focus:ring-[#E67E4D]",
+    text: "text-gray-900 text-sm",
+    activeText: "text-[#E67E4D]",
     placeholder: "text-gray-400",
+    boxBorder: "border-[#C48A66]"
   },
   progress: {
-    bar: "h-2 bg-gray-100 rounded-full overflow-hidden",
-    dots: "flex space-x-2",
-    numbers: "flex space-x-2",
-    percentage: "text-right text-sm text-gray-500 font-medium mb-1",
-    label: "text-sm text-gray-500 mb-1",
+    bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
+    dots: "flex space-x-2 justify-center",
+    numbers: "flex space-x-2 justify-center",
+    percentage: "text-right text-base text-gray-900 font-medium mb-1",
+    label: "text-base text-gray-600 mb-1 text-start",
   },
   button: {
-    primary: "inline-flex justify-center py-3 px-5 shadow-md text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
-    secondary: "inline-flex justify-center py-3 px-5 border border-gray-200 shadow-md text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
-    text: "text-sm font-medium text-indigo-600 hover:text-indigo-700",
-    navigation: "inline-flex items-center px-5 py-3 shadow-md text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500",
+    primary: "inline-flex justify-center py-4 px-16 text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] min-w-[200px]",
+    secondary: "inline-flex justify-center py-3 px-8 border border-gray-200 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E67E4D]",
+    text: "text-base font-medium text-[#E67E4D] hover:text-[#D86B3C]",
+    navigation: "inline-flex items-center px-8 py-4 text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200",
   },
   colors: {
-    primary: "#4F46E5", // indigo-600
+    primary: "#E67E4D", // coral orange
     secondary: "#6B7280", // gray-500
-    accent: "#F59E0B", // amber-500
+    accent: "#D86B3C", // darker coral
     background: "#FFFFFF", // white
     text: "#111827", // gray-900
     border: "#E5E7EB", // gray-200

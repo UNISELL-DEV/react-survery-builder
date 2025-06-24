@@ -105,11 +105,11 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
                 )}
               >
                 <Card 
-                  className={`p-4 transition-colors ${
-                    isSelected 
-                      ? "border-primary bg-primary/5 dark:bg-primary/20" 
-                      : "hover:bg-accent dark:hover:bg-accent/50"
-                  }`}
+                  className={cn(
+                    "p-4 transition-colors",
+                    "hover:bg-accent dark:hover:bg-accent/50",
+                    isSelected ? themeConfig.field.boxBorder ?? "border-primary" : "border-[#ccc]"
+                  )}
                 >
                   <div className="flex items-center justify-between">
                     <span className={cn("text-foreground", themeConfig.field.text)}>

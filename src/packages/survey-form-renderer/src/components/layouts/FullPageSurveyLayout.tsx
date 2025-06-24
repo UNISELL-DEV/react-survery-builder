@@ -1,4 +1,4 @@
-// Enhanced FullPageSurveyLayout with fixed alignment and improved UX
+// Enhanced FullPageSurveyLayout with intake form design styling
 import React, { useEffect, useRef } from "react";
 import { useSurveyForm } from "../../context/SurveyFormContext";
 import { BlockRenderer } from "../blocks/BlockRenderer";
@@ -152,9 +152,13 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
     visibleBlocksInCurrentPage: visibleCurrentPageBlocks.length,
   } : null;
 
+  // Get current block for potential disclaimer
+  const currentBlock = currentPageBlocks[currentBlockIndex];
+  const blockDisclaimer = currentBlock?.disclaimer;
+
   return (
     <div
-      className="survey-fullpage-layout min-h-[90vh] flex flex-col"
+      className="survey-fullpage-layout min-h-screen flex flex-col"
       ref={containerRef}
     >
       {/* Debug Panel (only visible when enableDebug is true) */}
@@ -171,23 +175,31 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
         </div>
       )}
 
+      {/* Logo Section - Positioned after header */}
+      {logo && (
+        <div className="w-full flex py-2 px-4 border-gray-100 mb-4">
+          <div className="w-full flex max-w-lg mx-auto">
+          <div className="justify-start">
+            {logo}
+          </div>
+            
+          </div>
+        </div>
+      )}
+
+
       {/* Fixed Header Section */}
-      <div className="w-full bg-background/95 backdrop-blur-sm border-b border-border/10">
-        <div className="w-full max-w-2xl mx-auto px-4 py-4">
+      <div className="w-full backdrop-blur-sm border-gray-100">
+        <div className="w-full max-w-lg mx-auto py-4">
           
-          {/* Progress Bar Section - Just the bar */}
+          {/* Progress Bar Section */}
           {progressBar && typeof progressBar === "object" && progressBar.position !== "bottom" && (
             <div className="mb-3">
-              <div
-                className={cn(
-                  "h-2 w-full rounded-full overflow-hidden",
-                  "bg-muted/60",
-                )}
-              >
+              <div className="h-2 w-full rounded-full overflow-hidden bg-gray-200">
                 <motion.div
                   className={cn(
                     "h-full transition-all duration-500 ease-out rounded-full",
-                    progressBar.color || "bg-primary",
+                    progressBar.color || "bg-[#a55a36]",
                   )}
                   initial={{ width: "0%" }}
                   animate={{ width: `${progressPercentage}%` }}
@@ -203,8 +215,8 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                       className={cn(
                         "w-2 h-2 rounded-full transition-colors",
                         i <= currentStepPosition
-                          ? "bg-primary"
-                          : "bg-muted"
+                          ? "bg-[#E67E4D]"
+                          : "bg-gray-200"
                       )}
                     />
                   ))}
@@ -212,7 +224,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
               )}
 
               {progressBar.type === "numbers" && (
-                <div className="text-center text-xs text-muted-foreground mt-1">
+                <div className="text-center text-xs text-gray-500 mt-2">
                   {currentStepPosition + 1} / {totalVisibleSteps}
                 </div>
               )}
@@ -222,14 +234,9 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
           {/* Default progress bar for boolean true */}
           {progressBar === true && (
             <div className="mb-3">
-              <div
-                className={cn(
-                  "h-2 w-full rounded-full overflow-hidden",
-                  "bg-muted/60",
-                )}
-              >
+              <div className="h-2 w-full rounded-full overflow-hidden bg-gray-200">
                 <motion.div
-                  className="h-full bg-primary transition-all duration-500 ease-out rounded-full"
+                  className="h-full bg-[#E67E4D] transition-all duration-500 ease-out rounded-full"
                   initial={{ width: "0%" }}
                   animate={{ width: `${progressPercentage}%` }}
                 />
@@ -237,11 +244,11 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
             </div>
           )}
 
-          {/* Navigation Row - Back button and Percentage on same line */}
-          <div className="flex items-center justify-between h-8">
+          {/* Navigation Row - Only Back button */}
+          <div className="flex items-center justify-start h-8">
             
-            {/* Left: Back Button Section - Fixed width container */}
-            <div className="flex items-center w-24">
+            {/* Back Button */}
+            <div className="flex items-center">
               {navigationButtons?.showPrevious !== false && canGoBack && (
                 <div className="flex items-center space-x-2">
                   <Button
@@ -252,9 +259,9 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                     className={cn(
                       "opacity-70 hover:opacity-100 transition-all duration-200",
                       "w-8 h-8 p-0 rounded-full",
-                      "border-2 border-solid",
-                      "hover:bg-muted hover:scale-105",
-                      "focus:ring-2 focus:ring-primary/20"
+                      "border border-gray-200",
+                      "hover:bg-gray-50 hover:scale-105",
+                      "focus:ring-2 focus:ring-[#E67E4D]/20"
                     )}
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -265,7 +272,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
 
                   {/* Navigation history indicator */}
                   {showNavigationHistory && (
-                    <div className="text-xs text-muted-foreground flex items-center opacity-70">
+                    <div className="text-xs text-gray-500 flex items-center opacity-70">
                       <History className="w-3 h-3 mr-1" />
                       <span className="tabular-nums">{navigationHistory.length - 1}</span>
                     </div>
@@ -273,36 +280,10 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Center: Debug info only when enabled */}
-            {enableDebug && (
-              <div className="flex flex-col items-center justify-center text-center">
-                <div className="text-xs text-muted-foreground tabular-nums">
-                  Step {currentStepPosition + 1} of {totalVisibleSteps}
-                </div>
-              </div>
-            )}
-
-            {/* Right: Percentage - Fixed width container for symmetry */}
-            <div className="flex justify-end w-24">
-              {progressBar && (
-                <div className="text-sm font-medium text-foreground tabular-nums">
-                  {Math.round(progressPercentage)}%
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Logo Section */}
-      {logo && (
-        <header className="w-full flex justify-center py-6 px-4">
-          <div className="text-center">
-            {logo}
-          </div>
-        </header>
-      )}
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
@@ -315,11 +296,38 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="flex-1 flex flex-col"
           >
-            {/* Question Content */}
-            <div className="flex-1 flex flex-col justify-start">
-              <div className="w-full max-w-2xl mx-auto px-4 py-8">
-                <div className="space-y-6">
-                  {currentPageBlocks[currentBlockIndex] && (
+            {/* Question Content - Centered Layout */}
+            <div className="flex-[0.8] flex flex-col justify-start items-center px-4 py-2">
+              <div className="w-full max-w-lg space-y-6">
+                {currentPageBlocks[currentBlockIndex] && (
+                  <div className="text-start">
+                    {/* Apply intake form styling to titles */}
+                    {/* <style jsx global>{`
+                      .survey-fullpage-layout h1,
+                      .survey-fullpage-layout .block-title,
+                      .survey-fullpage-layout .question-title {
+                        color: #E67E4D !important;
+                        font-weight: 300 !important;
+                        font-size: 2.25rem !important;
+                        line-height: 1.2 !important;
+                        margin-bottom: 1.5rem !important;
+                        text-align: center !important;
+                      }
+                      
+                      .survey-fullpage-layout .question-subtitle,
+                      .survey-fullpage-layout .block-description {
+                        color: #111827 !important;
+                        font-size: 1.125rem !important;
+                        line-height: 1.6 !important;
+                        font-weight: 400 !important;
+                        text-align: center !important;
+                        margin-bottom: 2rem !important;
+                        max-width: 28rem !important;
+                        margin-left: auto !important;
+                        margin-right: auto !important;
+                      }
+                    `}</style> */}
+                    
                     <BlockRenderer
                       block={currentPageBlocks[currentBlockIndex]}
                       value={
@@ -350,14 +358,24 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                       ref={firstInputRef}
                       theme={theme}
                     />
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Navigation Buttons - Fixed at bottom */}
-            <div className="w-full bg-background/95 backdrop-blur-sm border-t border-border/10">
-              <div className="w-full max-w-2xl mx-auto px-4 py-6">
+            <div className="w-full backdrop-blur-sm border-gray-100">
+              <div className="w-full max-w-2xl mx-auto px-4 py-4">
+                
+                {/* Disclaimer Text */}
+                {blockDisclaimer && (
+                  <div className="mb-6">
+                    <p className="text-xs text-gray-500 leading-relaxed max-w-md mx-auto text-center">
+                      {blockDisclaimer}
+                    </p>
+                  </div>
+                )}
+
                 <form onSubmit={handleSubmit}>
                   <div
                     className={cn(
@@ -384,27 +402,31 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                         </Button>
                       )}
 
-                    {/* Main Action Button */}
+                    {/* Main Action Button - Intake Form Style */}
                     {showNextButton && (
                       <Button
                         type="submit"
                         disabled={!isValid}
                         size="lg"
                         className={cn(
-                          "px-8 py-4 text-lg font-medium transition-all duration-200",
+                          "bg-black hover:bg-gray-800 text-white",
+                          "px-16 py-4 text-base font-medium",
+                          "rounded-full min-w-[200px]",
+                          "transition-all duration-200",
                           "hover:scale-[1.02] active:scale-[0.98]",
-                          "min-w-[160px] rounded-xl shadow-sm",
                           "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         )}
                       >
-                        {isLastPage &&
-                          currentBlockIndex === currentPageBlocks.length - 1
-                          ? completeText
-                          : continueText}
-                        {!(
-                          isLastPage &&
-                          currentBlockIndex === currentPageBlocks.length - 1
-                        ) && <ArrowRight className="ml-2 w-5 h-5" />}
+                        <span className="flex items-center">
+                          {isLastPage &&
+                            currentBlockIndex === currentPageBlocks.length - 1
+                            ? completeText
+                            : continueText}
+                          {!(
+                            isLastPage &&
+                            currentBlockIndex === currentPageBlocks.length - 1
+                          ) && <ArrowRight className="ml-2 w-4 h-4" />}
+                        </span>
                       </Button>
                     )}
                   </div>
@@ -419,18 +441,13 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
       {progressBar &&
         typeof progressBar === "object" &&
         progressBar.position === "bottom" && (
-          <div className="w-full border-t bg-background/80 backdrop-blur-sm">
+          <div className="w-full border-t bg-white/80 backdrop-blur-sm">
             <div className="w-full max-w-2xl mx-auto px-4 py-2">
-              <div
-                className={cn(
-                  "h-1 w-full rounded-full overflow-hidden",
-                  "bg-muted/60",
-                )}
-              >
+              <div className="h-2 w-full rounded-full overflow-hidden bg-gray-200">
                 <motion.div
                   className={cn(
                     "h-full transition-all duration-500 ease-out rounded-full",
-                    progressBar.color || "bg-primary",
+                    progressBar.color || "bg-[#E67E4D]",
                   )}
                   initial={{ width: "0%" }}
                   animate={{ width: `${progressPercentage}%` }}
