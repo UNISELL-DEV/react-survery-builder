@@ -85,11 +85,11 @@ const SelectableBoxQuestionForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="questionTitle">Question Title</Label>
+          <Label htmlFor="label">Label</Label>
           <Input
-            id="questionTitle"
-            value={data.questionTitle || ""}
-            onChange={(e) => handleChange("questionTitle", e.target.value)}
+            id="label"
+            value={data.label || ""}
+            onChange={(e) => handleChange("label", e.target.value)}
             placeholder="What's your goal?"
           />
         </div>
@@ -231,8 +231,8 @@ const SelectableBoxQuestionItem: React.FC<ContentBlockItemProps> = ({
 
   return (
     <div className="space-y-4">
-      {data.questionTitle && (
-        <h3 className="text-2xl font-bold">{data.questionTitle}</h3>
+      {data.label && (
+        <h3 className="text-2xl font-bold">{data.label}</h3>
       )}
 
       {data.description && (
@@ -303,7 +303,7 @@ export const SelectableBoxQuestionBlock: BlockDefinition = {
   defaultData: {
     type: "selectablebox",
     fieldName: `boxq${uuidv4().substring(0, 4)}`,
-    questionTitle: "What's your goal?",
+    label: "What's your goal?",
     description: "",
     boxSpacing: "4",
     defaultValue: "",
@@ -320,7 +320,7 @@ export const SelectableBoxQuestionBlock: BlockDefinition = {
   renderPreview: () => <SelectableBoxQuestionPreview />,
   validate: (data) => {
     if (!data.fieldName) return "Field name is required";
-    if (!data.questionTitle) return "Question title is required";
+    if (!data.label) return "Label is required";
     if (!data.options || data.options.length === 0) return "At least one option is required";
     return null;
   },

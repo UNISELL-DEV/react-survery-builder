@@ -62,12 +62,12 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
   
   return (
     <div className="survey-box-question space-y-4">
-      {/* Question Title */}
-      {block.questionTitle && (
+      {/* Label */}
+      {block.label && (
         <Label
           className={cn("text-lg font-bold block", themeConfig.field.label)}
         >
-          {block.questionTitle}
+          {block.label}
         </Label>
       )}
       

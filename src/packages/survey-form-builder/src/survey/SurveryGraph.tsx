@@ -363,8 +363,8 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
             width: 280,
             height: 80,
             data: {
-              label: item.fieldName || item.questionTitle || 'Navigation Item',
-              description: item.questionTitle || item.description || '',
+              label: item.fieldName || item.label || 'Navigation Item',
+              description: item.label || item.description || '',
               nodeType: item.type,
               itemType: item.type,
               originalData: item,
@@ -1000,8 +1000,8 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                           className="text-xs"
                           fill={isDarkMode ? '#cbd5e1' : '#64748b'}
                         >
-                          {`${index + 1}. ${(item.questionTitle || item.fieldName || item.type || 'Item').substring(0, 35)}${
-                            (item.questionTitle || item.fieldName || item.type || 'Item').length > 35 ? '...' : ''
+                          {`${index + 1}. ${(item.label || item.fieldName || item.type || 'Item').substring(0, 35)}${
+                            (item.label || item.fieldName || item.type || 'Item').length > 35 ? '...' : ''
                           }`}
                         </text>
                         {item.navigationRules && item.navigationRules.length > 0 && (
@@ -1216,7 +1216,7 @@ export const SurveyGraph: React.FC<SurveyGraphProps> = ({
                   {selectedNodeData.data.pageItems.map((item: any, index: number) => (
                     <div key={item.uuid || index} className="flex items-center justify-between text-xs">
                       <span className="text-gray-600 dark:text-gray-300">
-                        {item.fieldName || item.questionTitle || item.type || 'Item'}
+                        {item.fieldName || item.label || item.type || 'Item'}
                       </span>
                       {item.navigationRules && item.navigationRules.length > 0 && (
                         <div className="w-2 h-2 bg-orange-500 rounded-full" title="Has navigation rules"></div>

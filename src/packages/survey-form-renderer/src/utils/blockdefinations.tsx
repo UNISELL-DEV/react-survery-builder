@@ -361,7 +361,7 @@ export const SelectableBoxQuestionBlock: BlockDefinition = {
   defaultData: {
     type: "selectablebox",
     fieldName: `boxq${uuidv4().substring(0, 4)}`,
-    questionTitle: "What's your goal?",
+    label: "What's your goal?",
     description: "",
     boxSpacing: "4",
     defaultValue: "",
@@ -375,7 +375,7 @@ export const SelectableBoxQuestionBlock: BlockDefinition = {
   },
   validate: (data) => {
     if (!data.fieldName) return "Field name is required";
-    if (!data.questionTitle) return "Question title is required";
+    if (!data.label) return "Label is required";
     if (!data.options || data.options.length === 0) return "At least one option is required";
     return null;
   },

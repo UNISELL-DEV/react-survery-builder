@@ -62,7 +62,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "allergyHistory",
-            "questionTitle": "Have you ever had an adverse or allergic reaction to testosterone or testosterone replacement support medications?",
+            "label": "Have you ever had an adverse or allergic reaction to testosterone or testosterone replacement support medications?",
             "description": "e.g., testosterone injectable, topical (androgel, testim, bioidentical), clomiphene (clomid), enclomiphene, hcg (human chorionic gonadotropin), gonadorelin, anastrazole (arimadex), or to any of its ingredients?",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -98,7 +98,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "medicalAdvice",
-            "questionTitle": "Have you been advised to avoid hormone replacement due to a medical condition?",
+            "label": "Have you been advised to avoid hormone replacement due to a medical condition?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -134,7 +134,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "cancerHistory",
-            "questionTitle": "Have you ever been diagnosed with prostate, breast, or testicular cancer?",
+            "label": "Have you ever been diagnosed with prostate, breast, or testicular cancer?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -170,7 +170,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "polycythemia",
-            "questionTitle": "Have you ever been diagnosed with polycythemia (too many red blood cells)?",
+            "label": "Have you ever been diagnosed with polycythemia (too many red blood cells)?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -206,7 +206,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "medicalConditions",
-            "questionTitle": "Do you have a personal medical history involving any of the following medical conditions?",
+            "label": "Do you have a personal medical history involving any of the following medical conditions?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -290,7 +290,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "medicationHistory",
-            "questionTitle": "Are you currently taking or have you taken any of the following in the past?",
+            "label": "Are you currently taking or have you taken any of the following in the past?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -356,7 +356,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "medicationTiming",
-            "questionTitle": "Are you currently taking this medication, or did you take it previously?",
+            "label": "Are you currently taking this medication, or did you take it previously?",
             "description": "Only answer if you selected a medication above (not 'No')",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -403,7 +403,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "libidoRating",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): libido (sex drive)",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): libido (sex drive)",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -442,7 +442,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "erectionStrength",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): erection strength",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): erection strength",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -488,7 +488,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "energyLevel",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): energy level",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): energy level",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -527,7 +527,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "enjoymentOfLife",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): enjoyment of life",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): enjoyment of life",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -566,7 +566,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "depressionFeelings",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of depression",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of depression",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -605,7 +605,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "anxietyFeelings",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of anxiety",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of anxiety",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -651,7 +651,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "strengthEndurance",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): strength and/or endurance?",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): strength and/or endurance?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -690,7 +690,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "sportsAbility",
-            "questionTitle": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): ability to play sports",
+            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): ability to play sports",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -729,7 +729,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "heightLoss",
-            "questionTitle": "Have you lost height?",
+            "label": "Have you lost height?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -760,7 +760,7 @@ const sampleSurvey =
           {
             "type": "selectablebox",
             "fieldName": "fertilityConcerns",
-            "questionTitle": "Are you concerned with the side effects of low sperm count and decreased fertility that can occur with Testosterone?",
+            "label": "Are you concerned with the side effects of low sperm count and decreased fertility that can occur with Testosterone?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
