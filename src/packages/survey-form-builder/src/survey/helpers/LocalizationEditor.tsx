@@ -220,9 +220,8 @@ const extractLabelsFromSurvey = (node: any): string[] => {
 
     // Extract text content from the current node itself
     if (currentNode.name) labels.add(currentNode.name);
-    if (currentNode.questionTitle) labels.add(currentNode.questionTitle);
-    if (currentNode.description) labels.add(currentNode.description);
     if (currentNode.label) labels.add(currentNode.label);
+    if (currentNode.description) labels.add(currentNode.description);
     if (currentNode.text) labels.add(currentNode.text);
     if (currentNode.html) labels.add(currentNode.html);
     if (currentNode.placeholder) labels.add(currentNode.placeholder);
