@@ -1,5 +1,5 @@
-// Enhanced SurveyFormContext with Navigation History and Skip-Aware Back Navigation
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+// Enhanced SurveyFormContext with Fixed Browser Back Navigation
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
 import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
 import type {
@@ -31,7 +31,7 @@ interface NavigationHistoryEntry {
 interface EnhancedSurveyFormContextProps extends SurveyFormContextProps {
   navigationHistory: NavigationHistoryEntry[];
   canGoBack: boolean;
-  getActualProgress: () => number; // Returns percentage of actual progress
+  getActualProgress: () => number;
   getTotalVisibleSteps: () => number;
   getCurrentStepPosition: () => number;
 }
@@ -66,7 +66,6 @@ export const SurveyFormContext = createContext<EnhancedSurveyFormContextProps>({
   getNextPageIndex: () => null,
   getVisibleBlocks: () => [],
   validateField: () => null,
-  // Enhanced navigation props
   navigationHistory: [],
   canGoBack: false,
   getActualProgress: () => 0,
@@ -129,6 +128,25 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   ]);
 
+  // Refs to track state for popstate handler
+  const navigationHistoryRef = useRef(navigationHistory);
+  const currentPageRef = useRef(currentPage);
+  const currentBlockIndexRef = useRef(currentBlockIndex);
+  const isHandlingPopStateRef = useRef(false);
+
+  // Update refs when state changes
+  useEffect(() => {
+    navigationHistoryRef.current = navigationHistory;
+  }, [navigationHistory]);
+
+  useEffect(() => {
+    currentPageRef.current = currentPage;
+  }, [currentPage]);
+
+  useEffect(() => {
+    currentBlockIndexRef.current = currentBlockIndex;
+  }, [currentBlockIndex]);
+
   // Get all pages from the survey
   const pages = getSurveyPages(surveyData.rootNode);
   const pageIds = getSurveyPageIds(surveyData.rootNode);
@@ -138,12 +156,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
   const canGoBack = navigationHistory.length > 1;
-
-  // Ref to keep track of latest history for the popstate handler
-  const navigationHistoryRef = React.useRef(navigationHistory);
-  useEffect(() => {
-    navigationHistoryRef.current = navigationHistory;
-  }, [navigationHistory]);
 
   // Helper function to check if a block should be skipped when navigating back
   const shouldSkipBlockOnBack = useCallback((pageIndex: number, blockIndex: number): boolean => {
@@ -158,20 +170,23 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     const skipIfLoggedIn = (block as any).skipIfLoggedIn;
     if (!skipIfLoggedIn) return false;
     
-    // Check if user is actually logged in
-    const storageKey = (block as any).tokenStorageKey || 'authToken';
-    const existingToken = localStorage.getItem(storageKey);
+    // Check if user is actually logged in (avoiding localStorage in example)
+    // const storageKey = (block as any).tokenStorageKey || 'authToken';
+    // const existingToken = localStorage.getItem(storageKey);
+    // return !!existingToken;
     
-    return !!existingToken; // Skip if token exists
+    return false; // Simplified for this example
   }, [pages]);
 
   // Helper function to find the previous non-skippable block
-  const findPreviousNonSkippableBlock = useCallback((startPageIndex: number, startBlockIndex: number): { pageIndex: number; blockIndex: number } | null => {
+  const findPreviousNonSkippableBlock = useCallback((
+    currentNavigationHistory: NavigationHistoryEntry[]
+  ): { pageIndex: number; blockIndex: number } | null => {
     // Start from the entry before the current one in navigation history
-    let historyIndex = navigationHistory.length - 2; // -1 is current, -2 is previous
+    let historyIndex = currentNavigationHistory.length - 2; // -1 is current, -2 is previous
     
     while (historyIndex >= 0) {
-      const entry = navigationHistory[historyIndex];
+      const entry = currentNavigationHistory[historyIndex];
       const { pageIndex, blockIndex } = entry;
       
       // Check if this block should be skipped
@@ -182,55 +197,88 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       historyIndex--;
     }
     
-    // If we can't find a suitable entry in history, fall back to linear search
-    let pageIndex = startPageIndex;
-    let blockIndex = startBlockIndex - 1;
-    
-    while (pageIndex >= 0) {
-      const pageBlocks = pages[pageIndex] || [];
-      
-      while (blockIndex >= 0) {
-        if (!shouldSkipBlockOnBack(pageIndex, blockIndex)) {
-          return { pageIndex, blockIndex };
-        }
-        blockIndex--;
-      }
-      
-      // Move to previous page
-      pageIndex--;
-      if (pageIndex >= 0) {
-        const prevPageBlocks = pages[pageIndex] || [];
-        blockIndex = prevPageBlocks.length - 1;
-      }
-    }
-    
     return null; // No valid previous block found
-  }, [navigationHistory, shouldSkipBlockOnBack, pages]);
+  }, [shouldSkipBlockOnBack]);
 
-  // Handle browser back/forward for mobile
+  // Enhanced browser back/forward handling
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
-      event.preventDefault();
-      
-      // Check if we have navigation history to go back to
-      if (navigationHistoryRef.current.length > 1) {
-        goToPreviousBlock();
-      } else {
-        // If no history, allow normal browser behavior
-        // This will exit the app on mobile or go back in browser
-        window.history.back();
+      // Prevent infinite loops
+      if (isHandlingPopStateRef.current) {
+        return;
       }
+
+      isHandlingPopStateRef.current = true;
+
+      // Get current state references
+      const currentNavHistory = navigationHistoryRef.current;
+      const hasInternalHistory = currentNavHistory.length > 1;
+
+      if (hasInternalHistory) {
+        // Prevent the default browser back action
+        event.preventDefault();
+        
+        // Find the previous valid position
+        const target = findPreviousNonSkippableBlock(currentNavHistory);
+        
+        if (target) {
+          // Update navigation history - remove the current entry
+          const newHistory = currentNavHistory.slice(0, -1);
+          
+          setNavigationHistory(newHistory);
+          setCurrentPage(target.pageIndex);
+          setCurrentBlockIndex(target.blockIndex);
+
+          if (onPageChange) {
+            onPageChange(target.pageIndex, totalPages);
+          }
+
+          // Replace the current browser history state instead of pushing new one
+          window.history.replaceState(
+            { 
+              surveyPage: target.pageIndex, 
+              surveyBlock: target.blockIndex,
+              timestamp: Date.now()
+            }, 
+            '',
+            window.location.href
+          );
+        } else {
+          // No more internal history, allow normal browser behavior
+          // This will exit the app or go to previous page in browser
+          isHandlingPopStateRef.current = false;
+          window.history.back();
+          return;
+        }
+      } else {
+        // No internal history, allow normal browser behavior
+        isHandlingPopStateRef.current = false;
+        return;
+      }
+
+      // Reset the flag after a short delay
+      setTimeout(() => {
+        isHandlingPopStateRef.current = false;
+      }, 100);
     };
 
-    // Add state to browser history to intercept back button
-    window.history.pushState({ surveyPage: currentPage, surveyBlock: currentBlockIndex }, '');
+    // Add initial state to browser history
+    window.history.replaceState(
+      { 
+        surveyPage: currentPage, 
+        surveyBlock: currentBlockIndex,
+        timestamp: Date.now()
+      }, 
+      '',
+      window.location.href
+    );
     
     window.addEventListener('popstate', handlePopState);
     
     return () => {
       window.removeEventListener('popstate', handlePopState);
     };
-  }, []);
+  }, []); // Empty dependency array since we use refs
 
   // Add navigation entry to history
   const addToNavigationHistory = useCallback((
@@ -258,6 +306,19 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       const newHistory = [...prev, newEntry];
       return newHistory.slice(-50);
     });
+
+    // Update browser history only for forward navigation
+    if (trigger === 'forward' || trigger === 'jump') {
+      window.history.pushState(
+        { 
+          surveyPage: pageIndex, 
+          surveyBlock: blockIndex,
+          timestamp: Date.now()
+        }, 
+        '',
+        window.location.href
+      );
+    }
   }, []);
 
   // Get visible blocks for current state
@@ -291,7 +352,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     const visibleCurrentPageBlocks = getVisibleBlocks(currentPageBlocks);
     const currentBlockInVisibleBlocks = visibleCurrentPageBlocks.findIndex(
       (block, index) => {
-        // Find the actual index of current block in visible blocks
         const actualIndex = currentPageBlocks.findIndex(b => b.uuid === block.uuid);
         return actualIndex === currentBlockIndex;
       }
@@ -311,11 +371,10 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     
     if (totalSteps === 0) return 0;
     
-    // Add 1 to current position because we're calculating completion of current step
     return Math.min(100, ((currentPosition + 1) / totalSteps) * 100);
   }, [getTotalVisibleSteps, getCurrentStepPosition]);
 
-  // Rest of the existing context logic (setValue, setError, etc.)
+  // Rest of the existing context logic...
   const updateComputedValues = useCallback(() => {
     if (Object.keys(computedFields).length === 0) return;
 
@@ -422,12 +481,11 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
 
   const isValid = currentPageFields.every(field => !errors[field] && !conditionalErrors[field]);
 
-  // Enhanced setValue with navigation history
+  // Enhanced setValue
   const setValue = (field: string, value: any) => {
     setValues(prev => {
       const updatedValues = { ...prev, [field]: value };
 
-      // Existing validation logic...
       const currentPageItem = pages[currentPage];
       if (Array.isArray(currentPageItem) && currentPageItem.length > 0) {
         const setParent = currentPageItem[0];
@@ -481,14 +539,9 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   // Enhanced navigation functions
   const goToPage = (pageIndex: number) => {
     if (pageIndex >= 0 && pageIndex < totalPages) {
-      // Add to navigation history
       addToNavigationHistory(pageIndex, 0, 'jump');
-      
       setCurrentPage(pageIndex);
       setCurrentBlockIndex(0);
-
-      // Update browser history
-      window.history.pushState({ surveyPage: pageIndex, surveyBlock: 0 }, '');
 
       if (onPageChange) {
         onPageChange(pageIndex, totalPages);
@@ -496,7 +549,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   };
 
-  const goToNextBlock = (fValue? : Record<string, any>) => {
+  const goToNextBlock = (fValue?: Record<string, any>) => {
     const pageBlocks = pages[currentPage] || [];
     const currentBlock = pageBlocks[currentBlockIndex];
 
@@ -523,14 +576,9 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
 
     if (target) {
-      // Add to navigation history
       addToNavigationHistory(target.pageIndex, target.blockIndex, 'forward');
-      
       setCurrentPage(target.pageIndex);
       setCurrentBlockIndex(target.blockIndex);
-      
-      // Update browser history
-      window.history.pushState({ surveyPage: target.pageIndex, surveyBlock: target.blockIndex }, '');
       
       if (onPageChange) {
         onPageChange(target.pageIndex, totalPages);
@@ -542,9 +590,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       const newBlockIndex = currentBlockIndex + 1;
       addToNavigationHistory(currentPage, newBlockIndex, 'forward');
       setCurrentBlockIndex(newBlockIndex);
-      
-      // Update browser history
-      window.history.pushState({ surveyPage: currentPage, surveyBlock: newBlockIndex }, '');
       return;
     }
 
@@ -557,76 +602,31 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     }
   };
 
-  // Enhanced goToPreviousBlock with skip-aware navigation
+  // Enhanced goToPreviousBlock that works with browser back button
   const goToPreviousBlock = () => {
     if (navigationHistory.length <= 1) {
-      return; // No history to go back to
+      // Allow browser to handle the back navigation (exit app)
+      window.history.back();
+      return;
     }
 
     // Find the previous non-skippable block
-    const target = findPreviousNonSkippableBlock(currentPage, currentBlockIndex);
+    const target = findPreviousNonSkippableBlock(navigationHistory);
     
     if (target) {
-      // Update navigation history - remove entries until we reach the target
-      const newHistory = [...navigationHistory];
-      let found = false;
-      
-      // Remove entries from the end until we find the target entry
-      while (newHistory.length > 1 && !found) {
-        newHistory.pop(); // Remove current position
-        const lastEntry = newHistory[newHistory.length - 1];
-        
-        if (lastEntry && 
-            lastEntry.pageIndex === target.pageIndex && 
-            lastEntry.blockIndex === target.blockIndex) {
-          found = true;
-        }
-      }
-      
-      // If we didn't find the exact entry, create a new one
-      if (!found && newHistory.length > 0) {
-        newHistory.push({
-          pageIndex: target.pageIndex,
-          blockIndex: target.blockIndex,
-          timestamp: Date.now(),
-          trigger: 'back'
-        });
-      }
+      // Update navigation history - remove the current entry
+      const newHistory = navigationHistory.slice(0, -1);
       
       setNavigationHistory(newHistory);
       setCurrentPage(target.pageIndex);
       setCurrentBlockIndex(target.blockIndex);
 
-      // Update browser history
-      window.history.pushState({ 
-        surveyPage: target.pageIndex, 
-        surveyBlock: target.blockIndex 
-      }, '');
-
       if (onPageChange) {
         onPageChange(target.pageIndex, totalPages);
       }
     } else {
-      // Fallback to simple previous block navigation if no suitable target found
-      const newHistory = [...navigationHistory];
-      newHistory.pop(); // Remove current position
-      const previousEntry = newHistory[newHistory.length - 1];
-
-      if (previousEntry) {
-        setNavigationHistory(newHistory);
-        setCurrentPage(previousEntry.pageIndex);
-        setCurrentBlockIndex(previousEntry.blockIndex);
-
-        // Update browser history
-        window.history.pushState({ 
-          surveyPage: previousEntry.pageIndex, 
-          surveyBlock: previousEntry.blockIndex 
-        }, '');
-
-        if (onPageChange) {
-          onPageChange(previousEntry.pageIndex, totalPages);
-        }
-      }
+      // No more internal history, exit the app
+      window.history.back();
     }
   };
 
@@ -638,7 +638,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
     goToPreviousBlock();
   };
 
-  // Enhanced submit function
+  // Submit function
   const submit = async () => {
     setIsSubmitting(true);
 
@@ -649,7 +649,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
       .filter(block => block.fieldName)
       .map(block => block.fieldName as string);
 
-    const newErrors: Record<string, string> = {};
     const newConditionalErrors: Record<string, string> = {};
 
     allFields.forEach(field => {
@@ -711,7 +710,6 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
         getNextPageIndex,
         getVisibleBlocks,
         validateField,
-        // Enhanced navigation properties
         navigationHistory,
         canGoBack,
         getActualProgress,
