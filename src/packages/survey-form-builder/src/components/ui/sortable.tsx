@@ -39,9 +39,9 @@ import { CSS } from "@dnd-kit/utilities";
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils"
 import * as ReactDOM from "react-dom";
-import { useComposedRefs } from "@/packages/survey-form-renderer/src/lib/composition";
+import { useComposedRefs } from "../../lib/composition";
 
 const orientationConfig = {
   vertical: {
