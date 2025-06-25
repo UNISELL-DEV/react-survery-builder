@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSurveyForm } from '../../context/SurveyFormContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@survey-form-renderer/components/ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@survey-form-renderer/components/ui/collapsible';
-import { Button } from '@survey-form-renderer/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
+import { Button } from './button';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface DebugInfoProps {

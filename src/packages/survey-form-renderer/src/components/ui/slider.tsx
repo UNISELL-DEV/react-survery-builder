@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { cn } from "@survey-form-renderer/lib/utils";
+import { cn } from '../../lib/utils';;
 
 interface SliderProps {
   id?: number | string,

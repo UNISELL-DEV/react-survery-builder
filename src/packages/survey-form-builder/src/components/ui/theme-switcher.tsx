@@ -1,6 +1,6 @@
 import React from 'react';
-import { Switch } from '@survey-form-builder/components/ui/switch';
-import { Label } from '@survey-form-builder/components/ui/label';
+import { Switch } from './switch';
+import { Label } from './label';
 import { Sun, Moon } from 'lucide-react';
 
 interface ThemeSwitcherProps {

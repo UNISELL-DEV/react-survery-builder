@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 import { themes } from '../../themes';
-import { Button } from '@survey-form-renderer/components/ui/button';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { Button } from './button';
+import { cn } from '../../lib/utils';
 import { ArrowLeft, ArrowRight, Send } from 'lucide-react';
 
 interface NavigationButtonsProps {

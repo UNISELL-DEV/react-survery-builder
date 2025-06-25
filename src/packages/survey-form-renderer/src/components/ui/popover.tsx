@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { cn } from '../../lib/utils';
 
 interface PopoverProps {
   children: React.ReactNode;
