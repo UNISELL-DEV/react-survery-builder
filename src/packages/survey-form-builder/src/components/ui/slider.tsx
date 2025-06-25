@@ -120,7 +120,7 @@ const Slider: React.FC<SliderProps> = ({
         {internalValues.map((val, index) => (
           <div
             key={index}
-            ref={(el) => (thumbRefs.current[index] = el)}
+            ref={(el) => (thumbRefs.current[index] = el as any)}
             className={cn(
               "absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary bg-background shadow ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none",
               dragging === index && "ring-2 ring-ring ring-offset-2"
