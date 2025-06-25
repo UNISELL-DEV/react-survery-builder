@@ -1,9 +1,9 @@
 import React from 'react';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 import { themes } from '../../themes';
-import { RadioGroup, RadioGroupItem } from '@survey-form-renderer/components/ui/radio-group';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { Label } from '../ui/label';
+import { cn } from '../../lib/utils';
 
 interface RadioRendererProps {
   block: BlockData;

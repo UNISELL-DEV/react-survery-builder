@@ -1,7 +1,7 @@
 // Enhanced SurveyFormContext with Fixed Browser Back Navigation
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import type { ReactNode } from "react";
-import type { NodeData, BlockData } from "../../../survey-form-builder/src/types";
+import type { NodeData, BlockData } from "../types";
 import type {
   SurveyFormContextProps,
   SurveyTheme,

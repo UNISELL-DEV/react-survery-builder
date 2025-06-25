@@ -1,4 +1,4 @@
-import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
+import { BlockData, BlockDefinition } from "../types";
 import { Activity, AlignLeft, ArrowRightToLine, Calculator, Calendar, CheckSquare, CircleCheck, Code, FileText, GitBranch, Grid3X3, ListFilter, LucideTextCursor, Terminal, Upload, UserCheck, ShoppingCart } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 

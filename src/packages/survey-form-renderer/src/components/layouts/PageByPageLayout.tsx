@@ -6,8 +6,8 @@ import { BlockRenderer } from '../blocks/BlockRenderer';
 import { DebugInfo } from '../ui/DebugInfo';
 import { themes } from '../../themes';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { cn } from '../../lib/utils';
 
 interface PageByPageLayoutProps {
   progressBar?: boolean | {

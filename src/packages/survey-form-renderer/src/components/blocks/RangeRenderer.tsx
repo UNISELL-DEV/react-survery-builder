@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { themes } from '../../themes';
-import { Slider } from '@survey-form-renderer/components/ui/slider';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { cn } from '@survey-form-renderer/lib/utils';
-import { BlockData } from '@survey-form-renderer/types';
+import { Slider } from '../ui/slider';
+import { Label } from '../ui/label';
+import { cn } from '../../lib/utils';
+import { BlockData } from '../../types';
 
 interface RangeRendererProps {
   block: BlockData;

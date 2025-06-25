@@ -1,19 +1,19 @@
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@survey-form-builder/components/ui/button";
+import { Button } from "../../components/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardFooter,
-} from "@survey-form-builder/components/ui/card";
-import { Input } from "@survey-form-builder/components/ui/input";
+} from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
 import {
   Root as Sortable,
   Content as SortableContent,
   Item as SortableItem,
   ItemHandle as SortableItemHandle,
-} from "@survey-form-builder/components/ui/sortable";
+} from "../../components/ui/sortable";
 import { arrayMove } from "@dnd-kit/sortable";
 import { GripVertical } from "lucide-react";
 import { ContentBlockItem } from "./ContentBlockItem";

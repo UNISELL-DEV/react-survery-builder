@@ -7,7 +7,7 @@ import type {
   CurrentValues,
   EvaluationResult,
 } from '../types';
-import type { BlockData } from '../../../survey-form-builder/src/types';
+import type { BlockData } from '../types';
 
 /**
  * Evaluates a simple condition between two values using the specified operator

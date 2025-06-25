@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import type { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Button } from "@survey-form-builder/components/ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 import { Calendar, CalendarIcon } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import { Calendar as CalendarComponent } from "@survey-form-builder/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@survey-form-builder/components/ui/popover";
-import { Switch } from "@survey-form-builder/components/ui/switch";
-import { cn } from "@survey-form-builder/lib/utils";
+import { Calendar as CalendarComponent } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Switch } from "../ui/switch";
+import { cn } from "../../lib/utils";
 
 // Simple date formatter function since we're not using date-fns
 const formatDate = (date: Date, format: string = 'PPP'): string => {

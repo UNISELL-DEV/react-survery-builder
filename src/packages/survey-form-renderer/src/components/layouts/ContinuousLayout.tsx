@@ -4,8 +4,8 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { NavigationButtons } from '../ui/NavigationButtons';
 import { BlockRenderer } from '../blocks/BlockRenderer';
 import { themes } from '../../themes';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { cn } from '../../lib/utils';
 import { DebugInfo } from '../ui/DebugInfo';
 
 interface ContinuousLayoutProps {

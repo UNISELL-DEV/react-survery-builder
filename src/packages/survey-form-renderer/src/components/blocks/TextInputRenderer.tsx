@@ -1,10 +1,10 @@
 import React, { forwardRef } from 'react';
 import { themes } from '../../themes';
 import { getLocalized } from '../../utils/surveyUtils';
-import { Input } from '@survey-form-renderer/components/ui/input';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { cn } from '@survey-form-renderer/lib/utils';
-import { BlockData } from '@survey-form-renderer/types';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { cn } from '../../lib/utils';
+import { BlockData } from '../../types';
 
 interface TextInputRendererProps {
   block: BlockData;

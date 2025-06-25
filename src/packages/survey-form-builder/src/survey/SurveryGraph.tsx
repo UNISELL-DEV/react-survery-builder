@@ -2,11 +2,11 @@ import React, { useRef, useEffect, useState, useCallback, useMemo } from "react"
 import { NodeData, NavigationRule } from "../types";
 import { useSurveyBuilder } from "../context/SurveyBuilderContext";
 import { Plus, Trash2, Edit2, Save, X, ChevronRight, ChevronLeft, Settings, Link2, Unlink, ZoomIn, ZoomOut, Maximize2, Move, MousePointer, Eye, ChevronDown, ChevronUp } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@survey-form-builder/components/ui/card';
-import { Button } from '@survey-form-builder/components/ui/button';
-import { Label } from '@survey-form-builder/components/ui/label';
-import { Badge } from '@survey-form-builder/components/ui/badge';
-import { Separator } from '@survey-form-builder/components/ui/separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Label } from '../components/ui/label';
+import { Badge } from '../components/ui/badge';
+import { Separator } from '../components/ui/separator';
 import { NavigationRulesEditorDialog } from "../components/common/NavigationRulesEditorDialog";
 
 interface SurveyGraphProps {

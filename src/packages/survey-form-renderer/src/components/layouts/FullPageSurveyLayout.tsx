@@ -4,9 +4,9 @@ import { useSurveyForm } from "../../context/SurveyFormContext";
 import { BlockRenderer } from "../blocks/BlockRenderer";
 import { themes } from "../../themes";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@survey-form-renderer/components/ui/button";
+import { Button } from "../ui/button";
 import { ChevronLeft, ArrowRight, History } from "lucide-react";
-import { cn } from "@survey-form-renderer/lib/utils";
+import { cn } from '../../lib/utils';
 import { getSurveyPages } from "../../utils/surveyUtils";
 
 interface FullPageSurveyLayoutProps {

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 import { themes } from '../../themes';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@survey-form-renderer/components/ui/radio-group';
-import { Card } from '@survey-form-renderer/components/ui/card';
+import { Label } from '../ui/label';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { Card } from '../ui/card';
 import { CheckSquare } from 'lucide-react';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { cn } from '../../lib/utils';
 
 interface BoxOption {
   id: string;

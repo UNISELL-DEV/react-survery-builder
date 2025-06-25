@@ -1,11 +1,11 @@
 import type React from "react";
 import { useState } from "react";
-import { Button } from "@survey-form-builder/components/ui/button";
-import { Card, CardContent, CardHeader, CardFooter } from "@survey-form-builder/components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardHeader, CardFooter } from "../../components/ui/card";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { BlockData } from "../../types";
 import { NavigationRulesEditor } from "../../components/common/NavigationRulesEditor";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@survey-form-builder/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../../components/ui/dialog";
 import CommonBlockRules from "../../components/common/CommonBlockRules";
 
 interface ContentBlockItemProps {

@@ -3,8 +3,8 @@ import { BlockRenderer } from './BlockRenderer';
 import type { BlockRendererProps } from '../../types';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 import { ValidationSummary } from '../ui/ValidationSummary';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { cn } from '../../lib/utils';
 import { themes } from '../../themes';
 
 /**

@@ -1,15 +1,15 @@
 import React from "react";
 import { BlockDefinition, ContentBlockItemProps, BlockData } from "../../types";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
-import { Button } from "@survey-form-builder/components/ui/button";
-import { Textarea } from "@survey-form-builder/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@survey-form-builder/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@survey-form-builder/components/ui/select";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Checkbox } from "../ui/checkbox";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { UserCheck, TestTube, Settings, MapPin, BookOpen, Plus, Trash2, Phone, Mail, AlertTriangle, CheckCircle2, Shield, SkipForward } from "lucide-react";
-import { Alert, AlertDescription } from "@survey-form-builder/components/ui/alert";
+import { Alert, AlertDescription } from "../ui/alert";
 
 const AuthBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate, onRemove }) => {
   const [testResults, setTestResults] = React.useState<string[]>([]);

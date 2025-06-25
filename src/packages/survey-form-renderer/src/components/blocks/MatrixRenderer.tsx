@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 import { themes } from '../../themes';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@survey-form-renderer/components/ui/radio-group';
+import { Label } from '../ui/label';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import {
   Table,
   TableBody,
@@ -10,8 +10,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@survey-form-renderer/components/ui/table';
-import { cn } from '@survey-form-renderer/lib/utils';
+} from '../ui/table';
+import { cn } from '../../lib/utils';
 
 interface MatrixQuestion {
   id: string;

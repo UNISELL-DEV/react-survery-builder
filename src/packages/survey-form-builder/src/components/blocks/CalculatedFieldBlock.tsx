@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Textarea } from "@survey-form-builder/components/ui/textarea";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
-import { Alert, AlertDescription } from "@survey-form-builder/components/ui/alert";
-import { Badge } from "@survey-form-builder/components/ui/badge";
-import { Separator } from "@survey-form-builder/components/ui/separator";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
 import { Calculator, CheckCircle, Info } from "lucide-react";
 
 // Form component for editing the block configuration

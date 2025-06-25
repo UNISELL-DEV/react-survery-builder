@@ -1,9 +1,9 @@
 import React from "react";
 import type { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@survey-form-builder/components/ui/select";
+import { Input } from "../ui/input";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { ShoppingCart } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 

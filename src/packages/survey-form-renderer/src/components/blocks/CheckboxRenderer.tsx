@@ -1,9 +1,9 @@
 import React, { forwardRef } from 'react';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 import { themes } from '../../themes';
-import { Checkbox } from '@survey-form-renderer/components/ui/checkbox';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { Checkbox } from '../ui/checkbox';
+import { Label } from '../ui/label';
+import { cn } from '../../lib/utils';
 
 interface CheckboxRendererProps {
   block: BlockData;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { themes } from '../../themes';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 
 interface MarkdownRendererProps {
   block: BlockData;

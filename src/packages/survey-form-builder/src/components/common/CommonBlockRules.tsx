@@ -1,6 +1,6 @@
 import React from "react";
-import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
-import { Label } from "@survey-form-builder/components/ui/label";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
 // Re‑use the same BlockData type used across the builder
 import type { BlockData } from "../../types";
 

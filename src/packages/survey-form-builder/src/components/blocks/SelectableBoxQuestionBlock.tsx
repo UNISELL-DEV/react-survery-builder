@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import type { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Button } from "@survey-form-builder/components/ui/button";
-import { Card } from "@survey-form-builder/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@survey-form-builder/components/ui/radio-group";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { CirclePlus, CircleX, CheckSquare } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 

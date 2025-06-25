@@ -1,7 +1,7 @@
 import React from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Textarea } from "@survey-form-builder/components/ui/textarea";
-import { Label } from "@survey-form-builder/components/ui/label";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
 import { Terminal } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 

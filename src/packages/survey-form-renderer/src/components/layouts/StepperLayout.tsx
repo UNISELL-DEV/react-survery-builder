@@ -3,10 +3,10 @@ import { useSurveyForm } from '../../context/SurveyFormContext';
 import { NavigationButtons } from '../ui/NavigationButtons';
 import { BlockRenderer } from '../blocks/BlockRenderer';
 import { themes } from '../../themes';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@survey-form-renderer/components/ui/card';
-import { Button } from '@survey-form-renderer/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
+import { Button } from '../ui/button';
 import { DebugInfo } from '../ui/DebugInfo';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { cn } from '../../lib/utils';
 import { CheckIcon } from 'lucide-react';
 
 interface StepperLayoutProps {

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Textarea } from "@survey-form-builder/components/ui/textarea";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
-import { Alert, AlertDescription } from "@survey-form-builder/components/ui/alert";
-import { Badge } from "@survey-form-builder/components/ui/badge";
-import { Button } from "@survey-form-builder/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@survey-form-builder/components/ui/select";
-import { Separator } from "@survey-form-builder/components/ui/separator";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Separator } from "../ui/separator";
 import { GitBranch, Eye, EyeOff, Code, Info, ChevronRight } from "lucide-react";
 
 // Form component for editing the block configuration

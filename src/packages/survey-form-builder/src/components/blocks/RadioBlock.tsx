@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { RadioGroup, RadioGroupItem } from "@survey-form-builder/components/ui/radio-group";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Button } from "@survey-form-builder/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
 import { CircleCheck, CirclePlus, CircleX } from "lucide-react";
 import { Circle } from "lucide-react";  // optional, for an SVG circle
 import { v4 as uuidv4 } from "uuid";

@@ -1,4 +1,4 @@
-import { BlockData, BlockDefinition } from "@survey-form-renderer/types";
+import { BlockData, BlockDefinition } from "../types";
 import { Activity, ShoppingCart } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { TextInputBlock, TextareaBlock, SelectBlock, RadioBlock, CheckboxBlock, RangeBlock, DatePickerBlock, FileUploadBlock, MatrixBlock, SelectableBoxQuestionBlock, MarkdownBlock, HtmlBlock, ScriptBlock, AuthBlock, CheckoutBlock } from "./blockdefinations";

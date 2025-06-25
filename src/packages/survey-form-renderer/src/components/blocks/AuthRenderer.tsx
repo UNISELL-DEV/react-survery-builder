@@ -9,7 +9,6 @@ import { AlertCircle, CheckCircle2, Loader2, Mail, Phone, Shield, User, ArrowRig
 import { Alert, AlertDescription } from '../ui/alert';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@survey-form-renderer/lib/utils';
 
 type AuthStep = 'name' | 'email' | 'phone' | 'email-otp' | 'phone-otp' | 'welcome' | 'skipped';
 

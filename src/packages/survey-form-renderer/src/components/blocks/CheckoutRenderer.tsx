@@ -4,9 +4,9 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { Checkbox } from '../ui/checkbox';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { cn } from '../../lib/utils';
 import { useSurveyForm } from '../../context/SurveyFormContext';
-import type { BlockData } from '@survey-form-renderer/types';
+import type { BlockData } from '../../types';
 
 interface CheckoutRendererProps {
   block: BlockData;

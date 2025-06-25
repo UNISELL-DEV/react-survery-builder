@@ -1,8 +1,8 @@
 import React from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Label } from "@survey-form-builder/components/ui/label";
+import { Checkbox } from "../ui/checkbox";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import { CheckSquare } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 

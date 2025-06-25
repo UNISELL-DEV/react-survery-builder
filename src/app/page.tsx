@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SurveyForm } from '@/packages/survey-form-renderer/src/components/SurveyForm';
+import { SurveyForm } from 'survey-form-renderer/src';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';

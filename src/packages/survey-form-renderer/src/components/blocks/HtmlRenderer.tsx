@@ -1,5 +1,5 @@
 import React from 'react';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 import { themes } from '../../themes';
 
 interface HtmlRendererProps {

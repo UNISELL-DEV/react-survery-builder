@@ -11,7 +11,7 @@ import { Progress } from '../ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Separator } from '../ui/separator';
 import { Activity, Ruler, Weight, TrendingUp } from 'lucide-react';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { cn } from '../../lib/utils';
 
 interface BMICalculatorRendererProps {
   block: {

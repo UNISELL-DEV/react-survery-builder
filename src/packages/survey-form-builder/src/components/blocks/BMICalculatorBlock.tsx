@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { BlockDefinition, ContentBlockItemProps } from "../../types";
-import { Textarea } from "@survey-form-builder/components/ui/textarea";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@survey-form-builder/components/ui/select";
-import { Button } from "@survey-form-builder/components/ui/button";
-import { Badge } from "@survey-form-builder/components/ui/badge";
-import { Progress } from "@survey-form-builder/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@survey-form-builder/components/ui/tabs";
-import { Separator } from "@survey-form-builder/components/ui/separator";
+import { Textarea } from "../ui/textarea";
+import { Label } from "../ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Progress } from "../ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Separator } from "../ui/separator";
 import { Activity, Ruler, Weight, TrendingUp } from "lucide-react";
-import { Checkbox } from "@survey-form-builder/components/ui/checkbox";
-import { Input } from "@survey-form-builder/components/ui/input";
+import { Checkbox } from "../ui/checkbox";
+import { Input } from "../ui/input";
 
 // Form component for editing the block configuration
 const BMICalculatorForm: React.FC<ContentBlockItemProps> = ({

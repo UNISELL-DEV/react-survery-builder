@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { themes } from '../../themes';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { Button } from '@survey-form-renderer/components/ui/button';
+import { Label } from '../ui/label';
+import { Button } from '../ui/button';
 import { UploadCloud, X } from 'lucide-react';
-import { cn } from '@survey-form-renderer/lib/utils';
-import { BlockData } from '@survey-form-renderer/types';
+import { cn } from '../../lib/utils';
+import { BlockData } from '../../types';
 
 interface FileUploadRendererProps {
   block: BlockData;

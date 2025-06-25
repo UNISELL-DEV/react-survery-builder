@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { themes } from '../../themes';
-import { Label } from '@survey-form-renderer/components/ui/label';
-import { Calendar } from '@survey-form-renderer/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@survey-form-renderer/components/ui/popover';
-import { Button } from '@survey-form-renderer/components/ui/button';
-import { cn } from '@survey-form-renderer/lib/utils';
+import { Label } from '../ui/label';
+import { Calendar } from '../ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Button } from '../ui/button';
+import { cn } from '../../lib/utils';
 import { format, formatDate } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { BlockData } from '@survey-form-renderer/types';
+import { BlockData } from '../../types';
 
 interface DatePickerRendererProps {
   block: BlockData;

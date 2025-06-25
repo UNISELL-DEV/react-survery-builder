@@ -6,7 +6,7 @@ import Link from "next/link";
 
 
 import { CreditCard } from 'lucide-react';
-import { BlockDefinition, StandardBlocks, StandardNodes, SurveyBuilder } from "@/packages/survey-form-builder/src";
+import { BlockDefinition, StandardBlocks, StandardNodes, SurveyBuilder } from "survey-form-builder/src";
 
 // Create a custom credit card input block
 const CreditCardBlock : BlockDefinition = {

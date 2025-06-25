@@ -1,10 +1,10 @@
 import type React from "react";
 import { useState, useEffect } from "react";
-import { Button } from "@survey-form-builder/components/ui/button";
-import { Input } from "@survey-form-builder/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@survey-form-builder/components/ui/card";
-import { Label } from "@survey-form-builder/components/ui/label";
-import { Alert, AlertDescription } from "@survey-form-builder/components/ui/alert";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Label } from "../../components/ui/label";
+import { Alert, AlertDescription } from "../../components/ui/alert";
 import { ClipboardCopy } from "lucide-react";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { LocalizationMap } from "../../types";
