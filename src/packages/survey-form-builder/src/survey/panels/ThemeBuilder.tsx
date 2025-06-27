@@ -991,6 +991,7 @@ const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState
       </CardDescription>
     </CardHeader>
     <CardContent>
+      {state.rootNode ?
       <SurveyForm
         survey={state}
         layout="fullpage"
@@ -1001,7 +1002,7 @@ const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState
           showStepInfo: true,
           position: 'top',
         }}
-      />
+      /> : <p>Add some blocks to see survey in action</p>}
     </CardContent>
   </Card>
 );
