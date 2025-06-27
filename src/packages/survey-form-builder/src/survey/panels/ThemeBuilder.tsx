@@ -23,10 +23,6 @@ import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { ThemeDefinition, SurveyTheme, SurveyBuilderState } from "../../types";
 import { SurveyForm } from 'survey-form-renderer/src';
 
-// [Keep all the existing constants and helper functions exactly as they are]
-// PRESET_OPTIONS, COLOR_PRESETS, parseTailwindClasses, extractColorFromClass, 
-// ColorPicker, SpacingControl, VisualStyleBuilder, themePresets, FIELD_PRESETS
-
 // Preset options for various styling properties
 const PRESET_OPTIONS = {
   fontSize: [
@@ -121,6 +117,7 @@ const COLOR_PRESETS = [
   { name: "Cyan", value: "#06B6D4" },
   { name: "Gray", value: "#6B7280" },
   { name: "Slate", value: "#475569" },
+  { name: "Transparent", value: "#00FFFFFF" },
   { name: "Black", value: "#000000" },
 ];
 

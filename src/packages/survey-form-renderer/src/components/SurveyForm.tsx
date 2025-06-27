@@ -9,6 +9,7 @@ import { TabsLayout } from './layouts/TabsLayout';
 import { StepperLayout } from './layouts/StepperLayout';
 import { themes } from '../themes';
 import { getThemeClass } from '../utils/surveyUtils';
+import { applyDynamicColors } from '../utils/colorUtils';
 
 export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   survey,
@@ -47,6 +48,10 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   // Get the selected theme
   // const themeConfig = theme ?? themes.default;
   const themeConfig = survey?.theme ?? themes.modern;
+
+  useEffect(() => {
+    applyDynamicColors(themeConfig);
+  }, [themeConfig]);
 
   // Enhanced container class with better mobile responsiveness
   const containerClass = getThemeClass(

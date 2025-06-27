@@ -198,7 +198,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                 <motion.div
                   className={cn(
                     "h-full transition-all duration-500 ease-out rounded-full",
-                    progressBar.color || "bg-[#a55a36]",
+                    theme.progress.bar || "bg-[#a55a36]",
                   )}
                   initial={{ width: "0%" }}
                   animate={{ width: `${progressPercentage}%` }}

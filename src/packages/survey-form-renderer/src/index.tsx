@@ -52,6 +52,8 @@ import {
   supportsBranchingLogic
 } from './utils/blockAdapter';
 
+export { applyDynamicColors } from './utils/colorUtils';
+
 // Themes
 export {
   themes,
