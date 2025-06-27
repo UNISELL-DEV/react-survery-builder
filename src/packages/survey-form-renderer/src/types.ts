@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { ThemeDefinition } from "./themes";
 
 export type UUID = string;
 
@@ -6,6 +7,7 @@ export interface SurveyFormRendererProps {
   survey: {
     rootNode: NodeData;
     localizations?: LocalizationMap;
+    theme?: ThemeDefinition;
   };
   onSubmit?: (data: Record<string, any>) => void;
   onChange?: (data: Record<string, any>) => void;
@@ -35,7 +37,9 @@ export type SurveyTheme =
   | "colorful"
   | "modern"
   | "corporate"
-  | "dark";
+  | "dark"
+  | "custom";
+
 
 export type SurveyLayout =
   | "page-by-page"
@@ -79,7 +83,7 @@ export interface BlockRendererProps {
   disabled?: boolean;
   // Fixed: Use React.FC specifically instead of ComponentType
   customComponents?: Record<string, React.FC<BlockRendererProps>>;
-  theme?: SurveyTheme;
+  theme?: ThemeDefinition;
   // New props for conditional rendering
   isVisible?: boolean;
   customValidation?: (value: any) => string | null;
@@ -116,7 +120,7 @@ export interface SurveyFormContextProps {
   submit: () => void;
   language: string;
   setLanguage: (lang: string) => void;
-  theme: SurveyTheme;
+  theme: ThemeDefinition;
   surveyData: {
     rootNode: NodeData;
     localizations?: LocalizationMap;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Button } from "../components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../components/ui/sheet";
+import { Button } from "@survey-form-builder/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@survey-form-builder/components/ui/tabs";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@survey-form-builder/components/ui/sheet";
 import { SurveyNode } from "./SurveyNode";
 import { LocalizationEditor } from "./helpers/LocalizationEditor";
 import { v4 as uuidv4 } from "uuid";
@@ -10,6 +10,7 @@ import { JsonEditor } from "./helpers/JsonEditor";
 import { BlockDefinition, LocalizationMap, NodeData, NodeDefinition } from "../types";
 import { SurveyBuilderProvider, useSurveyBuilder } from "../context/SurveyBuilderContext";
 import { SurveyGraph } from "./SurveryGraph";
+import { ThemeBuilder } from "./panels/ThemeBuilder";
 
 // Define the props
 interface SurveyBuilderProps {
@@ -56,6 +57,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
     exportSurvey
   } = useSurveyBuilder();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isThemeBuilderOpen, setIsThemeBuilderOpen] = useState(false);
 
   // 1. Block definitions (once or on true changes only)
   React.useEffect(() => {
@@ -116,6 +118,18 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
               <TabsTrigger value="lang">Localizations</TabsTrigger>
             </TabsList>
           </Tabs>
+
+          <Sheet open={isThemeBuilderOpen} onOpenChange={setIsThemeBuilderOpen}>
+            <SheetTrigger asChild>
+              <Button type="button" variant="outline">Theme Builder</Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full">
+              <SheetHeader>
+                <SheetTitle>Theme Builder</SheetTitle>
+              </SheetHeader>
+              <ThemeBuilder />
+            </SheetContent>
+          </Sheet>
 
           <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
             <SheetTrigger asChild>

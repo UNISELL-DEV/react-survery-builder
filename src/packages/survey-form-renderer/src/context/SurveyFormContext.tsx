@@ -18,6 +18,7 @@ import {
   getNextPageFromNavigationRules,
   getNextStepFromNavigationRules
 } from "../utils/conditionalUtils";
+import { ThemeDefinition } from "../themes";
 
 // Navigation history entry
 interface NavigationHistoryEntry {
@@ -57,7 +58,7 @@ export const SurveyFormContext = createContext<EnhancedSurveyFormContextProps>({
   submit: () => {},
   language: "en",
   setLanguage: () => {},
-  theme: "default",
+  theme: null,
   surveyData: { rootNode: { type: "" } },
   conditionalErrors: {},
   computedValues: {},
@@ -84,7 +85,7 @@ interface SurveyFormProviderProps {
   onChange?: (data: Record<string, any>) => void;
   onPageChange?: (pageIndex: number, totalPages: number) => void;
   language?: string;
-  theme?: SurveyTheme;
+  theme?: ThemeDefinition;
   computedFields?: ComputedFieldsConfig;
   customValidators?: Record<string, CustomValidator>;
   debug?: boolean;
@@ -101,7 +102,7 @@ export const SurveyFormProvider: React.FC<SurveyFormProviderProps> = ({
   onChange,
   onPageChange,
   language = "en",
-  theme = "default",
+  theme,
   computedFields = {},
   customValidators = {},
   enableDebug = false,

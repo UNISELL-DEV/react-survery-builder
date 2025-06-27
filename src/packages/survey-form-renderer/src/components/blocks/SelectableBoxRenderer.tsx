@@ -6,6 +6,7 @@ import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Card } from '../ui/card';
 import { CheckSquare } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { ThemeDefinition } from '../../themes';
 
 interface BoxOption {
   id: string;
@@ -20,7 +21,7 @@ interface SelectableBoxRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
@@ -30,9 +31,9 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   
   // Parse options from block
   const options: BoxOption[] = block.options || [];

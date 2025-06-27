@@ -4,6 +4,7 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { cn } from '../../lib/utils';
 import { BlockData } from '../../types';
+import { ThemeDefinition } from '../../themes';
 
 interface TextareaRendererProps {
   block: BlockData;
@@ -12,12 +13,12 @@ interface TextareaRendererProps {
   onBlur?: () => void;
   error?: string | null; // Allow null values to match validation function return type
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const TextareaRenderer = forwardRef<HTMLTextAreaElement, TextareaRendererProps>(
-  ({ block, value, onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  ({ block, value, onChange, onBlur, error, disabled, theme = null }, ref) => {
+    const themeConfig = theme ?? themes.default;
 
     // Handle input change
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

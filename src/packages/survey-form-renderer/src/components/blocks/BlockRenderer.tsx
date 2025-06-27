@@ -19,7 +19,6 @@ import { CalculatedFieldRenderer } from './CalculatedFieldRenderer';
 import { BMICalculatorRenderer } from './BMICalculatorRenderer';
 import { CheckoutRenderer } from './CheckoutRenderer';
 import { AuthRenderer } from './AuthRenderer';
-import { themes } from '../../themes';
 import { blockTypeMap, validateBlock } from '../../utils/blockAdapter';
 import { useSurveyForm } from '../../context/SurveyFormContext';
 
@@ -27,8 +26,7 @@ import { useSurveyForm } from '../../context/SurveyFormContext';
  * A component that renders different types of blocks based on their type
  */
 export const BlockRenderer = forwardRef<HTMLElement, BlockRendererProps>((props, ref) => {
-  const { block, value, onChange, onBlur, error, disabled, customComponents, theme = 'default', isVisible } = props;
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const { block, value, onChange, onBlur, error, disabled, customComponents, theme = null, isVisible } = props;
   const { getVisibleBlocks } = useSurveyForm();
 
   // If the block has a visibility condition and is explicitly not visible, don't render it

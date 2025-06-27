@@ -6,6 +6,7 @@ import { ValidationSummary } from '../ui/ValidationSummary';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { cn } from '../../lib/utils';
 import { themes } from '../../themes';
+import { ThemeDefinition } from '../../themes';
 
 /**
  * Renderer for "set" block type
@@ -18,7 +19,7 @@ export const SetRenderer: React.FC<BlockRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default',
+  theme = null,
   customComponents,
 }) => {
   const {
@@ -26,7 +27,7 @@ export const SetRenderer: React.FC<BlockRendererProps> = ({
     evaluateCondition,
   } = useSurveyForm();
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   // Get the visible child items
   const items = block.items || [];

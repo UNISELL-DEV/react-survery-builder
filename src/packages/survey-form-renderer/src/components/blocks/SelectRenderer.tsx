@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { BlockData } from '../../types';
 import { themes } from '../../themes';
+import { ThemeDefinition } from '../../themes';
 import {
   Select,
   SelectContent,
@@ -18,12 +19,12 @@ interface SelectRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const SelectRenderer = forwardRef<HTMLButtonElement, SelectRendererProps>(
-  ({ block, value, onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  ({ block, value, onChange, onBlur, error, disabled, theme = null }, ref) => {
+    const themeConfig = theme ?? themes.default;
 
     // Handle input change
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

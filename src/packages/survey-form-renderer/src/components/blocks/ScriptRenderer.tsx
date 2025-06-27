@@ -2,10 +2,11 @@ import React, { useEffect, useContext } from 'react';
 import { BlockData } from '../../types';
 import { SurveyFormContext } from '../../context/SurveyFormContext';
 import { evaluateLogic } from '../../utils/surveyUtils';
+import { ThemeDefinition } from '../../themes';
 
 interface ScriptRendererProps {
   block: BlockData;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 /**

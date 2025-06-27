@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BlockData } from '../../types';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { Label } from '../ui/label';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import {
@@ -31,7 +31,7 @@ interface MatrixRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const MatrixRenderer: React.FC<MatrixRendererProps> = ({
@@ -41,9 +41,9 @@ export const MatrixRenderer: React.FC<MatrixRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   // Parse matrix data from block
   const questions: MatrixQuestion[] = block.questions || [];

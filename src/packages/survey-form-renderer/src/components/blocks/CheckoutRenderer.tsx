@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -15,7 +15,7 @@ interface CheckoutRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 interface AddressData {
@@ -115,7 +115,7 @@ export const CheckoutRenderer: React.FC<CheckoutRendererProps> = ({
   onBlur,
   error,
   disabled = false,
-  theme = 'default',
+  theme = null,
 }) => {
   const { setValue } = useSurveyForm();
   const fieldName = block.fieldName || 'checkout';

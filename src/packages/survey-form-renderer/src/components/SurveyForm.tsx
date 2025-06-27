@@ -17,7 +17,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   onPageChange,
   defaultValues = {},
   language = 'en',
-  theme = 'default',
+  theme = null,
   layout = 'stepper',
   progressBar = true,
   navigationButtons = {
@@ -45,7 +45,8 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   }
 
   // Get the selected theme
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  // const themeConfig = theme ?? themes.default;
+  const themeConfig = survey?.theme ?? themes.modern;
 
   // Enhanced container class with better mobile responsiveness
   const containerClass = getThemeClass(
@@ -94,7 +95,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
         onPageChange={onPageChange}
         enableDebug={enableDebug}
         language={language}
-        theme={theme}
+        theme={themeConfig}
         logo={logo}
       >
         {renderLayout(enableDebug)}

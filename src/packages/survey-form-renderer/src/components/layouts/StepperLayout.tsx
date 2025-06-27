@@ -80,7 +80,7 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
     surveyData
   } = useSurveyForm();
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Get all survey pages
@@ -94,7 +94,7 @@ export const StepperLayout: React.FC<StepperLayoutProps> = ({
   };
 
   // Apply dark mode styling
-  const isDarkMode = theme === 'dark';
+  const isDarkMode = theme.name === 'dark';
 
   return (
     <div className="survey-stepper-layout" ref={containerRef}>

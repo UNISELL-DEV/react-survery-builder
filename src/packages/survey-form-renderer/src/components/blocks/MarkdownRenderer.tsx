@@ -1,10 +1,10 @@
 import React from 'react';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { BlockData } from '../../types';
 
 interface MarkdownRendererProps {
   block: BlockData;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 /**
@@ -51,8 +51,8 @@ const parseMarkdown = (markdown: string): string => {
   return html;
 };
 
-export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ block, theme = 'default' }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ block, theme = null }) => {
+  const themeConfig = theme ?? themes.default;
 
   // Parse the markdown content to HTML
   const html = parseMarkdown(block.text || '');

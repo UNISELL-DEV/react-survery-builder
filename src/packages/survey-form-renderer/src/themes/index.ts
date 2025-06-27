@@ -409,4 +409,5 @@ export const themes: Record<SurveyTheme, ThemeDefinition> = {
   modern: modernTheme,
   corporate: corporateTheme,
   dark: darkTheme,
+  custom: undefined
 };

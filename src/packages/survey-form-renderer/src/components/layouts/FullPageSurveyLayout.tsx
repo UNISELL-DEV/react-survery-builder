@@ -89,7 +89,6 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
     getVisibleBlocks,
   } = useSurveyForm();
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 

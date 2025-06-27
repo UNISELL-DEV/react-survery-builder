@@ -68,7 +68,7 @@ export const ContinuousLayout: React.FC<ContinuousLayoutProps> = ({
     theme
   } = useSurveyForm();
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Get all survey pages from the surveyData in context
@@ -83,7 +83,7 @@ export const ContinuousLayout: React.FC<ContinuousLayoutProps> = ({
   };
 
   // Apply dark mode styling
-  const isDarkMode = theme === 'dark';
+  const isDarkMode = theme.name === 'dark';
 
   return (
     <div className="survey-continuous-layout" ref={containerRef}>

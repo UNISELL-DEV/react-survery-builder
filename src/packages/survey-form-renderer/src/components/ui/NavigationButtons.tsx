@@ -43,8 +43,8 @@ export const NavigationButtons: React.FC<NavigationButtonsProps> = ({
   submitText = 'Submit',
 }) => {
   const { theme } = useSurveyForm();
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
-  const isDarkMode = theme === 'dark';
+  const themeConfig = theme ?? themes.default;
+  const isDarkMode = theme.name === 'dark';
 
   const {
     showPrevious = true,

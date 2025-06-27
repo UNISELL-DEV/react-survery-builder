@@ -16,10 +16,10 @@ export const CalculatedFieldRenderer: React.FC<CalculatedFieldProps> = ({
   formula,
   dependencies,
   format,
-  theme = 'default',
+  theme = null,
 }) => {
   const { values, computedValues, updateComputedValues } = useSurveyForm();
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const [error, setError] = useState<string | null>(null);
   const [displayValue, setDisplayValue] = useState<string>("Waiting for inputs...");
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BlockData } from '../../types';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import { Label } from '../ui/label';
 import { cn } from '../../lib/utils';
@@ -12,7 +12,7 @@ interface RadioRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const RadioRenderer: React.FC<RadioRendererProps> = ({
@@ -22,9 +22,9 @@ export const RadioRenderer: React.FC<RadioRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   // Get labels and values arrays from the block
   const labels = block.labels || [];

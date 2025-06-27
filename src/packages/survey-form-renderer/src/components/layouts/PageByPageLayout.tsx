@@ -79,7 +79,7 @@ export const PageByPageLayout: React.FC<PageByPageLayoutProps> = ({
     theme
   } = useSurveyForm();
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
@@ -118,7 +118,7 @@ export const PageByPageLayout: React.FC<PageByPageLayoutProps> = ({
   const pageTitle = currentPageBlocks[0]?.name || `Page ${currentPage + 1}`;
 
   // Apply dark mode styling
-  const isDarkMode = theme === 'dark';
+  const isDarkMode = theme.name === 'dark';
 
   return (
     <div className="survey-page-by-page-layout" ref={containerRef}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { Label } from '../ui/label';
 import { Calendar } from '../ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
@@ -16,7 +16,7 @@ interface DatePickerRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 // Map our format strings to date-fns format strings
@@ -37,9 +37,9 @@ export const DatePickerRenderer: React.FC<DatePickerRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   // State for the selected date
   const [date, setDate] = useState<Date | null>(

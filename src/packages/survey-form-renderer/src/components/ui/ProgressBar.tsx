@@ -31,7 +31,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   },
 }) => {
   const { theme } = useSurveyForm();
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   const {
     type = 'bar',

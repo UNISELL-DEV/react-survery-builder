@@ -64,7 +64,7 @@ export const AccordionLayout: React.FC<AccordionLayoutProps> = ({
   // Track which sections are expanded
   const [expandedSections, setExpandedSections] = useState<number[]>([0]);
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   // Get all survey pages
   const { getSurveyPages } = require('../../utils/surveyUtils');

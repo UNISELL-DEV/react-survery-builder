@@ -68,7 +68,7 @@ export const TabsLayout: React.FC<TabsLayoutProps> = ({
     goToPage
   } = useSurveyForm();
 
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Get all survey pages

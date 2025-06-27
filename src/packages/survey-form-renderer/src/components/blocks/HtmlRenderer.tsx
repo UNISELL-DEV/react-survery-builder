@@ -1,17 +1,17 @@
 import React from 'react';
 import { BlockData } from '../../types';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 
 interface HtmlRendererProps {
   block: BlockData;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
   block,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   return (
     <div

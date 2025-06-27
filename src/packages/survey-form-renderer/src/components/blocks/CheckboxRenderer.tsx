@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import { BlockData } from '../../types';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { cn } from '../../lib/utils';
@@ -12,12 +12,12 @@ interface CheckboxRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const CheckboxRenderer = forwardRef<HTMLButtonElement, CheckboxRendererProps>(
-  ({ block, value = [], onChange, onBlur, error, disabled, theme = 'default' }, ref) => {
-    const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  ({ block, value = [], onChange, onBlur, error, disabled, theme = null }, ref) => {
+    const themeConfig = theme ?? themes.default;
 
     // Get labels and values arrays from the block
     const labels = block.labels || [];

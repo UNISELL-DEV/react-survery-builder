@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { Slider } from '../ui/slider';
 import { Label } from '../ui/label';
 import { cn } from '../../lib/utils';
@@ -12,7 +12,7 @@ interface RangeRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const RangeRenderer: React.FC<RangeRendererProps> = ({
@@ -22,9 +22,9 @@ export const RangeRenderer: React.FC<RangeRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
 
   // Parse block configuration
   const min = parseInt(String(block.min || "0"), 10);

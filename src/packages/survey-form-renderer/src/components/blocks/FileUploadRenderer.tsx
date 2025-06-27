@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
 import { UploadCloud, X } from 'lucide-react';
@@ -13,7 +13,7 @@ interface FileUploadRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 export const FileUploadRenderer: React.FC<FileUploadRendererProps> = ({
@@ -23,9 +23,9 @@ export const FileUploadRenderer: React.FC<FileUploadRendererProps> = ({
   onBlur,
   error,
   disabled,
-  theme = 'default'
+  theme = null
 }) => {
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Initialize files state, handling both File[] and serialized string inputs

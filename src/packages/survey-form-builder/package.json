@@ -69,7 +69,6 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.0",
-    "survey-form-builder": "workspace:*",
     "survey-form-renderer": "workspace:*"
   },
   "devDependencies": {

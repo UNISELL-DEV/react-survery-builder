@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSurveyForm } from '../../context/SurveyFormContext';
-import { themes } from '../../themes';
+import { ThemeDefinition, themes } from '../../themes';
 import { calculateBMI } from '../../utils/conditionalUtils';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Label } from '../ui/label';
@@ -23,7 +23,7 @@ interface BMICalculatorRendererProps {
     heightUnit?: 'cm' | 'inches';
     weightUnit?: 'kg' | 'lbs';
     defaultUnit?: 'metric' | 'imperial';
-    theme?: string;
+    theme?: ThemeDefinition;
   };
   value?: {
     height?: number;
@@ -36,7 +36,7 @@ interface BMICalculatorRendererProps {
   onBlur?: () => void;
   error?: string;
   disabled?: boolean;
-  theme?: string;
+  theme?: ThemeDefinition;
 }
 
 /**
@@ -49,10 +49,10 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
   onBlur,
   error,
   disabled = false,
-  theme = 'default',
+  theme = null,
 }) => {
   const { setValue } = useSurveyForm();
-  const themeConfig = themes[theme as keyof typeof themes] || themes.default;
+  const themeConfig = theme ?? themes.default;
   const initialRenderRef = useRef(true);
 
   // Extract field name from block
@@ -175,12 +175,12 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
 
   const getCardClassName = () => {
     const base = `w-full max-w-2xl border-0 shadow-none ${block.className || ''}`;
-    const blockTheme = block.theme || 'default';
+    const blockTheme = block.theme;
     
-    switch (blockTheme) {
+    switch (blockTheme.name) {
       case "minimal":
         return `${base} shadow-none bg-transparent`;
-      case "gradient":
+      case "colorful":
         return `${base} bg-gradient-to-br from-background via-background to-accent/10 shadow-lg`;
       default:
         return `${base}`;
