@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -20,7 +20,7 @@ import {
   Square, Circle, RotateCcw, Sliders, Paintbrush, Grid3X3, Move, CheckSquare
 } from "lucide-react";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
-import { ThemeDefinition, SurveyTheme, SurveyBuilderState } from "../../types";
+import { ThemeDefinition, SurveyTheme, SurveyBuilderState, NodeData, LocalizationMap } from "../../types";
 import { SurveyForm } from 'survey-form-renderer/src';
 
 // Preset options for various styling properties
@@ -1108,8 +1108,15 @@ const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState
   </Card>
 );
 
-export const ThemeBuilder: React.FC = () => {
-  const { state, updateTheme } = useSurveyBuilder();
+// Define the propsAdd commentMore actions
+
+
+interface ThemeBuilderProps {
+  onDataChange?: (data: { rootNode: NodeData | null; localizations: LocalizationMap }) => void;
+}
+
+export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
+  const { state, updateTheme, exportSurvey } = useSurveyBuilder();
   const [currentTheme, setCurrentTheme] = useState<ThemeDefinition>(state.theme);
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<SurveyTheme>(state.theme.name);
@@ -1121,6 +1128,10 @@ export const ThemeBuilder: React.FC = () => {
     setCurrentTheme(state.theme);
     setSelectedPreset(state.theme.name);
   }, [state.theme]);
+
+  React.useEffect(() => {
+    onDataChange?.(exportSurvey());
+  }, [state.rootNode, state.localizations, onDataChange]);
 
   // Apply theme changes
   const handleThemeUpdate = (updatedTheme: Partial<ThemeDefinition>) => {
