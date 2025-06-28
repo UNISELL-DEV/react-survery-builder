@@ -17,23 +17,22 @@ A flexible and customizable React library for building dynamic surveys and forms
 
 ```bash
 # Using npm
-npm install react-survey-builder
+npm install survey-form-builder
 
 # Using yarn
-yarn add react-survey-builder
+yarn add survey-form-builder
 
 # Using pnpm
-pnpm add react-survey-builder
+pnpm add survey-form-builder
 
 # Using bun
-bun add react-survey-builder
+bun add survey-form-builder
 ```
 
 ## Quick Start
 
 ```jsx
-import { SurveyBuilder, StandardBlocks, StandardNodes } from 'react-survey-builder';
-import 'react-survey-builder/dist/styles.css'; // Import styles
+import { SurveyBuilder, StandardBlocks, StandardNodes } from 'survey-form-builder';
 
 function App() {
   const handleDataChange = (data) => {
@@ -57,7 +56,7 @@ function App() {
 You can extend the survey builder with your own custom block types:
 
 ```jsx
-import { BlockDefinition } from 'react-survey-builder';
+import { BlockDefinition } from 'survey-form-builder';
 import { CreditCard } from 'lucide-react';
 
 // Create a custom credit card input block
