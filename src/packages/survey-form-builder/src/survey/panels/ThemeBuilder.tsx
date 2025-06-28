@@ -1309,7 +1309,7 @@ export const ThemeBuilder: React.FC = () => {
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
-                      <div className="text-sm font-medium capitalize">{preset.name}</div>
+                      <div className="text-sm font-medium text-start capitalize">{preset.name}</div>
                       <div className="mt-2 flex gap-1">
                         <div 
                           className="w-3 h-3 rounded-full border"
