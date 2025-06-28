@@ -24,6 +24,19 @@ export interface ThemeDefinition {
     activeText: string;
     placeholder: string;
     boxBorder?: string;
+
+    // Comprehensive SelectableBox styling properties
+    selectableBox?: string;                    // Base container styling for the box
+    selectableBoxDefault?: string;             // Default/unselected state styling
+    selectableBoxSelected?: string;            // Selected state styling
+    selectableBoxHover?: string;               // Hover state styling
+    selectableBoxFocus?: string;               // Focus state styling
+    selectableBoxDisabled?: string;            // Disabled state styling
+    selectableBoxContainer?: string;           // Inner container styling
+    selectableBoxText?: string;                // Text styling inside the box
+    selectableBoxTextSelected?: string;        // Text styling when selected
+    selectableBoxIndicator?: string;           // Selection indicator (checkmark) styling
+    selectableBoxIndicatorIcon?: string;       // Icon styling within the indicator
   };
   container: {
     card: string;

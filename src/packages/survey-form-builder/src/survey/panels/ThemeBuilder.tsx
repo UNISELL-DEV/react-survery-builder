@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -17,10 +17,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/pop
 import { 
   ClipboardCopy, Palette, Type, Layout, MousePointer, BarChart3, Package, 
   RefreshCw, Download, Upload, Plus, X, Info, Eye, EyeOff, Sparkles,
-  Square, Circle, RotateCcw, Sliders, Paintbrush, Grid3X3, Move
+  Square, Circle, RotateCcw, Sliders, Paintbrush, Grid3X3, Move, CheckSquare
 } from "lucide-react";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
-import { ThemeDefinition, SurveyTheme, SurveyBuilderState, NodeData, LocalizationMap } from "../../types";
+import { ThemeDefinition, SurveyTheme, SurveyBuilderState } from "../../types";
 import { SurveyForm } from 'survey-form-renderer/src';
 
 // Preset options for various styling properties
@@ -641,7 +641,19 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       text: "text-gray-900",
       activeText: "text-blue-600",
       placeholder: "text-gray-400",
-      boxBorder: "border-gray-300"
+      boxBorder: "border-gray-300",
+      // SelectableBox specific styles
+      selectableBox: "p-4 transition-all duration-200 hover:shadow-sm cursor-pointer",
+      selectableBoxDefault: "border border-gray-300 bg-white",
+      selectableBoxSelected: "border-blue-500 bg-blue-50 ring-1 ring-blue-500",
+      selectableBoxHover: "hover:border-gray-400 hover:shadow-sm",
+      selectableBoxFocus: "focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2",
+      selectableBoxDisabled: "opacity-50 cursor-not-allowed",
+      selectableBoxContainer: "",
+      selectableBoxText: "text-gray-900 font-medium",
+      selectableBoxTextSelected: "text-blue-900",
+      selectableBoxIndicator: "bg-blue-500 text-white",
+      selectableBoxIndicatorIcon: "text-white"
     },
     progress: {
       bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
@@ -697,7 +709,19 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       text: "text-gray-900",
       activeText: "text-gray-900",
       placeholder: "text-gray-400",
-      boxBorder: "border-gray-200"
+      boxBorder: "border-gray-200",
+      // SelectableBox minimal styles
+      selectableBox: "p-6 transition-all duration-200 cursor-pointer",
+      selectableBoxDefault: "border-b border-gray-100 bg-white",
+      selectableBoxSelected: "border-b-2 border-gray-900 bg-gray-50",
+      selectableBoxHover: "hover:bg-gray-50",
+      selectableBoxFocus: "focus-within:bg-gray-50",
+      selectableBoxDisabled: "opacity-50 cursor-not-allowed",
+      selectableBoxContainer: "",
+      selectableBoxText: "text-gray-900 font-normal",
+      selectableBoxTextSelected: "text-gray-900 font-medium",
+      selectableBoxIndicator: "bg-gray-900 text-white",
+      selectableBoxIndicatorIcon: "text-white"
     },
     progress: {
       bar: "h-1 bg-gray-100 rounded-none overflow-hidden",
@@ -753,7 +777,19 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       text: "text-gray-900 text-sm",
       activeText: "text-[#E67E4D]",
       placeholder: "text-gray-400",
-      boxBorder: "border-[#C48A66]"
+      boxBorder: "border-[#C48A66]",
+      // SelectableBox modern styles
+      selectableBox: "p-6 transition-all duration-300 cursor-pointer rounded-xl",
+      selectableBoxDefault: "border border-gray-200 bg-white shadow-sm",
+      selectableBoxSelected: "border-[#E67E4D] bg-[#E67E4D]/5 shadow-md ring-1 ring-[#E67E4D]/20",
+      selectableBoxHover: "hover:border-[#C48A66] hover:shadow-md hover:scale-[1.02]",
+      selectableBoxFocus: "focus-within:ring-2 focus-within:ring-[#E67E4D] focus-within:ring-offset-2",
+      selectableBoxDisabled: "opacity-50 cursor-not-allowed",
+      selectableBoxContainer: "",
+      selectableBoxText: "text-gray-900 text-lg font-medium",
+      selectableBoxTextSelected: "text-[#E67E4D] font-semibold",
+      selectableBoxIndicator: "bg-[#E67E4D] text-white shadow-sm",
+      selectableBoxIndicatorIcon: "text-white"
     },
     progress: {
       bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
@@ -809,7 +845,19 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       text: "text-gray-800",
       activeText: "text-purple-600",
       placeholder: "text-gray-400",
-      boxBorder: "border-purple-300"
+      boxBorder: "border-purple-300",
+      // SelectableBox colorful styles
+      selectableBox: "p-6 transition-all duration-300 cursor-pointer rounded-2xl transform hover:scale-105",
+      selectableBoxDefault: "border-2 border-purple-200 bg-white shadow-sm",
+      selectableBoxSelected: "border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-lg ring-2 ring-purple-200",
+      selectableBoxHover: "hover:border-purple-400 hover:shadow-md",
+      selectableBoxFocus: "focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2",
+      selectableBoxDisabled: "opacity-50 cursor-not-allowed transform-none",
+      selectableBoxContainer: "",
+      selectableBoxText: "text-gray-800 text-base font-semibold",
+      selectableBoxTextSelected: "text-purple-700 font-bold",
+      selectableBoxIndicator: "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg",
+      selectableBoxIndicatorIcon: "text-white"
     },
     progress: {
       bar: "h-3 bg-gray-200 rounded-full overflow-hidden",
@@ -865,7 +913,19 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       text: "text-slate-900",
       activeText: "text-slate-600",
       placeholder: "text-slate-400",
-      boxBorder: "border-slate-300"
+      boxBorder: "border-slate-300",
+      // SelectableBox corporate styles
+      selectableBox: "p-5 transition-all duration-200 cursor-pointer rounded-lg",
+      selectableBoxDefault: "border border-slate-300 bg-white shadow-sm",
+      selectableBoxSelected: "border-slate-600 bg-slate-50 shadow-md",
+      selectableBoxHover: "hover:border-slate-400 hover:shadow-sm",
+      selectableBoxFocus: "focus-within:ring-2 focus-within:ring-slate-600 focus-within:ring-offset-2",
+      selectableBoxDisabled: "opacity-50 cursor-not-allowed",
+      selectableBoxContainer: "",
+      selectableBoxText: "text-slate-900 font-medium tracking-wide",
+      selectableBoxTextSelected: "text-slate-700 font-semibold",
+      selectableBoxIndicator: "bg-slate-600 text-white",
+      selectableBoxIndicatorIcon: "text-white"
     },
     progress: {
       bar: "h-2 bg-slate-200 rounded overflow-hidden",
@@ -921,7 +981,19 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       text: "text-gray-200",
       activeText: "text-blue-400",
       placeholder: "text-gray-500",
-      boxBorder: "border-gray-600"
+      boxBorder: "border-gray-600",
+      // SelectableBox dark styles
+      selectableBox: "p-5 transition-all duration-200 cursor-pointer rounded-lg",
+      selectableBoxDefault: "border border-gray-600 bg-gray-800",
+      selectableBoxSelected: "border-blue-400 bg-gray-700 ring-1 ring-blue-400/50",
+      selectableBoxHover: "hover:border-gray-500 hover:bg-gray-750",
+      selectableBoxFocus: "focus-within:ring-2 focus-within:ring-blue-400 focus-within:ring-offset-2 focus-within:ring-offset-gray-900",
+      selectableBoxDisabled: "opacity-50 cursor-not-allowed",
+      selectableBoxContainer: "",
+      selectableBoxText: "text-gray-200 font-medium",
+      selectableBoxTextSelected: "text-blue-300 font-semibold",
+      selectableBoxIndicator: "bg-blue-500 text-gray-900",
+      selectableBoxIndicatorIcon: "text-gray-900"
     },
     progress: {
       bar: "h-2 bg-gray-700 rounded overflow-hidden",
@@ -1000,6 +1072,14 @@ const FIELD_PRESETS = {
     { name: "Floating", value: "bg-white shadow-lg rounded-2xl p-8 mb-8 hover:shadow-xl transition-shadow" },
     { name: "Minimal", value: "bg-transparent border-b border-gray-200 pb-6 mb-6" },
   ],
+  selectableBox: [
+    { name: "Default", value: "p-4 transition-all duration-200 hover:shadow-sm cursor-pointer border border-gray-300 bg-white rounded-md" },
+    { name: "Modern", value: "p-6 transition-all duration-300 cursor-pointer rounded-xl border border-gray-200 bg-white shadow-sm hover:scale-[1.02]" },
+    { name: "Minimal", value: "p-6 transition-all duration-200 cursor-pointer border-b border-gray-100 bg-white hover:bg-gray-50" },
+    { name: "Card Style", value: "p-6 transition-all duration-300 cursor-pointer rounded-2xl border-2 border-purple-200 bg-white shadow-sm hover:scale-105" },
+    { name: "Corporate", value: "p-5 transition-all duration-200 cursor-pointer rounded-lg border border-slate-300 bg-white shadow-sm" },
+    { name: "Dark", value: "p-5 transition-all duration-200 cursor-pointer rounded-lg border border-gray-600 bg-gray-800" },
+  ],
 };
 
 // Preview Component
@@ -1028,13 +1108,8 @@ const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState
   </Card>
 );
 
-// Define the props
-interface ThemeBuilderProps {
-  onDataChange?: (data: { rootNode: NodeData | null; localizations: LocalizationMap }) => void;
-}
-
-export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
-  const { state, updateTheme, exportSurvey } = useSurveyBuilder();
+export const ThemeBuilder: React.FC = () => {
+  const { state, updateTheme } = useSurveyBuilder();
   const [currentTheme, setCurrentTheme] = useState<ThemeDefinition>(state.theme);
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<SurveyTheme>(state.theme.name);
@@ -1053,10 +1128,6 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
     setCurrentTheme(newTheme);
     updateTheme(newTheme);
   };
-
-  React.useEffect(() => {
-    onDataChange?.(exportSurvey());
-  }, [state.rootNode, state.localizations, onDataChange]);
 
   // Apply a preset theme
   const handlePresetChange = (presetName: SurveyTheme) => {
@@ -1471,13 +1542,17 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
                   </CardHeader>
                   <CardContent>
                     <Tabs defaultValue="label" className="space-y-4">
-                      <TabsList className="grid grid-cols-3 lg:grid-cols-6">
+                      <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-1">
                         <TabsTrigger value="label">Label</TabsTrigger>
                         <TabsTrigger value="input">Input</TabsTrigger>
                         <TabsTrigger value="select">Select</TabsTrigger>
                         <TabsTrigger value="checkbox">Checkbox</TabsTrigger>
                         <TabsTrigger value="radio">Radio</TabsTrigger>
                         <TabsTrigger value="textarea">Textarea</TabsTrigger>
+                        <TabsTrigger value="selectableBox" className="flex items-center gap-1">
+                          <CheckSquare className="w-3 h-3" />
+                          <span className="hidden lg:inline">Box</span>
+                        </TabsTrigger>
                       </TabsList>
 
                       {Object.entries({
@@ -1486,14 +1561,117 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
                         select: 'select',
                         checkbox: 'checkbox',
                         radio: 'radio',
-                        textarea: 'textarea'
+                        textarea: 'textarea',
+                        selectableBox: 'selectableBox'
                       }).map(([key, presetKey]) => (
                         <TabsContent key={key} value={key}>
-                          <VisualStyleBuilder
-                            value={currentTheme.field[key as keyof typeof currentTheme.field]}
-                            onChange={(val) => updateNestedProperty('field', key, val)}
-                            presetType={presetKey as keyof typeof FIELD_PRESETS}
-                          />
+                          {key === 'selectableBox' ? (
+                            <div className="space-y-6">
+                              <Alert>
+                                <CheckSquare className="w-4 h-4" />
+                                <AlertDescription>
+                                  Customize the appearance of selectable box questions. These settings affect the overall container, selected state, hover effects, and more.
+                                </AlertDescription>
+                              </Alert>
+                              
+                              <div className="grid grid-cols-1 gap-6">
+                                <div>
+                                  <Label className="text-base font-semibold mb-3 block">Base Box Style</Label>
+                                  <VisualStyleBuilder
+                                    value={currentTheme.field.selectableBox || ""}
+                                    onChange={(val) => updateNestedProperty('field', 'selectableBox', val)}
+                                    presetType="selectableBox"
+                                  />
+                                </div>
+                                
+                                <Separator />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Default State</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxDefault || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxDefault', val)}
+                                      presetType="selectableBox"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Selected State</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxSelected || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxSelected', val)}
+                                      presetType="selectableBox"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Hover Style</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxHover || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxHover', val)}
+                                      presetType="selectableBox"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Focus Style</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxFocus || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxFocus', val)}
+                                      presetType="selectableBox"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <Separator />
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Text Style</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxText || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxText', val)}
+                                      presetType="label"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Selected Text Style</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxTextSelected || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxTextSelected', val)}
+                                      presetType="label"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Selection Indicator</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxIndicator || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxIndicator', val)}
+                                      presetType="button"
+                                    />
+                                  </div>
+                                  
+                                  <div>
+                                    <Label className="text-sm font-medium mb-2 block">Indicator Icon</Label>
+                                    <VisualStyleBuilder
+                                      value={currentTheme.field.selectableBoxIndicatorIcon || ""}
+                                      onChange={(val) => updateNestedProperty('field', 'selectableBoxIndicatorIcon', val)}
+                                      presetType="label"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <VisualStyleBuilder
+                              value={currentTheme.field[key as keyof typeof currentTheme.field]}
+                              onChange={(val) => updateNestedProperty('field', key, val)}
+                              presetType={presetKey as keyof typeof FIELD_PRESETS}
+                            />
+                          )}
                         </TabsContent>
                       ))}
                     </Tabs>

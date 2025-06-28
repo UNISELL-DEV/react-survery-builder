@@ -108,20 +108,40 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
               >
                 <Card 
                   className={cn(
-                    "p-4 transition-colors",
-                    "hover:bg-accent dark:hover:bg-accent/50",
-                    isSelected ? themeConfig.field.boxBorder ?? "border-primary" : "border-[#ccc]"
+                    // Base box styling from theme
+                    themeConfig.field.selectableBox || "p-4 transition-colors hover:bg-accent dark:hover:bg-accent/50",
+                    // Selected state styling
+                    isSelected 
+                      ? themeConfig.field.selectableBoxSelected || themeConfig.field.boxBorder || "border-primary" 
+                      : themeConfig.field.selectableBoxDefault || "border-[#ccc]",
+                    // Hover state styling
+                    !disabled && (themeConfig.field.selectableBoxHover || "hover:border-gray-400"),
+                    // Focus state styling
+                    themeConfig.field.selectableBoxFocus || "focus-within:ring-2 focus-within:ring-offset-2",
+                    // Disabled state styling
+                    disabled && (themeConfig.field.selectableBoxDisabled || "opacity-50 cursor-not-allowed")
                   )}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className={cn("text-foreground", themeConfig.field.text)}>
+                  <div className={cn(
+                    "flex items-center justify-between",
+                    themeConfig.field.selectableBoxContainer || ""
+                  )}>
+                    <span className={cn(
+                      "text-foreground", 
+                      themeConfig.field.selectableBoxText || themeConfig.field.text,
+                      isSelected && (themeConfig.field.selectableBoxTextSelected || themeConfig.field.activeText)
+                    )}>
                       {option.label}
                     </span>
                     {isSelected && showSelectionIndicator && (
                       <div className={cn(
-                        "flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground", ""
+                        "flex h-5 w-5 items-center justify-center rounded-full",
+                        themeConfig.field.selectableBoxIndicator || "bg-primary text-primary-foreground"
                       )}>
-                        <CheckSquare className="h-3 w-3" />
+                        <CheckSquare className={cn(
+                          "h-3 w-3",
+                          themeConfig.field.selectableBoxIndicatorIcon || ""
+                        )} />
                       </div>
                     )}
                   </div>
