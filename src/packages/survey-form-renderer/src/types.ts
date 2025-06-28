@@ -38,7 +38,7 @@ export type SurveyTheme =
   | "modern"
   | "corporate"
   | "dark"
-  | "custom";
+  | "custom" | any;
 
 
 export type SurveyLayout =
