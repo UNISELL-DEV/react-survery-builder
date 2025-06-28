@@ -23,35 +23,6 @@ const sampleSurvey =
         "name": "Page 1 - Medical Safety & History",
         "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
-          // {
-          //   "type": "auth",
-          //   "fieldName": "authResults",
-          //   "loginUrl": "http://127.0.0.1:8000/api/patient/login",
-          //   "signupUrl": "http://127.0.0.1:8000/api/patient/login",
-          //   "useOtp": true,
-          //   "sendEmailOtpUrl": "http://127.0.0.1:8000/api/patient/send-email-otp",
-          //   "verifyEmailOtpUrl": "http://127.0.0.1:8000/api/patient/verify-email-otp",
-          //   "sendMobileOtpUrl": "",
-          //   "verifyMobileOtpUrl": "",
-          //   "tokenField": "token",
-          //   "tokenStorageKey": "authToken",
-          //   "validateTokenUrl": "",
-          //   "requireName": true,
-          //   "requireEmail": true,
-          //   "requireMobile": false,
-          //   "nameLabel": "Name",
-          //   "emailLabel": "Email",
-          //   "mobileLabel": "Mobile Number",
-          //   "fieldMappings": {},
-          //   "customHeaders": {
-          //     "X-Merchant-ID": "1"
-          //   },
-          //   "additionalBodyParams": {},
-          //   "skipIfLoggedIn": false,
-          //   "uuid": "0b71c62a-c481-4c96-aea9-fafcc072bcc3",
-          //   "navigationRules": [],
-          //   "showContinueButton": false
-          // },
           {
             "type": "selectablebox",
             "fieldName": "allergyHistory",
@@ -939,6 +910,62 @@ const sampleSurvey =
   },
   "localizations": {
     "en": {}
+  },
+  "theme": {
+    "name": "modern",
+    "containerLayout": "max-w-2xl mx-auto py-4 px-4 sm:px-6",
+    "header": "mb-8",
+    "title": "block text-sm font-normal text-gray-600 mb-1",
+    "description": "text-xl text-gray-900 leading-relaxed font-normal text-start max-w-md mx-auto",
+    "background": "bg-transparent",
+    "card": "bg-white p-8 mb-8",
+    "container": {
+      "card": "bg-white border border-gray-100 rounded-xl",
+      "border": "border-gray-100",
+      "activeBorder": "border-[#E67E4D]",
+      "activeBg": "bg-[#E67E4D]/5",
+      "header": "bg-white"
+    },
+    "field": {
+      "label": "text-3xl font-medium text-[#688ce6] mb-4 block text-start",
+      "input": "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
+      "description": "mt-2 text-base text-gray-600 text-start",
+      "error": "mt-2 text-sm text-red-600 font-medium text-start",
+      "radio": "focus:ring-[#E67E4D] h-5 w-5 text-[#E67E4D] border-gray-300",
+      "checkbox": "focus:ring-[#E67E4D] h-5 w-5 text-[#E67E4D] border-gray-300 rounded-md",
+      "select": "text-2xl font-semibold rounded-2xl border-gray-200 shadow-md py-4 px-4 w-full focus:border-[#E67E4D] focus:ring-[#E67E4D]",
+      "textarea": "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
+      "file": "w-full text-base text-gray-900 border border-gray-200 rounded-xl cursor-pointer bg-gray-50 py-4 px-4",
+      "matrix": "border-collapse w-full text-base rounded-lg overflow-hidden",
+      "range": "accent-[#E67E4D] focus:outline-none focus:ring-2 focus:ring-[#E67E4D]",
+      "text": "text-gray-900 text-sm",
+      "activeText": "text-[#E67E4D]",
+      "placeholder": "text-gray-400",
+      "boxBorder": "border-[#C48A66]"
+    },
+    "progress": {
+      "bar": "bg-[#be5cee] rounded-full h-2 overflow-hidden",
+      "dots": "flex space-x-2 justify-center",
+      "numbers": "flex space-x-2 justify-center",
+      "percentage": "text-right text-base text-gray-900 font-medium mb-1",
+      "label": "text-base text-gray-600 mb-1 text-start"
+    },
+    "button": {
+      "primary": "inline-flex justify-center py-4 px-16 text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] min-w-[200px]",
+      "secondary": "inline-flex justify-center py-3 px-8 border border-gray-200 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E67E4D]",
+      "text": "text-base font-medium text-[#E67E4D] hover:text-[#D86B3C]",
+      "navigation": "inline-flex items-center px-8 py-4 text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200"
+    },
+    "colors": {
+      "primary": "#E67E4D",
+      "secondary": "#6B7280",
+      "accent": "#D86B3C",
+      "background": "#FFFFFF",
+      "text": "#111827",
+      "border": "#E5E7EB",
+      "error": "#EF4444",
+      "success": "#10B981"
+    }
   }
 };
 
