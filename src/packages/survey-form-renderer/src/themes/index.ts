@@ -103,7 +103,7 @@ export const defaultTheme: ThemeDefinition = {
     header: "bg-gray-50"
   },
   progress: {
-    bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
+    bar: "h-2 bg-[#3B82F6] rounded-full overflow-hidden",
     dots: "flex space-x-2",
     numbers: "flex space-x-2",
     percentage: "text-right text-sm text-gray-500 mb-1",
@@ -276,7 +276,7 @@ export const modernTheme: ThemeDefinition = {
     boxBorder: "border-[#C48A66]"
   },
   progress: {
-    bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
+    bar: "h-2 bg-[#3B82F6] rounded-full overflow-hidden",
     dots: "flex space-x-2 justify-center",
     numbers: "flex space-x-2 justify-center",
     percentage: "text-right text-base text-gray-900 font-medium mb-1",

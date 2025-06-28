@@ -47,7 +47,7 @@ const defaultTheme: ThemeDefinition = {
     boxBorder: "border-gray-300"
   },
   progress: {
-    bar: "h-2 bg-gray-200 rounded-full overflow-hidden",
+    bar: "h-2 bg-[#3B82F6] rounded-full overflow-hidden",
     dots: "flex space-x-2 justify-center",
     numbers: "flex space-x-2 justify-center",
     percentage: "text-right text-sm text-gray-600 mb-1",
