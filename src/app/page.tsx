@@ -1032,7 +1032,7 @@ export default function FormRendererExample() {
   };
 
   return (
-      <div className="container-fluid mx-auto p-4 bg-[#f8f8f8]">
+      <div className="container-fluid mx-auto p-4 bg-[#f8f8f8] min-h-screen">
           {/* <div className="flex items-center justify-between mb-8">
               <h1 className="text-3xl font-bold">IVYRX</h1>
               

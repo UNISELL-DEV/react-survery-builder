@@ -1211,7 +1211,7 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Layout - Two Column on Desktop, Single Column on Mobile */}
-      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:p-6">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:p-6 min-h-full">
         
         {/* Theme Builder Column - Full width on mobile, 8 columns on desktop */}
         <div className="lg:col-span-8 space-y-6 p-4 lg:p-0">
@@ -1806,7 +1806,7 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
         </div>
 
         {/* Preview Column - Hidden on mobile, 4 columns on desktop */}
-        <div className="hidden lg:block lg:col-span-4">
+        <div className="hidden lg:block lg:col-span-4 min-h-9/10">
           <ThemePreview theme={currentTheme} state={state}/>
         </div>
       </div>
