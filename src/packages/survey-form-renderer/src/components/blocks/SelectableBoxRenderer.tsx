@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { BlockData } from '../../types';
 import { themes } from '../../themes';
 import { Label } from '../ui/label';
@@ -34,6 +34,7 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
   theme = null
 }) => {
   const themeConfig = theme ?? themes.default;
+  const idPrefix = useId();
   
   // Parse options from block
   const options: BoxOption[] = block.options || [];
@@ -88,7 +89,7 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
       >
         {options.map((option) => {
           const isSelected = selectedValue === option.value;
-          const id = `${block.fieldName}-${option.id}`;
+          const id = `${idPrefix}-${block.fieldName}-${option.id}`;
           
           return (
             <div key={option.id} className="relative">

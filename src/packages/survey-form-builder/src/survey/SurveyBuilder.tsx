@@ -127,7 +127,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
               <SheetHeader>
                 <SheetTitle>Theme Builder</SheetTitle>
               </SheetHeader>
-              <ThemeBuilder />
+              <ThemeBuilder onDataChange={onDataChange}/>
             </SheetContent>
           </Sheet>
 

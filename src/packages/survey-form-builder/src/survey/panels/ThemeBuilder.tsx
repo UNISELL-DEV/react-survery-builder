@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 import { useState, useEffect } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -20,7 +20,7 @@ import {
   Square, Circle, RotateCcw, Sliders, Paintbrush, Grid3X3, Move
 } from "lucide-react";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
-import { ThemeDefinition, SurveyTheme, SurveyBuilderState } from "../../types";
+import { ThemeDefinition, SurveyTheme, SurveyBuilderState, NodeData, LocalizationMap } from "../../types";
 import { SurveyForm } from 'survey-form-renderer/src';
 
 // Preset options for various styling properties
@@ -964,6 +964,30 @@ const FIELD_PRESETS = {
     { name: "Minimal", value: "w-full border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 px-0 py-2" },
     { name: "Floating", value: "w-full rounded-lg border-2 border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none" },
   ],
+  select: [
+    { name: "Default", value: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" },
+    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
+    { name: "Minimal", value: "w-full border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 px-0 py-2" },
+    { name: "Floating", value: "w-full rounded-lg border-2 border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none appearance-none" },
+  ],
+  checkbox: [
+    { name: "Default", value: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" },
+    { name: "Large", value: "focus:ring-blue-500 h-5 w-5 text-blue-600 border-gray-300 rounded-md" },
+    { name: "Square", value: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded-none" },
+    { name: "Minimal", value: "focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-400 rounded" },
+  ],
+  radio: [
+    { name: "Default", value: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" },
+    { name: "Large", value: "focus:ring-blue-500 h-5 w-5 text-blue-600 border-gray-300" },
+    { name: "Colorful", value: "focus:ring-purple-500 h-5 w-5 text-purple-600 border-purple-300" },
+    { name: "Minimal", value: "focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-400" },
+  ],
+  textarea: [
+    { name: "Default", value: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" },
+    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
+    { name: "Minimal", value: "w-full border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 px-0 py-2 resize-none" },
+    { name: "Large", value: "w-full rounded-lg border-2 border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none min-h-[120px]" },
+  ],
   button: [
     { name: "Default", value: "inline-flex justify-center py-2 px-4 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" },
     { name: "Pill", value: "inline-flex justify-center py-3 px-8 text-base font-medium rounded-full text-white bg-blue-600 hover:bg-blue-700" },
@@ -1003,8 +1027,14 @@ const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState
     </CardContent>
   </Card>
 );
-export const ThemeBuilder: React.FC = () => {
-  const { state, updateTheme } = useSurveyBuilder();
+
+// Define the props
+interface ThemeBuilderProps {
+  onDataChange?: (data: { rootNode: NodeData | null; localizations: LocalizationMap }) => void;
+}
+
+export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
+  const { state, updateTheme, exportSurvey } = useSurveyBuilder();
   const [currentTheme, setCurrentTheme] = useState<ThemeDefinition>(state.theme);
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<SurveyTheme>(state.theme.name);
@@ -1023,6 +1053,10 @@ export const ThemeBuilder: React.FC = () => {
     setCurrentTheme(newTheme);
     updateTheme(newTheme);
   };
+
+  React.useEffect(() => {
+    onDataChange?.(exportSurvey());
+  }, [state.rootNode, state.localizations, onDataChange]);
 
   // Apply a preset theme
   const handlePresetChange = (presetName: SurveyTheme) => {

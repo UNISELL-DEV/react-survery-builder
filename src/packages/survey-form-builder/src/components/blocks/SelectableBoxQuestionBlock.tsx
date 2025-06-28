@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useId } from "react";
 import type { BlockDefinition, ContentBlockItemProps } from "../../types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -225,6 +225,7 @@ const SelectableBoxQuestionItem: React.FC<ContentBlockItemProps> = ({
   data,
 }) => {
   const [selectedValue, setSelectedValue] = React.useState<string>(data.defaultValue || "");
+  const idPrefix = useId();
   const options: BoxOption[] = data.options || [];
   const boxSpacing = data.boxSpacing || "4";
   const showSelectionIndicator = data.showSelectionIndicator !== false;
@@ -248,13 +249,13 @@ const SelectableBoxQuestionItem: React.FC<ContentBlockItemProps> = ({
           const isSelected = selectedValue === option.value;
           return (
             <div key={option.id} className="relative">
-              <RadioGroupItem 
-                value={option.value} 
-                id={`${data.fieldName}-${option.id}`}
+              <RadioGroupItem
+                value={option.value}
+                id={`${idPrefix}-${data.fieldName}-${option.id}`}
                 className="sr-only"
               />
-              <Label 
-                htmlFor={`${data.fieldName}-${option.id}`} 
+              <Label
+                htmlFor={`${idPrefix}-${data.fieldName}-${option.id}`}
                 className="block w-full cursor-pointer"
               >
                 <Card 

@@ -477,8 +477,6 @@ export const SurveyBuilderProvider: React.FC<SurveyBuilderProviderProps> = ({
       type,
     };
 
-    console.log(nodeData)
-
     dispatch({
       type: ActionTypes.ADD_NODE,
       payload: { parentUuid, nodeData },
