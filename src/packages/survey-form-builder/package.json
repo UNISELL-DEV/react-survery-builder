@@ -1,6 +1,6 @@
 {
   "name": "survey-form-builder",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "description": "A beautiful and customizable survey forms builders",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -69,7 +69,7 @@
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.0",
-    "survey-form-renderer": "workspace:*"
+    "survey-form-renderer": "0.1.5"
   },
   "devDependencies": {
     "@types/react": "^18.2.45",
