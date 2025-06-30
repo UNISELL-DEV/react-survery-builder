@@ -238,7 +238,7 @@ export const RangeBlock: BlockDefinition = {
     min: 0,
     max: 100,
     step: 1,
-    defaultValue: 50,
+    defaultValue: 0,
     showValue: "Selected: {value}",
     markStep: 25,
   },
