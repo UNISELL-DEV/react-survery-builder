@@ -91,7 +91,7 @@ export const SurveyForm: React.FC<SurveyFormRendererProps> = ({
   };
 
   return (
-    <div className={`${containerClass} ${themeConfig.background} min-h-0`}>
+    <div className={`${containerClass} ${themeConfig.background} min-h-screen flex justify-center`}>
       <SurveyFormProvider
         surveyData={survey}
         defaultValues={defaultValues}

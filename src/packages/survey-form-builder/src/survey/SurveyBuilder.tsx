@@ -11,6 +11,7 @@ import { BlockDefinition, LocalizationMap, NodeData, NodeDefinition } from "../t
 import { SurveyBuilderProvider, useSurveyBuilder } from "../context/SurveyBuilderContext";
 import { SurveyGraph } from "./SurveryGraph";
 import { ThemeBuilder } from "./panels/ThemeBuilder";
+import { PreviewSurvey } from "./panels/PreviewSurvey";
 
 // Define the props
 interface SurveyBuilderProps {
@@ -58,7 +59,8 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
   } = useSurveyBuilder();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isThemeBuilderOpen, setIsThemeBuilderOpen] = useState(false);
-
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  
   // 1. Block definitions (once or on true changes only)
   React.useEffect(() => {
     const existing = new Set(Object.keys(state.definitions.blocks));
@@ -153,6 +155,18 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
                   <JsonEditor />
                 </TabsContent>
               </Tabs>
+            </SheetContent>
+          </Sheet>
+
+          <Sheet open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+            <SheetTrigger asChild>
+              <Button type="button" variant="outline">Preview</Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full">
+              <SheetHeader>
+                <SheetTitle className="sr-only">Preview</SheetTitle>
+              </SheetHeader>
+              <PreviewSurvey/>
             </SheetContent>
           </Sheet>
 

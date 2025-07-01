@@ -117,7 +117,7 @@ const COLOR_PRESETS = [
   { name: "Cyan", value: "#06B6D4" },
   { name: "Gray", value: "#6B7280" },
   { name: "Slate", value: "#475569" },
-  { name: "Transparent", value: "#00FFFFFF" },
+  { name: "White", value: "#FFFFFF" },
   { name: "Black", value: "#000000" },
 ];
 
@@ -1082,35 +1082,128 @@ const FIELD_PRESETS = {
   ],
 };
 
-// Preview Component
-const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState }> = ({ theme, state }) => (
-  <Card className="h-fit sticky top-4">
-    <CardHeader>
-      <CardTitle className="text-lg">Live Preview</CardTitle>
-      <CardDescription>
-        See your changes in real-time
-      </CardDescription>
-    </CardHeader>
-    <CardContent>
-      {state.rootNode ?
-      <SurveyForm
-        survey={state}
-        layout="fullpage"
-        enableDebug={false}
-        progressBar={{
-          type: 'percentage',
-          showPercentage: true,
-          showStepInfo: true,
-          position: 'top',
-        }}
-      /> : <p>Add some blocks to see survey in action</p>}
-    </CardContent>
-  </Card>
-);
+// Resize Handle Component for the main layout
+const ResizeHandle: React.FC = () => {
+  const [isResizing, setIsResizing] = useState(false);
+  
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsResizing(true);
+    e.preventDefault();
+  };
 
-// Define the propsAdd commentMore actions
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const containerWidth = window.innerWidth - 48; // Account for padding
+      const leftWidth = Math.max(384, Math.min(containerWidth - 320, e.clientX - 24)); // Min 384px, max container - 320px
+      const rightWidth = containerWidth - leftWidth;
+      
+      // Update CSS custom properties to control the flex layout
+      document.documentElement.style.setProperty('--left-panel-width', `${leftWidth}px`);
+      document.documentElement.style.setProperty('--right-panel-width', `${rightWidth}px`);
+    };
 
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
 
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing]);
+
+  return (
+    <div
+      className={`hidden lg:flex items-center justify-center w-6 cursor-col-resize bg-gray-100 hover:bg-blue-100 transition-colors relative group ${
+        isResizing ? 'bg-blue-200 shadow-md' : ''
+      }`}
+      onMouseDown={handleMouseDown}
+    >
+      {/* Visual indicator */}
+      <div className={`w-1 h-8 rounded-full transition-colors ${
+        isResizing ? 'bg-blue-600' : 'bg-gray-400 group-hover:bg-blue-500'
+      }`}>
+      </div>
+      
+      {/* Tooltip */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 -mt-8">
+        Drag to resize panels
+      </div>
+    </div>
+  );
+};
+
+// Preview Component with Resizable functionality
+const ThemePreview: React.FC<{ theme: ThemeDefinition; state: SurveyBuilderState }> = ({ theme, state }) => {
+  const [previewWidth, setPreviewWidth] = useState(400);
+  const [previewScale, setPreviewScale] = useState(1);
+
+  // Predefined viewport sizes
+  const viewportPresets = [
+    { name: "Mobile", width: 375, icon: "📱" },
+    { name: "Tablet", width: 768, icon: "📱" },
+    { name: "Desktop", width: 1024, icon: "💻" },
+    { name: "Large", width: 1440, icon: "🖥️" },
+  ];
+
+  const handlePresetSelect = (width: number) => {
+    setPreviewWidth(width);
+  };
+
+  const handleScaleChange = (newScale: number[]) => {
+    setPreviewScale(newScale[0]);
+  };
+
+  return (
+    <Card className="h-full">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Live Preview</CardTitle>
+          </div>
+        </div>        
+      </CardHeader>
+
+      <CardContent className="p-0 relative">
+      {state.rootNode ? (
+              <SurveyForm
+                survey={state}
+                layout="fullpage"
+                enableDebug={false}
+                progressBar={{
+                  type: 'percentage',
+                  showPercentage: true,
+                  showStepInfo: true,
+                  position: 'top',
+                }}
+              />
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                <Package className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                <p>Add some blocks to see survey in action</p>
+              </div>
+            )}
+
+      </CardContent>
+    </Card>
+  );
+};
+
+// Define the props
 interface ThemeBuilderProps {
   onDataChange?: (data: { rootNode: NodeData | null; localizations: LocalizationMap }) => void;
 }
@@ -1123,6 +1216,18 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
   const [showPreview, setShowPreview] = useState(true);
   const [editMode, setEditMode] = useState<'visual' | 'code'>('visual');
 
+  // Initialize default layout widths
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const containerWidth = window.innerWidth - 48; // Account for padding
+      const defaultLeftWidth = Math.max(384, containerWidth * 0.6);
+      const defaultRightWidth = containerWidth - defaultLeftWidth;
+      
+      document.documentElement.style.setProperty('--left-panel-width', `${defaultLeftWidth}px`);
+      document.documentElement.style.setProperty('--right-panel-width', `${defaultRightWidth}px`);
+    }
+  }, []);
+
   // Update local state when global theme changes
   useEffect(() => {
     setCurrentTheme(state.theme);
@@ -1131,7 +1236,7 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
 
   React.useEffect(() => {
     onDataChange?.(exportSurvey());
-  }, [state.rootNode, state.localizations, onDataChange]);
+  }, [state.rootNode, state.localizations, onDataChange, currentTheme]);
 
   // Apply theme changes
   const handleThemeUpdate = (updatedTheme: Partial<ThemeDefinition>) => {
@@ -1210,11 +1315,18 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Main Layout - Two Column on Desktop, Single Column on Mobile */}
-      <div className="lg:grid lg:grid-cols-12 lg:gap-6 lg:p-6 min-h-full">
+      {/* Main Layout - Resizable Two Column Layout on Desktop, Single Column on Mobile */}
+      <div className="flex flex-col lg:flex-row lg:h-screen lg:p-2 min-h-full">
         
-        {/* Theme Builder Column - Full width on mobile, 8 columns on desktop */}
-        <div className="lg:col-span-8 space-y-6 p-4 lg:p-0">
+        {/* Theme Builder Column - Flexible width */}
+        <div 
+          className="flex-1 lg:min-w-96 space-y-6 p-4 lg:p-0 lg:pr-3 overflow-y-auto"
+          style={{
+            width: 'var(--left-panel-width, auto)',
+            maxWidth: 'var(--left-panel-width, none)',
+            flexShrink: 0
+          }}
+        >
           
           {/* Header Controls */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -1805,8 +1917,18 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
           )}
         </div>
 
-        {/* Preview Column - Hidden on mobile, 4 columns on desktop */}
-        <div className="hidden lg:block lg:col-span-4 min-h-9/10">
+        {/* Resize Handle - Only visible on desktop */}
+        <ResizeHandle />
+
+        {/* Preview Column - Resizable width on desktop */}
+        <div 
+          className="hidden lg:block lg:min-w-80 lg:max-w-3xl overflow-hidden"
+          style={{
+            width: 'var(--right-panel-width, auto)',
+            maxWidth: 'var(--right-panel-width, none)',
+            flexShrink: 0
+          }}
+        >
           <ThemePreview theme={currentTheme} state={state}/>
         </div>
       </div>
