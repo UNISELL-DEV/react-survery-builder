@@ -13,12 +13,14 @@
   ],
   "resolutions": {
     "@types/react": "^19",
-    "@types/react-dom": "^19"
+    "@types/react-dom": "^19",
+    "react": "^19",
+    "react-dom": "^19"
   },
   "dependencies": {
     "next": "^15.0.0",
-    "react": "^17.0.0 || ^18.0.0",
-    "react-dom": "^17.0.0 || ^18.0.0",
+    "react": "^19",
+    "react-dom": "^19",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.0",

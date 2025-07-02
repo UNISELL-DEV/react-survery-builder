@@ -1,4 +1,4 @@
-import { defineConfig } from 'tsup'
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: ['src/index.tsx'],
@@ -8,7 +8,7 @@ export default defineConfig({
   sourcemap: true,
   clean: true,
   external: ['react', 'react-dom'],
-  esbuildOptions(options, context) {
-     options.jsx = 'automatic'
-  }
-})
+  esbuildOptions(options) {
+    options.jsx = 'automatic';
+  },
+});

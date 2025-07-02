@@ -235,20 +235,6 @@ const CheckoutBlockPreview: React.FC = () => {
   );
 };
 
-console.log('CheckoutBlock imports debug:', {
-  React: typeof React,
-  Input: typeof Input,
-  Checkbox: typeof Checkbox,
-  Label: typeof Label,
-  Select: typeof Select,
-  SelectContent: typeof SelectContent,
-  SelectItem: typeof SelectItem,
-  SelectTrigger: typeof SelectTrigger,
-  SelectValue: typeof SelectValue,
-  ShoppingCart: typeof ShoppingCart,
-  uuidv4: typeof uuidv4
-});
-
 
 export const CheckoutBlock: BlockDefinition = {
   type: "checkout",

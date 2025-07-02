@@ -51,6 +51,7 @@ import {
   supportsConditionalRendering,
   supportsBranchingLogic
 } from './utils/blockAdapter';
+import { SurveyBuilder } from './survey/SurveyBuilder';
 
 export { applyDynamicColors } from './utils/colorUtils';
 
@@ -141,3 +142,5 @@ export * from './components/nodes';
 
 // Export utility functions
 export * from './utils/nodeUtils';
+
+export default SurveyForm;

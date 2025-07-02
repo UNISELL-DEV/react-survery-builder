@@ -16343,19 +16343,6 @@ var CheckoutBlockPreview = () => {
     ] })
   ] }) });
 };
-console.log("CheckoutBlock imports debug:", {
-  React: typeof React61,
-  Input: typeof Input,
-  Checkbox: typeof Checkbox,
-  Label: typeof Label,
-  Select: typeof Select,
-  SelectContent: typeof SelectContent,
-  SelectItem: typeof SelectItem,
-  SelectTrigger: typeof SelectTrigger,
-  SelectValue: typeof SelectValue,
-  ShoppingCart: typeof ShoppingCart3,
-  uuidv4: typeof uuidv415
-});
 var CheckoutBlock3 = {
   type: "checkout",
   name: "Checkout Form",
@@ -17692,6 +17679,9 @@ var SectionNodeDefinition = {
 var StandardNodes = [
   SectionNodeDefinition
 ];
+
+// src/index.tsx
+var index_default = SurveyForm;
 export {
   ActionTypes,
   AuthBlock2 as AuthBlock,
@@ -17748,6 +17738,7 @@ export {
   colorfulTheme,
   corporateTheme,
   darkTheme,
+  index_default as default,
   defaultTheme,
   ensureNodeUuids,
   evaluateCondition,

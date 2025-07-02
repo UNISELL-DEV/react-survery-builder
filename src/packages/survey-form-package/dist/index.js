@@ -224,6 +224,7 @@ __export(index_exports, {
   colorfulTheme: () => colorfulTheme,
   corporateTheme: () => corporateTheme,
   darkTheme: () => darkTheme,
+  default: () => index_default,
   defaultTheme: () => defaultTheme,
   ensureNodeUuids: () => ensureNodeUuids,
   evaluateCondition: () => evaluateCondition,
@@ -16421,19 +16422,6 @@ var CheckoutBlockPreview = () => {
     ] })
   ] }) });
 };
-console.log("CheckoutBlock imports debug:", {
-  React: typeof import_react49.default,
-  Input: typeof Input,
-  Checkbox: typeof Checkbox,
-  Label: typeof Label,
-  Select: typeof Select,
-  SelectContent: typeof SelectContent,
-  SelectItem: typeof SelectItem,
-  SelectTrigger: typeof SelectTrigger,
-  SelectValue: typeof SelectValue,
-  ShoppingCart: typeof import_lucide_react40.ShoppingCart,
-  uuidv4: typeof import_uuid15.v4
-});
 var CheckoutBlock3 = {
   type: "checkout",
   name: "Checkout Form",
@@ -17748,6 +17736,9 @@ var SectionNodeDefinition = {
 var StandardNodes = [
   SectionNodeDefinition
 ];
+
+// src/index.tsx
+var index_default = SurveyForm;
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   ActionTypes,
