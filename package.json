@@ -19,12 +19,13 @@
   },
   "dependencies": {
     "next": "^15.0.0",
+    "next-themes": "^0.4.6",
     "react": "^19",
     "react-dom": "^19",
+    "survey-form-package": "workspace:*",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^11.0.0",
-    "survey-form-package": "workspace:*"
+    "uuid": "^11.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
