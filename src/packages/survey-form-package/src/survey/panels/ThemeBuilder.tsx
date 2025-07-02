@@ -260,7 +260,7 @@ const ColorPicker: React.FC<{
           <PopoverContent className="w-80">
             <div className="space-y-4">
               <div>
-                <Label>Quick Colors</Label>
+                <Label className="text-foreground">Quick Colors</Label>
                 <div className="grid grid-cols-6 gap-2 mt-2">
                   {COLOR_PRESETS.map(preset => (
                     <button
@@ -274,7 +274,7 @@ const ColorPicker: React.FC<{
                 </div>
               </div>
               <div>
-                <Label>Custom Color</Label>
+                <Label className="text-foreground">Custom Color</Label>
                 <div className="flex gap-2 mt-2">
                   <input
                     type="color"
@@ -327,10 +327,10 @@ const SpacingControl: React.FC<{
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Label className="capitalize">{type}</Label>
-        <Badge variant="outline">{Object.keys(value).length} rules</Badge>
+        <Badge variant="outline" className="bg-background text-foreground">{Object.keys(value).length} rules</Badge>
       </div>
       
-      <div className="space-y-2 p-4 border rounded-lg bg-gray-50">
+      <div className="space-y-2 p-4 border rounded-lg bg-muted/50">
         <div className="flex items-center gap-2">
           <Label className="w-16 text-xs">All</Label>
           <Select value={allValue} onValueChange={(val) => updateSpacing('', val)}>
@@ -575,7 +575,7 @@ const VisualStyleBuilder: React.FC<{
         </Button>
         
         {showAdvanced && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-gray-50">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-lg bg-muted/50">
             <SpacingControl 
               value={parsed.padding} 
               onChange={(val) => updateClasses({ padding: val })}
@@ -617,14 +617,14 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
     header: "mb-8",
     title: "text-3xl font-bold text-gray-900 mb-4 text-center",
     description: "text-lg text-gray-600 mb-8 text-center",
-    background: "bg-gray-50",
+    background: "bg-muted/50",
     card: "bg-white shadow-sm rounded-lg p-6 mb-6",
     container: {
       card: "bg-white border border-gray-200 rounded-lg",
       border: "border-gray-200",
       activeBorder: "border-blue-500",
       activeBg: "bg-blue-50",
-      header: "bg-gray-50",
+      header: "bg-muted/50",
     },
     field: {
       label: "block text-sm font-medium text-gray-700 mb-2",
@@ -635,7 +635,7 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       checkbox: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded",
       select: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
       textarea: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
-      file: "w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-gray-50",
+      file: "w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer bg-muted/50",
       matrix: "border-collapse w-full text-sm",
       range: "accent-blue-600",
       text: "text-gray-900",
@@ -664,7 +664,7 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
     },
     button: {
       primary: "inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
-      secondary: "inline-flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
+      secondary: "inline-flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
       text: "text-sm font-medium text-blue-600 hover:text-blue-500",
       navigation: "inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500",
     },
@@ -691,7 +691,7 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       card: "bg-white",
       border: "border-gray-100",
       activeBorder: "border-gray-900",
-      activeBg: "bg-gray-50",
+      activeBg: "bg-muted/50",
       header: "bg-white",
     },
     field: {
@@ -713,9 +713,9 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       // SelectableBox minimal styles
       selectableBox: "p-6 transition-all duration-200 cursor-pointer",
       selectableBoxDefault: "border-b border-gray-100 bg-white",
-      selectableBoxSelected: "border-b-2 border-gray-900 bg-gray-50",
-      selectableBoxHover: "hover:bg-gray-50",
-      selectableBoxFocus: "focus-within:bg-gray-50",
+      selectableBoxSelected: "border-b-2 border-gray-900 bg-muted/50",
+      selectableBoxHover: "hover:bg-muted/50",
+      selectableBoxFocus: "focus-within:bg-muted/50",
       selectableBoxDisabled: "opacity-50 cursor-not-allowed",
       selectableBoxContainer: "",
       selectableBoxText: "text-gray-900 font-normal",
@@ -771,7 +771,7 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
       checkbox: "focus:ring-[#E67E4D] h-5 w-5 text-[#E67E4D] border-gray-300 rounded-md",
       select: "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
       textarea: "w-full rounded-xl border-gray-200 shadow-sm focus:border-[#E67E4D] focus:ring-[#E67E4D] text-lg py-4 px-4",
-      file: "w-full text-base text-gray-900 border border-gray-200 rounded-xl cursor-pointer bg-gray-50 py-4 px-4",
+      file: "w-full text-base text-gray-900 border border-gray-200 rounded-xl cursor-pointer bg-muted/50 py-4 px-4",
       matrix: "border-collapse w-full text-base rounded-lg overflow-hidden",
       range: "accent-[#E67E4D] focus:outline-none focus:ring-2 focus:ring-[#E67E4D]",
       text: "text-gray-900 text-sm",
@@ -800,7 +800,7 @@ const themePresets: Record<SurveyTheme, ThemeDefinition> = {
     },
     button: {
       primary: "inline-flex justify-center py-4 px-16 text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] min-w-[200px]",
-      secondary: "inline-flex justify-center py-3 px-8 border border-gray-200 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E67E4D]",
+      secondary: "inline-flex justify-center py-3 px-8 border border-gray-200 text-base font-medium rounded-xl text-gray-700 bg-white hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#E67E4D]",
       text: "text-base font-medium text-[#E67E4D] hover:text-[#D86B3C]",
       navigation: "inline-flex items-center px-8 py-4 text-base font-medium rounded-full text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-all duration-200",
     },
@@ -1032,13 +1032,13 @@ const FIELD_PRESETS = {
   ],
   input: [
     { name: "Default", value: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" },
-    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
+    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-muted/50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
     { name: "Minimal", value: "w-full border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 px-0 py-2" },
     { name: "Floating", value: "w-full rounded-lg border-2 border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none" },
   ],
   select: [
     { name: "Default", value: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" },
-    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
+    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-muted/50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
     { name: "Minimal", value: "w-full border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 px-0 py-2" },
     { name: "Floating", value: "w-full rounded-lg border-2 border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none appearance-none" },
   ],
@@ -1056,7 +1056,7 @@ const FIELD_PRESETS = {
   ],
   textarea: [
     { name: "Default", value: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" },
-    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
+    { name: "Modern", value: "w-full rounded-xl border-gray-200 bg-muted/50 focus:bg-white focus:border-blue-500 focus:ring-blue-500 transition-colors" },
     { name: "Minimal", value: "w-full border-0 border-b-2 border-gray-200 focus:border-blue-500 focus:ring-0 px-0 py-2 resize-none" },
     { name: "Large", value: "w-full rounded-lg border-2 border-gray-300 px-4 py-3 focus:border-blue-500 focus:outline-none min-h-[120px]" },
   ],
@@ -1075,7 +1075,7 @@ const FIELD_PRESETS = {
   selectableBox: [
     { name: "Default", value: "p-4 transition-all duration-200 hover:shadow-sm cursor-pointer border border-gray-300 bg-white rounded-md" },
     { name: "Modern", value: "p-6 transition-all duration-300 cursor-pointer rounded-xl border border-gray-200 bg-white shadow-sm hover:scale-[1.02]" },
-    { name: "Minimal", value: "p-6 transition-all duration-200 cursor-pointer border-b border-gray-100 bg-white hover:bg-gray-50" },
+    { name: "Minimal", value: "p-6 transition-all duration-200 cursor-pointer border-b border-gray-100 bg-white hover:bg-muted/50" },
     { name: "Card Style", value: "p-6 transition-all duration-300 cursor-pointer rounded-2xl border-2 border-purple-200 bg-white shadow-sm hover:scale-105" },
     { name: "Corporate", value: "p-5 transition-all duration-200 cursor-pointer rounded-lg border border-slate-300 bg-white shadow-sm" },
     { name: "Dark", value: "p-5 transition-all duration-200 cursor-pointer rounded-lg border border-gray-600 bg-gray-800" },
@@ -1128,7 +1128,7 @@ const ResizeHandle: React.FC = () => {
 
   return (
     <div
-      className={`hidden lg:flex items-center justify-center w-6 cursor-col-resize bg-gray-100 hover:bg-blue-100 transition-colors relative group ${
+      className={`hidden lg:flex items-center justify-center w-6 cursor-col-resize bg-background hover:bg-blue-100 transition-colors relative group ${
         isResizing ? 'bg-blue-200 shadow-md' : ''
       }`}
       onMouseDown={handleMouseDown}
@@ -1345,13 +1345,13 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-muted/50">
       {/* Main Layout - Resizable Two Column Layout on Desktop, Single Column on Mobile */}
-      <div className="flex flex-col lg:flex-row lg:h-screen lg:p-2 min-h-full">
+      <div className="flex flex-col lg:flex-row lg:h-screen min-h-full">
         
         {/* Theme Builder Column - Flexible width */}
         <div 
-          className="flex-1 lg:min-w-96 space-y-6 p-4 lg:p-0 lg:pr-3 overflow-y-auto"
+          className="flex-1 lg:min-w-96 space-y-6 p-4 lg:p-2 rounded-md lg:pr-3 overflow-y-auto"
           style={{
             width: 'var(--left-panel-width, auto)',
             maxWidth: 'var(--left-panel-width, none)',
@@ -1409,11 +1409,11 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
                 value={editMode} 
                 onValueChange={(val) => val && setEditMode(val as 'visual' | 'code')}
               >
-                <ToggleGroupItem value="visual" className="data-[state=on]:bg-blue-100">
+                <ToggleGroupItem value="visual" className="data-[state=on]:bg-blue-100 dark:bg-blue-800">
                   <Palette className="w-4 h-4 mr-1" />
                   Visual
                 </ToggleGroupItem>
-                <ToggleGroupItem value="code" className="data-[state=on]:bg-blue-100">
+                <ToggleGroupItem value="code" className="data-[state=on]:bg-blue-100 data-[state=on]:dark:bg-blue-800">
                   <Type className="w-4 h-4 mr-1" />
                   Code
                 </ToggleGroupItem>
@@ -1459,11 +1459,11 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
                       onClick={() => handlePresetChange(key as SurveyTheme)}
                       className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${
                         selectedPreset === key 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-950' 
+                          : 'border-border hover:border-muted-foreground'                        
                       }`}
                     >
-                      <div className="text-sm font-medium text-start capitalize">{preset.name}</div>
+                      <div className="text-sm font-medium text-start capitalize text-foreground">{preset.name}</div>
                       <div className="mt-2 flex gap-1">
                         <div 
                           className="w-3 h-3 rounded-full border"
@@ -1942,7 +1942,7 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
 
           {/* Mobile Preview */}
           {showPreview && (
-            <div className="lg:hidden">
+            <div className="lg:hidden rounded-xl">
               <ThemePreview theme={currentTheme} state={state} />
             </div>
           )}
@@ -1953,7 +1953,7 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
 
         {/* Preview Column - Resizable width on desktop */}
         <div 
-          className="hidden lg:block lg:min-w-80 lg:max-w-3xl overflow-hidden"
+          className="hidden lg:block lg:min-w-80 lg:max-w-2xl overflow-hidden rounded-xl"
           style={{
             width: 'var(--right-panel-width, auto)',
             maxWidth: 'var(--right-panel-width, none)',
