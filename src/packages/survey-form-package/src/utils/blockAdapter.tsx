@@ -3,53 +3,6 @@ import { Activity, ShoppingCart } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { TextInputBlock, TextareaBlock, SelectBlock, RadioBlock, CheckboxBlock, RangeBlock, DatePickerBlock, FileUploadBlock, MatrixBlock, SelectableBoxQuestionBlock, MarkdownBlock, HtmlBlock, ScriptBlock, AuthBlock, CheckoutBlock } from "../builder/blocks";
 
-// Export the block definition
-export const BMICalculatorBlock: BlockDefinition = {
-  type: "bmiCalculator",
-  name: "BMI Calculator",
-  description: "Modern BMI calculator with sleek design and intuitive controls",
-  icon: <Activity className="w-4 h-4" />,
-  defaultData: {
-    type: "bmiCalculator",
-    label: "BMI Calculator",
-    description: "Calculate your Body Mass Index",
-    fieldName: "bmiResult",
-    defaultUnit: "metric",
-    showResults: false,
-    theme: "default",
-    className: "",
-  },
-  validate: (data) => {
-    if (!data.label) return "Label is required";
-    if (!data.fieldName) return "Field name is required";
-    return null;
-  },
-};
-
-export const CheckoutBlockDefinition: BlockDefinition = {
-  type: 'checkout',
-  name: 'Checkout Form',
-  description: 'Collect shipping, billing and contact details',
-  icon: <ShoppingCart className="w-4 h-4" />,
-  defaultData: {
-    type: 'checkout',
-    fieldName: `checkout${uuidv4().substring(0,4)}`,
-    label: 'Checkout',
-    description: '',
-    showShippingAddress: true,
-    showBillingAddress: false,
-    requireEmail: true,
-    requirePhone: false,
-    className: '',
-  },
-  validate: (data) => {
-    if (!data.fieldName) return 'Field name is required';
-    return null;
-  },
-};
-
-
-
 /**
  * Maps survey builder block types to the appropriate renderer components
  * This allows us to re-use the validation and properties from the original blocks
@@ -111,7 +64,7 @@ export const blockTypeMap: Record<string, any> = {
   },
 
   // Checkout block
-  checkout: CheckoutBlockDefinition
+  checkout: CheckboxBlock
 };
 
 /**
