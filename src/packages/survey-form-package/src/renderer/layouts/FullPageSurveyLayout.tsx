@@ -189,7 +189,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
 
       {/* Fixed Header Section */}
       <div className="w-full backdrop-blur-sm border-gray-100">
-        <div className="w-full max-w-lg min-w-[32rem] mx-auto py-4">
+        <div className="w-full max-w-lg min-w-80 sm:min-w-[32rem] mx-auto py-4 px-4">
           
           {/* Progress Bar Section */}
           {progressBar && typeof progressBar === "object" && progressBar.position !== "bottom" && (
@@ -297,7 +297,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
           >
             {/* Question Content - Centered Layout */}
             <div className="flex-[0.8] flex flex-col justify-start items-center px-4 py-2">
-              <div className="w-full max-w-lg min-w-[32rem] space-y-6">
+              <div className="w-full max-w-lg min-w-80 sm:min-w-[32rem] space-y-6 px-4">
                 {currentPageBlocks[currentBlockIndex] && (
                   <div className="text-start">
                     {/* Apply intake form styling to titles */}
@@ -364,7 +364,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
 
             {/* Navigation Buttons - Fixed at bottom */}
             <div className="w-full backdrop-blur-sm border-gray-100">
-              <div className="w-full max-w-2xl min-w-[32rem] mx-auto px-4 py-4">
+              <div className="w-full max-w-2xl min-w-80 sm:min-w-[32rem] mx-auto px-4 py-4">
                 
                 {/* Disclaimer Text */}
                 {blockDisclaimer && (
@@ -410,7 +410,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
                         className={cn(
                           "bg-black hover:bg-gray-800 text-white",
                           "px-16 py-4 text-base font-medium",
-                          "rounded-full min-w-[200px]",
+                          "rounded-full min-w-32 sm:min-w-[200px]",
                           "transition-all duration-200",
                           "hover:scale-[1.02] active:scale-[0.98]",
                           "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
@@ -441,7 +441,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
         typeof progressBar === "object" &&
         progressBar.position === "bottom" && (
           <div className="w-full border-t bg-white/80 backdrop-blur-sm">
-            <div className="w-full max-w-2xl min-w-[32rem] mx-auto px-4 py-2">
+            <div className="w-full max-w-2xl min-w-80 sm:min-w-[32rem] mx-auto px-4 py-2">
               <div className="h-2 w-full rounded-full overflow-hidden bg-gray-200">
                 <motion.div
                   className={cn(
