@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { SurveyForm } from 'survey-form-renderer/src';
+import { SurveyForm } from 'survey-form-package/src';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -289,7 +289,7 @@ export default function FormRendererExample() {
               <div className="lg:col-span-12">
                   <SurveyForm
                       logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
-                      survey={currentSurvey}
+                      survey={currentSurvey as any}
                       onSubmit={handleSubmit}
                       onChange={handleChange}
                       layout='fullpage'
