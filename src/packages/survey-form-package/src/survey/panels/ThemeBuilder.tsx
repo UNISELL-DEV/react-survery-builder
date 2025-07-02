@@ -1218,14 +1218,45 @@ export const ThemeBuilder: React.FC<ThemeBuilderProps> = ({onDataChange}) => {
 
   // Initialize default layout widths
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const containerWidth = window.innerWidth - 48; // Account for padding
-      const defaultLeftWidth = Math.max(384, containerWidth * 0.6);
-      const defaultRightWidth = containerWidth - defaultLeftWidth;
-      
-      document.documentElement.style.setProperty('--left-panel-width', `${defaultLeftWidth}px`);
-      document.documentElement.style.setProperty('--right-panel-width', `${defaultRightWidth}px`);
-    }
+    const handleResize = () => {
+      // Use requestAnimationFrame to ensure resize happens after layout
+      requestAnimationFrame(() => {
+        if (typeof window !== 'undefined') {
+          const containerWidth = window.innerWidth - 48;
+          
+          if (window.innerWidth < 1024) {
+            document.documentElement.style.setProperty('--left-panel-width', `${containerWidth}px`);
+            document.documentElement.style.setProperty('--right-panel-width', '0px');
+          } else {
+            const defaultLeftWidth = Math.max(384, containerWidth * 0.6);
+            const defaultRightWidth = containerWidth - defaultLeftWidth;
+            document.documentElement.style.setProperty('--left-panel-width', `${defaultLeftWidth}px`);
+            document.documentElement.style.setProperty('--right-panel-width', `${defaultRightWidth}px`);
+          }
+        }
+      });
+    };
+  
+    // Debounce function
+    let timeoutId;
+    const debouncedResize = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(handleResize, 100);
+    };
+  
+    // Set initial values
+    handleResize();
+  
+    // Add multiple event listeners for better coverage
+    window.addEventListener('resize', debouncedResize);
+    window.addEventListener('orientationchange', handleResize);
+  
+    // Cleanup
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('resize', debouncedResize);
+      window.removeEventListener('orientationchange', handleResize);
+    };
   }, []);
 
   // Update local state when global theme changes

@@ -90,32 +90,40 @@ export const ContentBlockPage: React.FC<ContentBlockPageProps> = ({
 
   return (
     <Card className="mb-4 content-block-page">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div className="flex gap-2 items-center">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
+        {/* Name field */}
+        <div className="w-full sm:w-auto">
           <Input
             value={data.name || ""}
             onChange={handleNameChange}
             placeholder="Page Name"
-            className="w-[300px]"
+            className="w-full sm:w-[300px]"
           />
         </div>
-        <div className="flex gap-2">
-          <Button type="button"
+
+        {/* Action buttons */}
+        <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+          <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => setCollapsed(!collapsed)}
+            className="grow sm:grow-0"
           >
             {collapsed ? "Expand" : "Collapse"}
           </Button>
-          <Button type="button"
+          <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={onRemove}
+            className="grow sm:grow-0"
           >
             Remove
           </Button>
         </div>
       </CardHeader>
+
 
       {!collapsed && (
         <CardContent>

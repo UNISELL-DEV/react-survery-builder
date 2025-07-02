@@ -105,76 +105,80 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
 
   return (
     <div className="survey-builder h-full flex flex-col pb-5">
-      <div className="survey-builder-header flex items-center justify-between p-4 bg-card border-b">
-        <h2 className="text-xl font-bold">Form Builder</h2>
+<div className="survey-builder-header flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 bg-card border-b">
+  {/* Heading */}
+  <h2 className="text-xl font-bold shrink-0">Form Builder</h2>
 
-        <div className="flex items-center gap-2">
-          <Tabs
-            value={state.displayMode}
-            onValueChange={(v) => handleDisplayModeChange(v as any)}
-            className="mr-4"
-          >
-            <TabsList>
-              <TabsTrigger value="list">List View</TabsTrigger>
-              <TabsTrigger value="graph">Graph View</TabsTrigger>
-              <TabsTrigger value="lang">Localizations</TabsTrigger>
-            </TabsList>
-          </Tabs>
+  {/* Controls */}
+  <div className="flex flex-wrap items-center gap-2 sm:gap-4 w-full sm:w-auto lg:flex-nowrap">
+    {/* Tabs */}
+    <Tabs
+      value={state.displayMode}
+      onValueChange={(v) => handleDisplayModeChange(v as any)}
+      className="flex-grow overflow-x-auto whitespace-nowrap"
+    >
+      <TabsList>
+        <TabsTrigger value="list">List View</TabsTrigger>
+        <TabsTrigger value="graph">Graph View</TabsTrigger>
+        <TabsTrigger value="lang">Localizations</TabsTrigger>
+      </TabsList>
+    </Tabs>
 
-          <Sheet open={isThemeBuilderOpen} onOpenChange={setIsThemeBuilderOpen}>
-            <SheetTrigger asChild>
-              <Button type="button" variant="outline">Theme Builder</Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full">
-              <SheetHeader>
-                <SheetTitle>Theme Builder</SheetTitle>
-              </SheetHeader>
-              <ThemeBuilder onDataChange={onDataChange}/>
-            </SheetContent>
-          </Sheet>
+    {/* Theme Builder */}
+    <Sheet open={isThemeBuilderOpen} onOpenChange={setIsThemeBuilderOpen}>
+      <SheetTrigger asChild>
+        <Button type="button" variant="outline" className="grow lg:grow-0">
+          Theme&nbsp;Builder
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full">
+        <SheetHeader><SheetTitle>Theme Builder</SheetTitle></SheetHeader>
+        <ThemeBuilder onDataChange={onDataChange} />
+      </SheetContent>
+    </Sheet>
 
-          <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
-            <SheetTrigger asChild>
-              <Button type="button" variant="outline">Tools</Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[540px] sm:w-[540px]">
-              <SheetHeader>
-                <SheetTitle>Tools</SheetTitle>
-              </SheetHeader>
-              <Tabs defaultValue="blocks" className="mt-4">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="blocks">Block Library</TabsTrigger>
-                  <TabsTrigger value="json">JSON</TabsTrigger>
-                </TabsList>
+    {/* Tools */}
+    <Sheet open={isPanelOpen} onOpenChange={setIsPanelOpen}>
+      <SheetTrigger asChild>
+        <Button type="button" variant="outline" className="grow lg:grow-0">
+          Tools
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full lg:w-[540px]">
+        <SheetHeader><SheetTitle>Tools</SheetTitle></SheetHeader>
+        <Tabs defaultValue="blocks" className="mt-4">
+          <TabsList className="mb-4">
+            <TabsTrigger value="blocks">Block Library</TabsTrigger>
+            <TabsTrigger value="json">JSON</TabsTrigger>
+          </TabsList>
+          <TabsContent value="blocks" className="overflow-y-auto"><BlockLibrary /></TabsContent>
+          <TabsContent value="json"><JsonEditor /></TabsContent>
+        </Tabs>
+      </SheetContent>
+    </Sheet>
 
-                <TabsContent value="blocks" className="overflow-y-scroll">
-                  <BlockLibrary />
-                </TabsContent>
+    {/* Preview */}
+    <Sheet open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+      <SheetTrigger asChild>
+        <Button type="button" variant="outline" className="grow lg:grow-0">
+          Preview
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full">
+        <SheetHeader><SheetTitle className="sr-only">Preview</SheetTitle></SheetHeader>
+        <PreviewSurvey />
+      </SheetContent>
+    </Sheet>
 
-                <TabsContent value="json">
-                  <JsonEditor />
-                </TabsContent>
-              </Tabs>
-            </SheetContent>
-          </Sheet>
+    {/* Create Form */}
+    {!state.rootNode && (
+      <Button type="button" onClick={handleCreateRootNode} className="grow lg:grow-0">
+        Create&nbsp;Form
+      </Button>
+    )}
+  </div>
+</div>
 
-          <Sheet open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-            <SheetTrigger asChild>
-              <Button type="button" variant="outline">Preview</Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-full">
-              <SheetHeader>
-                <SheetTitle className="sr-only">Preview</SheetTitle>
-              </SheetHeader>
-              <PreviewSurvey/>
-            </SheetContent>
-          </Sheet>
-
-          {!state.rootNode && (
-            <Button type="button" onClick={handleCreateRootNode}>Create Form</Button>
-          )}
-        </div>
-      </div>
 
       <div className="survey-builder-content flex-grow p-4 overflow-auto">
         {state.displayMode === "list" && (

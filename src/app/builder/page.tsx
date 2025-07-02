@@ -73,7 +73,7 @@ export default function Home() {
             <h1 className="text-3xl font-bold mb-2">Intake form Builder</h1>
           </div>
           <div className="flex gap-3">
-            <Link href="/demo2">
+            <Link href="/demo">
               <Button className="bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-lg">
                 View Interactive Demo
               </Button>

@@ -84,8 +84,8 @@ import { GripVertical } from "lucide-react";interface SectionNodeProps {
     });
   };  return (
     <Card className="mb-4 section-node">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div className="flex gap-2 items-center">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
+        <div className="w-full sm:w-auto">
           <Input
             value={data.name || ""}
             onChange={handleNameChange}
@@ -93,7 +93,7 @@ import { GripVertical } from "lucide-react";interface SectionNodeProps {
             className="w-[300px]"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 sm:flex-nowrap">
           <Button
             type="button"
             variant="outline"

@@ -46,7 +46,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
 
   return (
     <Card className="mb-4 content-block-item">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
+      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
         <div className="flex gap-2 items-center">
           {blockDefinition.icon && <span>{blockDefinition.icon}</span>}
           <span className="font-medium">{data.name || blockDefinition.name}</span>
@@ -56,7 +56,7 @@ export const ContentBlockItem: React.FC<ContentBlockItemProps> = ({
             </span>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2 sm:flex-nowrap">
           <Dialog open={isEditing} onOpenChange={setIsEditing}>
             <DialogTrigger asChild>
               <Button type="button"
