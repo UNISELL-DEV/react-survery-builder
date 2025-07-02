@@ -157,7 +157,7 @@ export const CheckoutRenderer: React.FC<CheckoutRendererProps> = ({
   const sectionClassName = "bg-white border border-gray-200 rounded-xl p-6 shadow-sm";
 
   return (
-    <div className={cn('survey-checkout space-y-6 max-w-2xl mx-auto', block.className)}>
+    <div className={cn('survey-checkout w-full min-w-0 space-y-6 max-w-2xl mx-auto', block.className)}>
       {/* Header */}
       {block.label && (
         <div className="text-center space-y-2 pb-4">

@@ -188,7 +188,7 @@ export const BMICalculatorRenderer: React.FC<BMICalculatorRendererProps> = ({
   };
 
   return (
-    <Card className={getCardClassName()}>
+    <Card className={`w-full min-w-0 ${getCardClassName()}`}>
       <CardHeader className="text-center pb-6">
         <CardTitle className="flex items-center justify-center gap-3 text-2xl">
           <div className={`p-2 rounded-full bg-gradient-to-r ${bmiData.color}`}>

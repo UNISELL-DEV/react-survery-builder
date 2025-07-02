@@ -101,7 +101,7 @@ export const CalculatedFieldRenderer: React.FC<CalculatedFieldProps> = ({
   }, [values, computedValues, dependencies, formula, format, block.fieldName, updateComputedValues]);
 
   return (
-    <Card className={cn("w-full border bg-card", block.className)}>
+    <Card className={cn("w-full min-w-0 border bg-card", block.className)}>
       <CardContent className="p-4">
         {block.label && (
           <Label className={cn("text-base block font-medium mb-2", themeConfig.field.label)}>

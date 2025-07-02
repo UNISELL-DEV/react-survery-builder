@@ -36,7 +36,7 @@ export const SelectRenderer = forwardRef<HTMLButtonElement, SelectRendererProps>
     const values = block.values || labels.map((_, i) => i);
 
     return (
-      <div className="survey-select space-y-2">
+      <div className="survey-select space-y-2 w-full min-w-0">
         {/* Label */}
         {block.label && (
           <Label

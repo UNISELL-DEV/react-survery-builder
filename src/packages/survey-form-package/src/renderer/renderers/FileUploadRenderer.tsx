@@ -154,7 +154,7 @@ export const FileUploadRenderer: React.FC<FileUploadRendererProps> = ({
   };
 
   return (
-    <div className="survey-file-upload space-y-3">
+    <div className="survey-file-upload space-y-3 w-full min-w-0">
       {/* Label */}
       {block.label && (
         <Label

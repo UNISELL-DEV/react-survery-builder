@@ -101,7 +101,7 @@ export const RangeRenderer: React.FC<RangeRendererProps> = ({
   }
 
   return (
-    <div className="survey-range space-y-4">
+    <div className="survey-range space-y-4 w-full min-w-0">
       {/* Label */}
       {block.label && (
         <Label

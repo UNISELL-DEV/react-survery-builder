@@ -562,7 +562,7 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
   // Show loading for initial authentication check
   if (loading && currentStep !== 'email-otp' && currentStep !== 'phone-otp' && currentStep !== 'welcome') {
     return (
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full min-w-0  mx-auto">
         <CardContent className="pt-6">
           <div className="flex items-center justify-center space-x-2">
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -588,7 +588,7 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-full max-w-md mx-auto">
+        <Card className="w-full min-w-0  mx-auto">
           <CardHeader className="text-center">
             <motion.div 
               className="w-12 h-12 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center"
@@ -637,7 +637,7 @@ export const AuthRenderer: React.FC<BlockRendererProps> = ({ block }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md mx-auto">
+      <Card className="w-full min-w-0  mx-auto">
         <CardHeader className="text-center">
           <motion.div 
             className="w-12 h-12 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center"

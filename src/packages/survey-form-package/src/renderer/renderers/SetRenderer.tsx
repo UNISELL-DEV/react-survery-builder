@@ -44,7 +44,7 @@ export const SetRenderer: React.FC<BlockRendererProps> = ({
     .map(child => child.fieldName as string);
 
   return (
-    <Card className={cn("border bg-card", block.className)}>
+    <Card className={cn("w-full min-w-0 border bg-card", block.className)}>
       {(block.label || block.description) && (
         <CardHeader>
           {block.label && (

@@ -63,7 +63,7 @@ export const SelectableBoxRenderer: React.FC<SelectableBoxRendererProps> = ({
   };
   
   return (
-    <div className="survey-box-question space-y-4">
+    <div className="survey-box-question space-y-4 w-full min-w-0">
       {/* Label */}
       {block.label && (
         <Label

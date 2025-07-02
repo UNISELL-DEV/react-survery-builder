@@ -78,7 +78,7 @@ export const MatrixRenderer: React.FC<MatrixRendererProps> = ({
   };
 
   return (
-    <div className="survey-matrix space-y-4">
+    <div className="survey-matrix space-y-4 w-full min-w-0">
       {/* Matrix Title */}
       {block.label && (
         <Label

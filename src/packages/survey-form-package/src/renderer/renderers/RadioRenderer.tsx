@@ -41,7 +41,7 @@ export const RadioRenderer: React.FC<RadioRendererProps> = ({
   };
 
   return (
-    <div className="survey-radio space-y-3">
+    <div className="survey-radio space-y-3 w-full min-w-0">
       {/* Label */}
       {block.label && (
         <Label className={cn("text-base block", themeConfig.field.label)}>

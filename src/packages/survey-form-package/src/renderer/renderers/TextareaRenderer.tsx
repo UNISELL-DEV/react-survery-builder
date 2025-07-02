@@ -26,7 +26,7 @@ export const TextareaRenderer = forwardRef<HTMLTextAreaElement, TextareaRenderer
     };
 
     return (
-      <div className="survey-textarea space-y-2">
+      <div className="survey-textarea space-y-2 w-full min-w-0">
         {/* Label */}
         {block.label && (
           <Label

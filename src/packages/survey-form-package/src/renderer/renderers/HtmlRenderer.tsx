@@ -15,7 +15,7 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
 
   return (
     <div
-      className="survey-html"
+      className="survey-html w-full min-w-0"
       dangerouslySetInnerHTML={{ __html: block.html || '' }}
     />
   );

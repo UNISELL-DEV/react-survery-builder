@@ -118,7 +118,7 @@ export const DatePickerRenderer: React.FC<DatePickerRendererProps> = ({
     : '';
 
   return (
-    <div className="survey-datepicker space-y-2">
+    <div className="survey-datepicker space-y-2 w-full min-w-0">
       {/* Label */}
       {block.label && (
         <Label

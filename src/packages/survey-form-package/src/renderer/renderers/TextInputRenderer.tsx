@@ -27,7 +27,7 @@ export const TextInputRenderer = forwardRef<HTMLInputElement, TextInputRendererP
     };
 
     return (
-      <div className="survey-text-input space-y-2">
+      <div className="survey-text-input space-y-2 w-full min-w-0">
         {/* Label */}
         {block.label && (
           <Label

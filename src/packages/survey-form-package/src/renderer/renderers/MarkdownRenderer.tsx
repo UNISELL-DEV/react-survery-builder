@@ -59,7 +59,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ block, theme
 
   return (
     <div
-      className="survey-markdown"
+      className="survey-markdown w-full min-w-0"
       dangerouslySetInnerHTML={{ __html: html }}
     />
   );

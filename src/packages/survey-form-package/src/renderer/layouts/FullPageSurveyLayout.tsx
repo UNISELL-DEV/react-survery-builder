@@ -189,7 +189,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
 
       {/* Fixed Header Section */}
       <div className="w-full backdrop-blur-sm border-gray-100">
-        <div className="w-full max-w-lg mx-auto py-4">
+        <div className="w-full max-w-lg min-w-[32rem] mx-auto py-4">
           
           {/* Progress Bar Section */}
           {progressBar && typeof progressBar === "object" && progressBar.position !== "bottom" && (
@@ -297,7 +297,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
           >
             {/* Question Content - Centered Layout */}
             <div className="flex-[0.8] flex flex-col justify-start items-center px-4 py-2">
-              <div className="w-full max-w-lg space-y-6">
+              <div className="w-full max-w-lg min-w-[32rem] space-y-6">
                 {currentPageBlocks[currentBlockIndex] && (
                   <div className="text-start">
                     {/* Apply intake form styling to titles */}
@@ -364,7 +364,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
 
             {/* Navigation Buttons - Fixed at bottom */}
             <div className="w-full backdrop-blur-sm border-gray-100">
-              <div className="w-full max-w-2xl mx-auto px-4 py-4">
+              <div className="w-full max-w-2xl min-w-[32rem] mx-auto px-4 py-4">
                 
                 {/* Disclaimer Text */}
                 {blockDisclaimer && (
@@ -441,7 +441,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
         typeof progressBar === "object" &&
         progressBar.position === "bottom" && (
           <div className="w-full border-t bg-white/80 backdrop-blur-sm">
-            <div className="w-full max-w-2xl mx-auto px-4 py-2">
+            <div className="w-full max-w-2xl min-w-[32rem] mx-auto px-4 py-2">
               <div className="h-2 w-full rounded-full overflow-hidden bg-gray-200">
                 <motion.div
                   className={cn(
