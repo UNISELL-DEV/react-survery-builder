@@ -7,6 +7,7 @@ import Link from "next/link";
 
 import { CreditCard } from 'lucide-react';
 import { BlockDefinition, StandardBlocks, StandardNodes, SurveyBuilder } from "survey-form-package/src";
+import { useTheme } from "next-themes";
 
 // Create a custom credit card input block
 const CreditCardBlock : BlockDefinition = {
@@ -63,6 +64,7 @@ function App() {
 }
 
 export default function Home() {
+  const { theme, setTheme } = useTheme();
   const [surveyData, setSurveyData] = useState<any>(null);
 
   return (
@@ -95,6 +97,25 @@ export default function Home() {
             {surveyData ? JSON.stringify(surveyData, null, 2) : "No survey data yet"}
           </pre>
         </div>
+      </div>
+      <div className="fixed bottom-4 right-4">
+        <Button
+          type="button"
+          aria-label="Toggle dark/light mode"
+          className="text-xl shadow-none border-0 p-2 rounded-full bg-white/60 dark:bg-[#181d23]/60 ring-1 ring-inset ring-blue-100 dark:ring-teal-700 hover:bg-slate-100 dark:hover:bg-[#202730] transition-transform scale-100 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-teal-400 flex items-center justify-center"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          <span className="inline-flex items-center h-6 w-6">
+            {theme !== 'dark'
+              ? (
+                // Sun Icon
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-blue-700"><circle cx="12" cy="12" r="5" /><path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 6.95l-1.414-1.414M4.464 4.464L3.05 3.05m16.95 1.414l-1.414 1.414M4.464 19.536l-1.414 1.414" /></svg>
+              ) : (
+                // Moon Icon
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-teal-400"><path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 1 0 21 12.79Z" /></svg>
+              )}
+          </span>
+        </Button>
       </div>
     </main>
   );

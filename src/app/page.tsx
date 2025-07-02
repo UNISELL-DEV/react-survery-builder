@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Check, Upload, AlertCircle } from 'lucide-react';
 import Logo from '@/components/Logo';
+import { useTheme } from 'next-themes';
 
 // Example survey data from the builder
 const sampleSurvey = {
@@ -983,6 +984,7 @@ const sampleSurvey = {
 
 
 export default function FormRendererExample() {
+  const { theme, setTheme } = useTheme();
   const [submittedData, setSubmittedData] = useState<Record<string, any> | null>(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('Survey submitted successfully.');
@@ -993,196 +995,214 @@ export default function FormRendererExample() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const handleSubmit = (data: Record<string, any>) => {
-      setSubmittedData(data);
-      setAlertMessage('Survey submitted successfully.');
-      setShowAlert(true);
-      setTimeout(() => {
-          setShowAlert(false);
-      }, 5000);
+    setSubmittedData(data);
+    setAlertMessage('Survey submitted successfully.');
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
   };
 
   const handleChange = (data: Record<string, any>) => {
-      console.log(data);
+    console.log(data);
   };
 
   const validateAndLoadJson = () => {
-      try {
-          setJsonError('');
-          const parsedJson = JSON.parse(jsonInput);
-          
-          // Basic validation to ensure it's a survey object
-          if (!parsedJson.rootNode || !parsedJson.rootNode.type || !parsedJson.rootNode.items) {
-              setJsonError('Invalid survey format. Must contain rootNode with type and items properties.');
-              return;
-          }
+    try {
+      setJsonError('');
+      const parsedJson = JSON.parse(jsonInput);
 
-          setCurrentSurvey(parsedJson);
-          setJsonInput('');
-          setIsSheetOpen(false);
-          
-          // Show success message
-          setAlertMessage('Survey loaded successfully.');
-          setShowAlert(true);
-          setTimeout(() => {
-              setShowAlert(false);
-          }, 3000);
-          
-      } catch (error) {
-          setJsonError('Invalid JSON format. Please check your syntax.');
+      // Basic validation to ensure it's a survey object
+      if (!parsedJson.rootNode || !parsedJson.rootNode.type || !parsedJson.rootNode.items) {
+        setJsonError('Invalid survey format. Must contain rootNode with type and items properties.');
+        return;
       }
+
+      setCurrentSurvey(parsedJson);
+      setJsonInput('');
+      setIsSheetOpen(false);
+
+      // Show success message
+      setAlertMessage('Survey loaded successfully.');
+      setShowAlert(true);
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 3000);
+
+    } catch (error) {
+      setJsonError('Invalid JSON format. Please check your syntax.');
+    }
   };
 
   const loadSampleJson = () => {
-      setJsonInput(JSON.stringify(currentSurvey, null, 2));
-      setJsonError('');
+    setJsonInput(JSON.stringify(currentSurvey, null, 2));
+    setJsonError('');
   };
 
   const clearJson = () => {
-      setJsonInput('');
-      setJsonError('');
+    setJsonInput('');
+    setJsonError('');
   };
 
   return (
-//       <div className="container-fluid mx-auto p-4 bg-[#f8f8f8] min-h-screen">
-//           {/* <div className="flex items-center justify-between mb-8">
-//               <h1 className="text-3xl font-bold">IVYRX</h1>
-              
-//               <div className="flex items-center gap-2">
-//                   <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-//                       <SheetTrigger asChild>
-//                           <Button variant="outline" className="flex items-center gap-2">
-//                               <Upload className="h-4 w-4" />
-//                               Load Survey JSON
-//                           </Button>
-//                       </SheetTrigger>
-//                       <SheetContent className="w-[600px] sm:w-[800px] overflow-y-auto px-4">
-//                           <SheetHeader>
-//                               <SheetTitle>Load Survey Configuration</SheetTitle>
-//                               <SheetDescription>
-//                                   Paste your survey JSON configuration below to dynamically load a different survey.
-//                               </SheetDescription>
-//                           </SheetHeader>
-                          
-//                           <div className="space-y-4 mt-6">
-//                               <div className="space-y-2">
-//                                   <Label htmlFor="json-input">Survey JSON Configuration</Label>
-//                                   <Textarea
-//                                       id="json-input"
-//                                       placeholder="Paste your survey JSON here..."
-//                                       value={jsonInput}
-//                                       onChange={(e) => setJsonInput(e.target.value)}
-//                                       className="min-h-[400px] font-mono text-sm"
-//                                   />
-//                               </div>
-                              
-//                               {jsonError && (
-//                                   <Alert className="bg-red-50 text-red-800 border-red-200">
-//                                       <AlertCircle className="h-4 w-4" />
-//                                       <AlertTitle>Error</AlertTitle>
-//                                       <AlertDescription>{jsonError}</AlertDescription>
-//                                   </Alert>
-//                               )}
-                              
-//                               <div className="flex flex-wrap gap-2">
-//                                   <Button 
-//                                       onClick={validateAndLoadJson}
-//                                       disabled={!jsonInput.trim()}
-//                                       className="flex items-center gap-2"
-//                                   >
-//                                       <Check className="h-4 w-4" />
-//                                       Load Survey
-//                                   </Button>
-//                                   <Button 
-//                                       variant="outline" 
-//                                       onClick={loadSampleJson}
-//                                   >
-//                                       Load Current JSON
-//                                   </Button>
-//                                   <Button 
-//                                       variant="secondary" 
-//                                       onClick={clearJson}
-//                                   >
-//                                       Clear
-//                                   </Button>
-//                               </div>
-                              
-//                               <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-//                                   <h4 className="font-medium mb-2">Expected JSON Format:</h4>
-//                                   <pre className="text-xs overflow-x-auto">
-// {`{
-// "rootNode": {
-//   "type": "section",
-//   "name": "Survey Name",
-//   "uuid": "unique-id",
-//   "items": [
-//     {
-//       "type": "set",
-//       "name": "Page Name",
-//       "uuid": "page-uuid",
-//       "items": [...]
-//     }
-//   ]
-// },
-// "localizations": {
-//   "en": {}
-// }
-// }`}
-//                                   </pre>
-//                               </div>
-//                           </div>
-//                       </SheetContent>
-//                   </Sheet>
-//               </div>
-//           </div> */}
-          
-//           {showAlert && (
-//               <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
-//                   <Check className="h-5 w-5" />
-//                   <AlertTitle>Success!</AlertTitle>
-//                   <AlertDescription>
-//                       {alertMessage}
-//                   </AlertDescription>
-//               </Alert>
-//           )}
+    //       <div className="container-fluid mx-auto p-4 bg-[#f8f8f8] min-h-screen">
+    //           {/* <div className="flex items-center justify-between mb-8">
+    //               <h1 className="text-3xl font-bold">IVYRX</h1>
 
-//           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-//               <div className="lg:col-span-12">
-//                   <SurveyForm
-//                       logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
-//                       survey={currentSurvey}
-//                       onSubmit={handleSubmit}
-//                       onChange={handleChange}
-//                       layout='fullpage'
-//                       theme={activeTheme as any}
-//                       enableDebug={false}
-//                       progressBar={{
-//                           type: 'percentage',
-//                           showPercentage: true,
-//                           showStepInfo: true,
-//                           position: 'top',
-//                       }}
-//                   />
-//               </div>
-//           </div>
-//       </div>
+    //               <div className="flex items-center gap-2">
+    //                   <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+    //                       <SheetTrigger asChild>
+    //                           <Button variant="outline" className="flex items-center gap-2">
+    //                               <Upload className="h-4 w-4" />
+    //                               Load Survey JSON
+    //                           </Button>
+    //                       </SheetTrigger>
+    //                       <SheetContent className="w-[600px] sm:w-[800px] overflow-y-auto px-4">
+    //                           <SheetHeader>
+    //                               <SheetTitle>Load Survey Configuration</SheetTitle>
+    //                               <SheetDescription>
+    //                                   Paste your survey JSON configuration below to dynamically load a different survey.
+    //                               </SheetDescription>
+    //                           </SheetHeader>
 
-      <div className="container-fluid mx-auto min-h-screen">
-                  <SurveyForm
-                      logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
-                      survey={currentSurvey as any}
-                      onSubmit={handleSubmit}
-                      onChange={handleChange}
-                      layout='fullpage'
-                      theme={activeTheme as any}
-                      enableDebug={false}
-                      progressBar={{
-                          type: 'percentage',
-                          showPercentage: true,
-                          showStepInfo: true,
-                          position: 'top',
-                      }}
-                  />
+    //                           <div className="space-y-4 mt-6">
+    //                               <div className="space-y-2">
+    //                                   <Label htmlFor="json-input">Survey JSON Configuration</Label>
+    //                                   <Textarea
+    //                                       id="json-input"
+    //                                       placeholder="Paste your survey JSON here..."
+    //                                       value={jsonInput}
+    //                                       onChange={(e) => setJsonInput(e.target.value)}
+    //                                       className="min-h-[400px] font-mono text-sm"
+    //                                   />
+    //                               </div>
 
+    //                               {jsonError && (
+    //                                   <Alert className="bg-red-50 text-red-800 border-red-200">
+    //                                       <AlertCircle className="h-4 w-4" />
+    //                                       <AlertTitle>Error</AlertTitle>
+    //                                       <AlertDescription>{jsonError}</AlertDescription>
+    //                                   </Alert>
+    //                               )}
+
+    //                               <div className="flex flex-wrap gap-2">
+    //                                   <Button 
+    //                                       onClick={validateAndLoadJson}
+    //                                       disabled={!jsonInput.trim()}
+    //                                       className="flex items-center gap-2"
+    //                                   >
+    //                                       <Check className="h-4 w-4" />
+    //                                       Load Survey
+    //                                   </Button>
+    //                                   <Button 
+    //                                       variant="outline" 
+    //                                       onClick={loadSampleJson}
+    //                                   >
+    //                                       Load Current JSON
+    //                                   </Button>
+    //                                   <Button 
+    //                                       variant="secondary" 
+    //                                       onClick={clearJson}
+    //                                   >
+    //                                       Clear
+    //                                   </Button>
+    //                               </div>
+
+    //                               <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+    //                                   <h4 className="font-medium mb-2">Expected JSON Format:</h4>
+    //                                   <pre className="text-xs overflow-x-auto">
+    // {`{
+    // "rootNode": {
+    //   "type": "section",
+    //   "name": "Survey Name",
+    //   "uuid": "unique-id",
+    //   "items": [
+    //     {
+    //       "type": "set",
+    //       "name": "Page Name",
+    //       "uuid": "page-uuid",
+    //       "items": [...]
+    //     }
+    //   ]
+    // },
+    // "localizations": {
+    //   "en": {}
+    // }
+    // }`}
+    //                                   </pre>
+    //                               </div>
+    //                           </div>
+    //                       </SheetContent>
+    //                   </Sheet>
+    //               </div>
+    //           </div> */}
+
+    //           {showAlert && (
+    //               <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
+    //                   <Check className="h-5 w-5" />
+    //                   <AlertTitle>Success!</AlertTitle>
+    //                   <AlertDescription>
+    //                       {alertMessage}
+    //                   </AlertDescription>
+    //               </Alert>
+    //           )}
+
+    //           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    //               <div className="lg:col-span-12">
+    //                   <SurveyForm
+    //                       logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
+    //                       survey={currentSurvey}
+    //                       onSubmit={handleSubmit}
+    //                       onChange={handleChange}
+    //                       layout='fullpage'
+    //                       theme={activeTheme as any}
+    //                       enableDebug={false}
+    //                       progressBar={{
+    //                           type: 'percentage',
+    //                           showPercentage: true,
+    //                           showStepInfo: true,
+    //                           position: 'top',
+    //                       }}
+    //                   />
+    //               </div>
+    //           </div>
+    //       </div>
+
+    <div className="container-fluid mx-auto min-h-screen">
+      <SurveyForm
+        logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
+        survey={currentSurvey as any}
+        onSubmit={handleSubmit}
+        onChange={handleChange}
+        layout='fullpage'
+        theme={activeTheme as any}
+        enableDebug={false}
+        progressBar={{
+          type: 'percentage',
+          showPercentage: true,
+          showStepInfo: true,
+          position: 'top',
+        }}
+      />
+      <div className="fixed bottom-4 right-4">
+        <Button
+          type="button"
+          aria-label="Toggle dark/light mode"
+          className="text-xl shadow-none border-0 p-2 rounded-full bg-white/60 dark:bg-[#181d23]/60 ring-1 ring-inset ring-blue-100 dark:ring-teal-700 hover:bg-slate-100 dark:hover:bg-[#202730] transition-transform scale-100 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-teal-400 flex items-center justify-center"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          <span className="inline-flex items-center h-6 w-6">
+            {theme !== 'dark'
+              ? (
+                // Sun Icon
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-blue-700"><circle cx="12" cy="12" r="5" /><path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 6.95l-1.414-1.414M4.464 4.464L3.05 3.05m16.95 1.414l-1.414 1.414M4.464 19.536l-1.414 1.414" /></svg>
+              ) : (
+                // Moon Icon
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-teal-400"><path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 1 0 21 12.79Z" /></svg>
+              )}
+          </span>
+        </Button>
       </div>
+    </div>
   );
 }
