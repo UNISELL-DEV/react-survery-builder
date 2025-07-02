@@ -1,28 +1,28 @@
-import { SurveyForm } from './components/SurveyForm';
+import { SurveyForm } from './renderer/SurveyForm';
 import { SurveyFormProvider, useSurveyForm } from './context/SurveyFormContext';
-import { BlockRenderer } from './components/renderers/BlockRenderer';
-import { TextInputRenderer } from './components/renderers/TextInputRenderer';
-import { TextareaRenderer } from './components/renderers/TextareaRenderer';
-import { RadioRenderer } from './components/renderers/RadioRenderer';
-import { CheckboxRenderer } from './components/renderers/CheckboxRenderer';
-import { SelectRenderer } from './components/renderers/SelectRenderer';
-import { MarkdownRenderer } from './components/renderers/MarkdownRenderer';
-import { HtmlRenderer } from './components/renderers/HtmlRenderer';
-import { RangeRenderer } from './components/renderers/RangeRenderer';
-import { DatePickerRenderer } from './components/renderers/DatePickerRenderer';
-import { FileUploadRenderer } from './components/renderers/FileUploadRenderer';
-import { MatrixRenderer } from './components/renderers/MatrixRenderer';
-import { SelectableBoxRenderer } from './components/renderers/SelectableBoxRenderer';
-import { ScriptRenderer } from './components/renderers/ScriptRenderer';
-import { SetRenderer } from './components/renderers/SetRenderer';
-import { AuthRenderer } from './components/renderers/AuthRenderer';
+import { BlockRenderer } from './renderer/renderers/BlockRenderer';
+import { TextInputRenderer } from './renderer/renderers/TextInputRenderer';
+import { TextareaRenderer } from './renderer/renderers/TextareaRenderer';
+import { RadioRenderer } from './renderer/renderers/RadioRenderer';
+import { CheckboxRenderer } from './renderer/renderers/CheckboxRenderer';
+import { SelectRenderer } from './renderer/renderers/SelectRenderer';
+import { MarkdownRenderer } from './renderer/renderers/MarkdownRenderer';
+import { HtmlRenderer } from './renderer/renderers/HtmlRenderer';
+import { RangeRenderer } from './renderer/renderers/RangeRenderer';
+import { DatePickerRenderer } from './renderer/renderers/DatePickerRenderer';
+import { FileUploadRenderer } from './renderer/renderers/FileUploadRenderer';
+import { MatrixRenderer } from './renderer/renderers/MatrixRenderer';
+import { SelectableBoxRenderer } from './renderer/renderers/SelectableBoxRenderer';
+import { ScriptRenderer } from './renderer/renderers/ScriptRenderer';
+import { SetRenderer } from './renderer/renderers/SetRenderer';
+import { AuthRenderer } from './renderer/renderers/AuthRenderer';
 import { DebugInfo } from './components/ui/DebugInfo';
 
 // New conditional components
-import { ConditionalBlockRenderer } from './components/renderers/ConditionalBlockRenderer';
-import { CalculatedFieldRenderer } from './components/renderers/CalculatedFieldRenderer';
-import { BMICalculatorRenderer } from './components/renderers/BMICalculatorRenderer';
-import { CheckoutRenderer } from './components/renderers/CheckoutRenderer';
+import { ConditionalBlockRenderer } from './renderer/renderers/ConditionalBlockRenderer';
+import { CalculatedFieldRenderer } from './renderer/renderers/CalculatedFieldRenderer';
+import { BMICalculatorRenderer } from './renderer/renderers/BMICalculatorRenderer';
+import { CheckoutRenderer } from './renderer/renderers/CheckoutRenderer';
 import { ValidationSummary } from './components/ui/ValidationSummary';
 
 // Utility functions
@@ -51,7 +51,7 @@ import {
   supportsConditionalRendering,
   supportsBranchingLogic
 } from './utils/blockAdapter';
-import { SurveyBuilder } from './survey/SurveyBuilder';
+import { SurveyBuilder } from './builder/survey/SurveyBuilder';
 
 export { applyDynamicColors } from './utils/colorUtils';
 
@@ -64,7 +64,7 @@ export {
   modernTheme,
   corporateTheme,
   darkTheme
-} from './themes';
+} from './renderer/themes';
 
 export {
   // Main components
@@ -125,7 +125,7 @@ export {
 // Export public types
 export * from './types';
 
-export * from "./survey/SurveyBuilder";
+export * from "./builder/survey/SurveyBuilder";
 
 // Export context and hooks
 export {
@@ -135,10 +135,10 @@ export {
 } from './context/SurveyBuilderContext';
 
 // Export standard blocks
-export * from './components/blocks';
+export * from './builder/blocks';
 
 // Export node definitions
-export * from './components/nodes';
+export * from './builder/nodes';
 
 // Export utility functions
 export * from './utils/nodeUtils';
