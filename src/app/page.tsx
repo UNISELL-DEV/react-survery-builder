@@ -15,19 +15,19 @@ import { useTheme } from 'next-themes';
 const sampleSurvey = {
   "rootNode": {
     "type": "section",
-    "name": "TRT Initial Intake Form",
+    "name": "Career Path Assessment Survey",
     "uuid": "5de71609-0e0e-4c8f-a79a-aa563ad91716",
     "items": [
       {
         "type": "set",
-        "name": "Page 1 - Medical Safety & History",
+        "name": "Page 1 - Background & Experience",
         "uuid": "8f09fe5a-3855-486c-9b05-167953c5dac1",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "allergyHistory",
-            "label": "Have you ever had an adverse or allergic reaction to testosterone or testosterone replacement support medications?",
-            "description": "e.g., testosterone injectable, topical (androgel, testim, bioidentical), clomiphene (clomid), enclomiphene, hcg (human chorionic gonadotropin), gonadorelin, anastrazole (arimadex), or to any of its ingredients?",
+            "fieldName": "experienceLevel",
+            "label": "What is your current level of professional experience in technology?",
+            "description": "This helps us understand your starting point for career recommendations",
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
@@ -35,61 +35,35 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "allergy-yes",
-                "label": "Yes",
-                "value": "yes"
+                "id": "exp-none",
+                "label": "No professional experience",
+                "value": "none"
               },
               {
-                "id": "allergy-no",
-                "label": "No",
-                "value": "no"
+                "id": "exp-entry",
+                "label": "0-2 years experience",
+                "value": "entry"
+              },
+              {
+                "id": "exp-mid",
+                "label": "3-5 years experience",
+                "value": "mid"
+              },
+              {
+                "id": "exp-senior",
+                "label": "5+ years experience",
+                "value": "senior"
               }
             ],
             "uuid": "dd060ccd-cab8-49a5-a007-5f5b638c5901",
             "navigationRules": [
               {
-                "condition": "allergyHistory == \"yes\"",
-                "target": "disq-allergy-1171-4a9b-b076-209d58b86f23",
-                "isPage": true
-              },
-              {
-                "condition": "allergyHistory == \"no\"",
+                "condition": "experienceLevel == \"none\"",
                 "target": "f6366314-ec4a-4af5-8843-5928b7d8b515",
                 "isPage": true
-              }
-            ]
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "medicalAdvice",
-            "label": "Have you been advised to avoid hormone replacement due to a medical condition?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "advice-yes",
-                "label": "Yes",
-                "value": "yes"
               },
               {
-                "id": "advice-no",
-                "label": "No",
-                "value": "no"
-              }
-            ],
-            "uuid": "ac93f201-0f57-4629-b567-46e13b2ced88",
-            "navigationRules": [
-              {
-                "condition": "medicalAdvice == \"yes\"",
-                "target": "disq-medical-1171-4a9b-b076-209d58b86f24",
-                "isPage": true
-              },
-              {
-                "condition": "medicalAdvice == \"no\"",
+                "condition": "experienceLevel != \"none\"",
                 "target": "1c14950b-1171-4a9b-b076-209d58b86f10",
                 "isPage": true
               }
@@ -97,8 +71,8 @@ const sampleSurvey = {
           },
           {
             "type": "selectablebox",
-            "fieldName": "cancerHistory",
-            "label": "Have you ever been diagnosed with prostate, breast, or testicular cancer?",
+            "fieldName": "educationBackground",
+            "label": "What is your educational background?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -107,25 +81,45 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "cancer-yes",
-                "label": "Yes",
-                "value": "yes"
+                "id": "edu-high-school",
+                "label": "High School",
+                "value": "high-school"
               },
               {
-                "id": "cancer-no",
-                "label": "No",
-                "value": "no"
+                "id": "edu-associates",
+                "label": "Associate's Degree",
+                "value": "associates"
+              },
+              {
+                "id": "edu-bachelors",
+                "label": "Bachelor's Degree",
+                "value": "bachelors"
+              },
+              {
+                "id": "edu-masters",
+                "label": "Master's Degree or higher",
+                "value": "masters"
+              },
+              {
+                "id": "edu-bootcamp",
+                "label": "Coding Bootcamp/Certification",
+                "value": "bootcamp"
+              },
+              {
+                "id": "edu-self-taught",
+                "label": "Self-taught",
+                "value": "self-taught"
               }
             ],
-            "uuid": "54197f31-8da6-450c-af52-5ec8f664f5c9",
+            "uuid": "ac93f201-0f57-4629-b567-46e13b2ced88",
             "navigationRules": [
               {
-                "condition": "cancerHistory == \"yes\"",
-                "target": "disq-cancer-1171-4a9b-b076-209d58b86f25",
+                "condition": "educationBackground == \"high-school\" && experienceLevel == \"none\"",
+                "target": "disq-education-1171-4a9b-b076-209d58b86f24",
                 "isPage": true
               },
               {
-                "condition": "cancerHistory == \"no\"",
+                "condition": "educationBackground != \"high-school\" || experienceLevel != \"none\"",
                 "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
                 "isPage": true
               }
@@ -133,8 +127,8 @@ const sampleSurvey = {
           },
           {
             "type": "selectablebox",
-            "fieldName": "polycythemia",
-            "label": "Have you ever been diagnosed with polycythemia (too many red blood cells)?",
+            "fieldName": "careerChange",
+            "label": "Are you looking to change careers or advance in your current field?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -143,25 +137,25 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "poly-yes",
-                "label": "Yes",
-                "value": "yes"
+                "id": "change-career",
+                "label": "Change careers entirely",
+                "value": "change"
               },
               {
-                "id": "poly-no",
-                "label": "No",
-                "value": "no"
+                "id": "advance-current",
+                "label": "Advance in current field",
+                "value": "advance"
+              },
+              {
+                "id": "explore-options",
+                "label": "Just exploring options",
+                "value": "explore"
               }
             ],
-            "uuid": "f4197f31-8da6-450c-af52-5ec8f664f5c0",
+            "uuid": "54197f31-8da6-450c-af52-5ec8f664f5c9",
             "navigationRules": [
               {
-                "condition": "polycythemia == \"yes\"",
-                "target": "disq-poly-1171-4a9b-b076-209d58b86f26",
-                "isPage": true
-              },
-              {
-                "condition": "polycythemia == \"no\"",
+                "condition": "careerChange == \"change\" || careerChange == \"advance\" || careerChange == \"explore\"",
                 "target": "g1c14950b-1171-4a9b-b076-209d58b86f12",
                 "isPage": true
               }
@@ -169,8 +163,56 @@ const sampleSurvey = {
           },
           {
             "type": "selectablebox",
-            "fieldName": "medicalConditions",
-            "label": "Do you have a personal medical history involving any of the following medical conditions?",
+            "fieldName": "workEnvironment",
+            "label": "What work environment do you prefer?",
+            "description": "",
+            "boxSpacing": "4",
+            "defaultValue": "",
+            "showSelectionIndicator": false,
+            "autoContinueOnSelect": true,
+            "showContinueButton": false,
+            "options": [
+              {
+                "id": "remote-only",
+                "label": "Remote only",
+                "value": "remote"
+              },
+              {
+                "id": "office-only",
+                "label": "Office only",
+                "value": "office"
+              },
+              {
+                "id": "hybrid",
+                "label": "Hybrid (mix of remote and office)",
+                "value": "hybrid"
+              },
+              {
+                "id": "no-preference",
+                "label": "No preference",
+                "value": "no-preference"
+              }
+            ],
+            "uuid": "f4197f31-8da6-450c-af52-5ec8f664f5c0",
+            "navigationRules": [
+              {
+                "condition": "workEnvironment == \"remote\" || workEnvironment == \"office\" || workEnvironment == \"hybrid\" || workEnvironment == \"no-preference\"",
+                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 2 - Skills & Interests Assessment",
+        "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b515",
+        "items": [
+          {
+            "type": "selectablebox",
+            "fieldName": "technicalSkills",
+            "label": "Which technical areas interest you most? (Select all that apply)",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -180,138 +222,60 @@ const sampleSurvey = {
             "multiSelect": true,
             "options": [
               {
-                "id": "condition-cardiovascular",
-                "label": "Cardiovascular (Heart Attack, Stroke, BP, Atrial Fibrillation, etc.)",
-                "value": "cardiovascular"
+                "id": "skill-programming",
+                "label": "Programming/Software Development",
+                "value": "programming"
               },
               {
-                "id": "condition-bph",
-                "label": "Benign Prostatic Hyperplasia (BPH)",
-                "value": "bph"
+                "id": "skill-data",
+                "label": "Data Analysis/Data Science",
+                "value": "data"
               },
               {
-                "id": "condition-hematologic",
-                "label": "Hematologic-bleeding or clotting disorders (Deep Vein Thrombosis (DVT) or Pulmonary Embolism (PE))",
-                "value": "hematologic"
+                "id": "skill-design",
+                "label": "UI/UX Design",
+                "value": "design"
               },
               {
-                "id": "condition-hepatic",
-                "label": "Hepatic-Liver conditions (Hepatitis, Jaundice, Liver Dysfunction)",
-                "value": "hepatic"
+                "id": "skill-cybersecurity",
+                "label": "Cybersecurity",
+                "value": "cybersecurity"
               },
               {
-                "id": "condition-edema",
-                "label": "Edema (Swelling of the legs)",
-                "value": "edema"
+                "id": "skill-cloud",
+                "label": "Cloud Computing/DevOps",
+                "value": "cloud"
               },
               {
-                "id": "condition-gynecomastia",
-                "label": "Gynecomastia",
-                "value": "gynecomastia"
+                "id": "skill-ai",
+                "label": "Artificial Intelligence/Machine Learning",
+                "value": "ai"
               },
               {
-                "id": "condition-hypercalcemia",
-                "label": "Hypercalcemia",
-                "value": "hypercalcemia"
+                "id": "skill-mobile",
+                "label": "Mobile App Development",
+                "value": "mobile"
               },
               {
-                "id": "condition-prolactin",
-                "label": "High Prolactin",
-                "value": "high-prolactin"
+                "id": "skill-project-management",
+                "label": "Project Management",
+                "value": "project-management"
               },
               {
-                "id": "condition-sleep-apnea",
-                "label": "Untreated or severe sleep apnea",
-                "value": "sleep-apnea"
-              },
-              {
-                "id": "condition-none",
+                "id": "skill-none",
                 "label": "None of the above",
-                "value": "none"
-              }
-            ],
-            "uuid": "h4197f31-8da6-450c-af52-5ec8f664f5c1",
-            "navigationRules": [
-              {
-                "condition": "medicalConditions.includes(\"cardiovascular\") || medicalConditions.includes(\"bph\") || medicalConditions.includes(\"hematologic\") || medicalConditions.includes(\"hepatic\") || medicalConditions.includes(\"edema\") || medicalConditions.includes(\"gynecomastia\") || medicalConditions.includes(\"hypercalcemia\") || medicalConditions.includes(\"high-prolactin\") || medicalConditions.includes(\"sleep-apnea\")",
-                "target": "disq-conditions-1171-4a9b-b076-209d58b86f27",
-                "isPage": true
-              },
-              {
-                "condition": "medicalConditions.includes(\"none\") || !medicalConditions.some(condition => [\"cardiovascular\", \"bph\", \"hematologic\", \"hepatic\", \"edema\", \"gynecomastia\", \"hypercalcemia\", \"high-prolactin\", \"sleep-apnea\"].includes(condition))",
-                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
-                "isPage": true
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 2 - Medication History",
-        "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b515",
-        "items": [
-          {
-            "type": "selectablebox",
-            "fieldName": "medicationHistory",
-            "label": "Are you currently taking or have you taken any of the following in the past?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "med-testosterone-injectable",
-                "label": "Testosterone Injectable",
-                "value": "testosterone-injectable"
-              },
-              {
-                "id": "med-testosterone-topical",
-                "label": "Testosterone Topical (Androgel, Testim, Bioidentical)",
-                "value": "testosterone-topical"
-              },
-              {
-                "id": "med-clomiphene",
-                "label": "Clomiphene (Clomid)",
-                "value": "clomiphene"
-              },
-              {
-                "id": "med-enclomiphene",
-                "label": "Enclomiphene",
-                "value": "enclomiphene"
-              },
-              {
-                "id": "med-hcg",
-                "label": "HCG (Human Chorionic Gonadotropin)",
-                "value": "hcg"
-              },
-              {
-                "id": "med-gonadorelin",
-                "label": "Gonadorelin",
-                "value": "gonadorelin"
-              },
-              {
-                "id": "med-anastrazole",
-                "label": "Anastrazole (Arimadex)",
-                "value": "anastrazole"
-              },
-              {
-                "id": "med-none",
-                "label": "No",
                 "value": "none"
               }
             ],
             "uuid": "a775a4da-b947-4b4b-8067-df8b462ca635",
             "navigationRules": [
               {
-                "condition": "medicationHistory == \"none\"",
-                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "condition": "technicalSkills.includes(\"none\")",
+                "target": "disq-interest-1171-4a9b-b076-209d58b86f25",
                 "isPage": true
               },
               {
-                "condition": "medicationHistory != \"none\"",
+                "condition": "!technicalSkills.includes(\"none\")",
                 "target": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
                 "isPage": true
               }
@@ -319,9 +283,9 @@ const sampleSurvey = {
           },
           {
             "type": "selectablebox",
-            "fieldName": "medicationTiming",
-            "label": "Are you currently taking this medication, or did you take it previously?",
-            "description": "Only answer if you selected a medication above (not 'No')",
+            "fieldName": "learningStyle",
+            "label": "How do you prefer to learn new skills?",
+            "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
@@ -329,20 +293,30 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "timing-current",
-                "label": "Currently taking the medication",
-                "value": "current"
+                "id": "learn-formal",
+                "label": "Formal education (university, courses)",
+                "value": "formal"
               },
               {
-                "id": "timing-previous",
-                "label": "Previously took this medication",
-                "value": "previous"
+                "id": "learn-online",
+                "label": "Online tutorials and self-study",
+                "value": "online"
+              },
+              {
+                "id": "learn-hands-on",
+                "label": "Hands-on projects and practice",
+                "value": "hands-on"
+              },
+              {
+                "id": "learn-mentorship",
+                "label": "Mentorship and guidance",
+                "value": "mentorship"
               }
             ],
             "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c990",
             "navigationRules": [
               {
-                "condition": "medicationTiming == \"current\" || medicationTiming == \"previous\"",
+                "condition": "learningStyle == \"formal\" || learningStyle == \"online\" || learningStyle == \"hands-on\" || learningStyle == \"mentorship\"",
                 "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
                 "isPage": true
               }
@@ -350,10 +324,10 @@ const sampleSurvey = {
           },
           {
             "type": "textfield",
-            "fieldName": "medicationDose",
-            "label": "What dose were you taking, or are you taking currently?",
-            "placeholder": "Enter dosage information (leave blank if not applicable)",
-            "description": "Only fill this out if you selected a medication in the first question",
+            "fieldName": "previousExperience",
+            "label": "Briefly describe any relevant experience or projects you've worked on",
+            "placeholder": "e.g., Built a personal website, completed online courses, worked on team projects...",
+            "description": "This helps us better understand your background",
             "defaultValue": "",
             "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb"
           }
@@ -361,13 +335,13 @@ const sampleSurvey = {
       },
       {
         "type": "set",
-        "name": "Page 3 - Sexual Health Assessment",
+        "name": "Page 3 - Work Style Assessment",
         "uuid": "i1c14950b-1171-4a9b-b076-209d58b86f13",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "libidoRating",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): libido (sex drive)",
+            "fieldName": "problemSolving",
+            "label": "Rate your problem-solving abilities on a scale of 1-5 (5 being excellent)",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -376,28 +350,28 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "libido-1",
-                "label": "One",
+                "id": "problem-1",
+                "label": "1 - Need significant help",
                 "value": "1"
               },
               {
-                "id": "libido-2",
-                "label": "Two",
+                "id": "problem-2",
+                "label": "2 - Below average",
                 "value": "2"
               },
               {
-                "id": "libido-3",
-                "label": "Three",
+                "id": "problem-3",
+                "label": "3 - Average",
                 "value": "3"
               },
               {
-                "id": "libido-4",
-                "label": "Four",
+                "id": "problem-4",
+                "label": "4 - Above average",
                 "value": "4"
               },
               {
-                "id": "libido-5",
-                "label": "Five",
+                "id": "problem-5",
+                "label": "5 - Excellent",
                 "value": "5"
               }
             ],
@@ -405,8 +379,8 @@ const sampleSurvey = {
           },
           {
             "type": "selectablebox",
-            "fieldName": "erectionStrength",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (5 being greatest): erection strength",
+            "fieldName": "teamwork",
+            "label": "Rate your teamwork and collaboration skills on a scale of 1-5 (5 being excellent)",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -415,28 +389,28 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "erection-1",
-                "label": "One",
+                "id": "team-1",
+                "label": "1 - Prefer working alone",
                 "value": "1"
               },
               {
-                "id": "erection-2",
-                "label": "Two",
+                "id": "team-2",
+                "label": "2 - Below average",
                 "value": "2"
               },
               {
-                "id": "erection-3",
-                "label": "Three",
+                "id": "team-3",
+                "label": "3 - Average",
                 "value": "3"
               },
               {
-                "id": "erection-4",
-                "label": "Four",
+                "id": "team-4",
+                "label": "4 - Above average",
                 "value": "4"
               },
               {
-                "id": "erection-5",
-                "label": "Five",
+                "id": "team-5",
+                "label": "5 - Excellent team player",
                 "value": "5"
               }
             ],
@@ -446,52 +420,68 @@ const sampleSurvey = {
       },
       {
         "type": "set",
-        "name": "Page 4 - Mental Health & Well-being Assessment",
+        "name": "Page 4 - Career Motivation Assessment",
         "uuid": "m1c14950b-1171-4a9b-b076-209d58b86f15",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "energyLevel",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): energy level",
+            "fieldName": "motivationFactors",
+            "label": "What motivates you most in a career? (Select up to 3)",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
             "autoContinueOnSelect": true,
             "showContinueButton": false,
+            "multiSelect": true,
             "options": [
               {
-                "id": "energy-1",
-                "label": "One",
-                "value": "1"
+                "id": "motiv-salary",
+                "label": "High salary potential",
+                "value": "salary"
               },
               {
-                "id": "energy-2",
-                "label": "Two",
-                "value": "2"
+                "id": "motiv-creativity",
+                "label": "Creative expression",
+                "value": "creativity"
               },
               {
-                "id": "energy-3",
-                "label": "Three",
-                "value": "3"
+                "id": "motiv-impact",
+                "label": "Making a positive impact",
+                "value": "impact"
               },
               {
-                "id": "energy-4",
-                "label": "Four",
-                "value": "4"
+                "id": "motiv-flexibility",
+                "label": "Work-life balance and flexibility",
+                "value": "flexibility"
               },
               {
-                "id": "energy-5",
-                "label": "Five",
-                "value": "5"
+                "id": "motiv-growth",
+                "label": "Continuous learning and growth",
+                "value": "growth"
+              },
+              {
+                "id": "motiv-stability",
+                "label": "Job security and stability",
+                "value": "stability"
+              },
+              {
+                "id": "motiv-innovation",
+                "label": "Working with cutting-edge technology",
+                "value": "innovation"
+              },
+              {
+                "id": "motiv-leadership",
+                "label": "Leadership opportunities",
+                "value": "leadership"
               }
             ],
             "uuid": "n4197f31-8da6-450c-af52-5ec8f664f5c4"
           },
           {
             "type": "selectablebox",
-            "fieldName": "enjoymentOfLife",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): enjoyment of life",
+            "fieldName": "workPace",
+            "label": "What work pace do you prefer?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -500,37 +490,32 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "enjoyment-1",
-                "label": "One",
-                "value": "1"
+                "id": "pace-fast",
+                "label": "Fast-paced, dynamic environment",
+                "value": "fast"
               },
               {
-                "id": "enjoyment-2",
-                "label": "Two",
-                "value": "2"
+                "id": "pace-moderate",
+                "label": "Moderate pace with steady progress",
+                "value": "moderate"
               },
               {
-                "id": "enjoyment-3",
-                "label": "Three",
-                "value": "3"
+                "id": "pace-methodical",
+                "label": "Methodical, careful approach",
+                "value": "methodical"
               },
               {
-                "id": "enjoyment-4",
-                "label": "Four",
-                "value": "4"
-              },
-              {
-                "id": "enjoyment-5",
-                "label": "Five",
-                "value": "5"
+                "id": "pace-variable",
+                "label": "Variable pace depending on project",
+                "value": "variable"
               }
             ],
             "uuid": "p4197f31-8da6-450c-af52-5ec8f664f5c5"
           },
           {
             "type": "selectablebox",
-            "fieldName": "depressionFeelings",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of depression",
+            "fieldName": "communicationPreference",
+            "label": "How much do you enjoy communicating with clients/stakeholders?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -539,83 +524,39 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "depression-1",
-                "label": "One",
-                "value": "1"
+                "id": "comm-love",
+                "label": "Love it - I'm energized by client interaction",
+                "value": "love"
               },
               {
-                "id": "depression-2",
-                "label": "Two",
-                "value": "2"
+                "id": "comm-enjoy",
+                "label": "Enjoy it in moderation",
+                "value": "enjoy"
               },
               {
-                "id": "depression-3",
-                "label": "Three",
-                "value": "3"
+                "id": "comm-tolerate",
+                "label": "Can tolerate it when necessary",
+                "value": "tolerate"
               },
               {
-                "id": "depression-4",
-                "label": "Four",
-                "value": "4"
-              },
-              {
-                "id": "depression-5",
-                "label": "Five",
-                "value": "5"
+                "id": "comm-avoid",
+                "label": "Prefer to minimize client interaction",
+                "value": "avoid"
               }
             ],
             "uuid": "r4197f31-8da6-450c-af52-5ec8f664f5c6"
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "anxietyFeelings",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): feelings of anxiety",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "anxiety-1",
-                "label": "One",
-                "value": "1"
-              },
-              {
-                "id": "anxiety-2",
-                "label": "Two",
-                "value": "2"
-              },
-              {
-                "id": "anxiety-3",
-                "label": "Three",
-                "value": "3"
-              },
-              {
-                "id": "anxiety-4",
-                "label": "Four",
-                "value": "4"
-              },
-              {
-                "id": "anxiety-5",
-                "label": "Five",
-                "value": "5"
-              }
-            ],
-            "uuid": "t4197f31-8da6-450c-af52-5ec8f664f5c7"
           }
         ]
       },
       {
         "type": "set",
-        "name": "Page 5 - Physical Performance Assessment",
+        "name": "Page 5 - Final Preferences",
         "uuid": "u1c14950b-1171-4a9b-b076-209d58b86f19",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "strengthEndurance",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): strength and/or endurance?",
+            "fieldName": "salaryExpectation",
+            "label": "What is your target salary range? (USD annually)",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -624,37 +565,37 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "strength-1",
-                "label": "One",
-                "value": "1"
+                "id": "salary-40k",
+                "label": "$40,000 - $60,000",
+                "value": "40k-60k"
               },
               {
-                "id": "strength-2",
-                "label": "Two",
-                "value": "2"
+                "id": "salary-60k",
+                "label": "$60,000 - $80,000",
+                "value": "60k-80k"
               },
               {
-                "id": "strength-3",
-                "label": "Three",
-                "value": "3"
+                "id": "salary-80k",
+                "label": "$80,000 - $120,000",
+                "value": "80k-120k"
               },
               {
-                "id": "strength-4",
-                "label": "Four",
-                "value": "4"
+                "id": "salary-120k",
+                "label": "$120,000+",
+                "value": "120k+"
               },
               {
-                "id": "strength-5",
-                "label": "Five",
-                "value": "5"
+                "id": "salary-unsure",
+                "label": "Not sure yet",
+                "value": "unsure"
               }
             ],
             "uuid": "v4197f31-8da6-450c-af52-5ec8f664f5c8"
           },
           {
             "type": "selectablebox",
-            "fieldName": "sportsAbility",
-            "label": "Rank the following as it applies to you on a scale of 1-5 (1 is worst, 5 is best): ability to play sports",
+            "fieldName": "timeToCommit",
+            "label": "How much time can you dedicate to skill development per week?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -663,37 +604,32 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "sports-1",
-                "label": "One",
-                "value": "1"
+                "id": "time-5",
+                "label": "Less than 5 hours",
+                "value": "under-5"
               },
               {
-                "id": "sports-2",
-                "label": "Two",
-                "value": "2"
+                "id": "time-10",
+                "label": "5-10 hours",
+                "value": "5-10"
               },
               {
-                "id": "sports-3",
-                "label": "Three",
-                "value": "3"
+                "id": "time-20",
+                "label": "10-20 hours",
+                "value": "10-20"
               },
               {
-                "id": "sports-4",
-                "label": "Four",
-                "value": "4"
-              },
-              {
-                "id": "sports-5",
-                "label": "Five",
-                "value": "5"
+                "id": "time-20plus",
+                "label": "20+ hours (full-time commitment)",
+                "value": "20+"
               }
             ],
             "uuid": "x4197f31-8da6-450c-af52-5ec8f664f5c9"
           },
           {
             "type": "selectablebox",
-            "fieldName": "heightLoss",
-            "label": "Have you lost height?",
+            "fieldName": "startupVsCorporate",
+            "label": "Do you prefer startup culture or corporate environment?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
@@ -702,57 +638,46 @@ const sampleSurvey = {
             "showContinueButton": false,
             "options": [
               {
-                "id": "height-yes",
-                "label": "Yes",
-                "value": "yes"
+                "id": "culture-startup",
+                "label": "Startup - fast-paced, innovative, wearing many hats",
+                "value": "startup"
               },
               {
-                "id": "height-no",
-                "label": "No",
-                "value": "no"
-              }
-            ],
-            "uuid": "z4197f31-8da6-450c-af52-5ec8f664f5d0"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Page 6 - Treatment Preferences",
-        "uuid": "aa1c14950b-1171-4a9b-b076-209d58b86f22",
-        "items": [
-          {
-            "type": "selectablebox",
-            "fieldName": "fertilityConcerns",
-            "label": "Are you concerned with the side effects of low sperm count and decreased fertility that can occur with Testosterone?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "fertility-yes",
-                "label": "Yes",
-                "value": "yes"
+                "id": "culture-corporate",
+                "label": "Corporate - structured, stable, defined roles",
+                "value": "corporate"
               },
               {
-                "id": "fertility-no",
-                "label": "No",
-                "value": "no"
+                "id": "culture-either",
+                "label": "Either works for me",
+                "value": "either"
               }
             ],
-            "uuid": "bb4197f31-8da6-450c-af52-5ec8f664f5d1",
+            "uuid": "z4197f31-8da6-450c-af52-5ec8f664f5d0",
             "navigationRules": [
               {
-                "condition": "fertilityConcerns == \"yes\"",
-                "target": "qualified-enclo-1171-4a9b-b076-209d58b86f29",
+                "condition": "technicalSkills.includes(\"programming\") || technicalSkills.includes(\"mobile\")",
+                "target": "qualified-developer-1171-4a9b-b076-209d58b86f28",
                 "isPage": true
               },
               {
-                "condition": "fertilityConcerns == \"no\"",
-                "target": "qualified-test-1171-4a9b-b076-209d58b86f28",
+                "condition": "technicalSkills.includes(\"data\") || technicalSkills.includes(\"ai\")",
+                "target": "qualified-data-1171-4a9b-b076-209d58b86f29",
+                "isPage": true
+              },
+              {
+                "condition": "technicalSkills.includes(\"design\")",
+                "target": "qualified-design-1171-4a9b-b076-209d58b86f30",
+                "isPage": true
+              },
+              {
+                "condition": "technicalSkills.includes(\"project-management\") || communicationPreference == \"love\"",
+                "target": "qualified-management-1171-4a9b-b076-209d58b86f31",
+                "isPage": true
+              },
+              {
+                "condition": "true",
+                "target": "qualified-general-1171-4a9b-b076-209d58b86f32",
                 "isPage": true
               }
             ]
@@ -761,87 +686,42 @@ const sampleSurvey = {
       },
       {
         "type": "set",
-        "name": "Disqualified - Allergy",
-        "uuid": "disq-allergy-1171-4a9b-b076-209d58b86f23",
+        "name": "Needs More Preparation",
+        "uuid": "disq-education-1171-4a9b-b076-209d58b86f24",
         "items": [
           {
             "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your allergy history with testosterone or related medications, we cannot safely provide TRT treatment at this time.</p><p class=\"text-sm text-gray-500\">We recommend consulting with your healthcare provider for alternative treatment options.</p></div></div>",
-            "variableName": "",
-            "className": "",
-            "uuid": "disq-allergy-html-uuid",
-            "isEndBlock": true
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Disqualified - Medical Condition",
-        "uuid": "disq-medical-1171-4a9b-b076-209d58b86f24",
-        "items": [
-          {
-            "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on medical advice you've received to avoid hormone replacement therapy, we cannot provide TRT treatment at this time.</p><p class=\"text-sm text-gray-500\">Please follow your healthcare provider's recommendations regarding hormone replacement therapy.</p></div></div>",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-yellow-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Let's Build Your Foundation First!</h2><p class=\"text-gray-600 mb-6\">Based on your current background, we recommend building some foundational skills before diving into a specific tech career path.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Recommended next steps:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Consider taking basic computer science courses</li><li>• Try free online coding tutorials</li><li>• Explore community college tech programs</li><li>• Build a simple project to test your interest</li></ul></div></div></div>",
             "variableName": "",
             "className": "",
             "isEndBlock": true,
-            "uuid": "disq-medical-html-uuid"
+            "uuid": "disq-education-html-uuid"
           }
         ]
       },
       {
         "type": "set",
-        "name": "Disqualified - Cancer History",
-        "uuid": "disq-cancer-1171-4a9b-b076-209d58b86f25",
+        "name": "Explore Other Interests",
+        "uuid": "disq-interest-1171-4a9b-b076-209d58b86f25",
         "items": [
           {
             "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Due to your history of prostate, breast, or testicular cancer, TRT treatment is not recommended and could be unsafe.</p><p class=\"text-sm text-gray-500\">Please consult with your oncologist for appropriate treatment options.</p></div></div>",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-purple-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Let's Explore Your Interests!</h2><p class=\"text-gray-600 mb-6\">It looks like you haven't found your tech passion yet. That's perfectly okay! Technology offers many different paths.</p><div class=\"bg-green-50 border border-green-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-green-900 mb-2\">We recommend:</h3><ul class=\"text-sm text-green-800 space-y-1\"><li>• Take our detailed skills assessment</li><li>• Try introductory courses in different areas</li><li>• Attend tech meetups and networking events</li><li>• Shadow professionals in various tech roles</li></ul></div></div></div>",
             "variableName": "",
             "className": "",
             "isEndBlock": true,
-            "uuid": "disq-cancer-html-uuid"
+            "uuid": "disq-interest-html-uuid"
           }
         ]
       },
       {
         "type": "set",
-        "name": "Disqualified - Polycythemia",
-        "uuid": "disq-poly-1171-4a9b-b076-209d58b86f26",
+        "name": "Software Developer Path",
+        "uuid": "qualified-developer-1171-4a9b-b076-209d58b86f28",
         "items": [
           {
             "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Your history of polycythemia (high red blood cell count) makes TRT treatment unsafe, as it can further increase red blood cell production.</p><p class=\"text-sm text-gray-500\">Please work with your hematologist to manage your condition.</p></div></div>",
-            "variableName": "",
-            "className": "",
-            "isEndBlock": true,
-            "uuid": "disq-poly-html-uuid"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Disqualified - Medical Conditions",
-        "uuid": "disq-conditions-1171-4a9b-b076-209d58b86f27",
-        "items": [
-          {
-            "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-red-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M6 18L18 6M6 6l12 12\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Unfortunately, you don't qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your medical history, TRT treatment may not be safe for you at this time. Your existing conditions require careful management.</p><p class=\"text-sm text-gray-500\">Please consult with your healthcare provider about alternative treatment options that are appropriate for your medical conditions.</p></div></div>",
-            "variableName": "",
-            "className": "",
-            "isEndBlock": true,
-            "uuid": "disq-conditions-html-uuid"
-          }
-        ]
-      },
-      {
-        "type": "set",
-        "name": "Qualified - Testosterone Treatment",
-        "uuid": "qualified-test-1171-4a9b-b076-209d58b86f28",
-        "items": [
-          {
-            "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for TRT</h2><p class=\"text-gray-600 mb-6\">Based on your responses, you appear to be a good candidate for Testosterone Replacement Therapy. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">What happens next:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Medical review of your responses</li><li>• Lab work coordination</li><li>• Treatment plan development</li><li>• Medication delivery setup</li></ul></div></div></div>",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Perfect! You're suited for Software Development</h2><p class=\"text-gray-600 mb-6\">Based on your interests and skills, we recommend pursuing a career in software development. You show strong problem-solving aptitude and interest in programming.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Your development path:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Start with web development fundamentals (HTML, CSS, JavaScript)</li><li>• Learn a backend language (Python, Java, or Node.js)</li><li>• Build portfolio projects</li><li>• Contribute to open source projects</li><li>• Apply for junior developer positions</li></ul></div><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4\"><p class=\"text-sm text-gray-700\"><strong>Salary Range:</strong> $60,000 - $150,000+ depending on experience and location</p></div></div></div>",
             "variableName": "",
             "className": "",
             "showContinueButton": true,
@@ -852,18 +732,18 @@ const sampleSurvey = {
                 "isPage": true
               }
             ],
-            "uuid": "qualified-test-html-uuid"
+            "uuid": "qualified-developer-html-uuid"
           }
         ]
       },
       {
         "type": "set",
-        "name": "Qualified - Enclomiphene Treatment",
-        "uuid": "qualified-enclo-1171-4a9b-b076-209d58b86f29",
+        "name": "Data Science Path",
+        "uuid": "qualified-data-1171-4a9b-b076-209d58b86f29",
         "items": [
           {
             "type": "html",
-            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Congratulations! You qualify for Enclomiphene</h2><p class=\"text-gray-600 mb-6\">Based on your fertility concerns, we recommend Enclomiphene treatment, which can help boost testosterone while preserving fertility. Our medical team will review your information and contact you with next steps.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Benefits of Enclomiphene:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Increases natural testosterone production</li><li>• Preserves fertility and sperm production</li><li>• Oral medication (no injections)</li><li>• Fewer side effects than traditional TRT</li></ul></div></div></div>",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Excellent! You're ideal for Data Science</h2><p class=\"text-gray-600 mb-6\">Your interest in data analysis and AI, combined with your analytical thinking, makes you a great candidate for data science roles.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Your learning roadmap:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Master Python and SQL</li><li>• Learn statistics and mathematics</li><li>• Study machine learning algorithms</li><li>• Work with data visualization tools</li><li>• Build data science portfolio projects</li></ul></div><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4\"><p class=\"text-sm text-gray-700\"><strong>Salary Range:</strong> $70,000 - $180,000+ for experienced data scientists</p></div></div></div>",
             "variableName": "",
             "className": "",
             "showContinueButton": true,
@@ -874,27 +754,95 @@ const sampleSurvey = {
                 "isPage": true
               }
             ],
-            "uuid": "qualified-enclo-html-uuid"
+            "uuid": "qualified-data-html-uuid"
           }
         ]
       },
       {
         "type": "set",
-        "name": "Page 14",
+        "name": "UI/UX Design Path",
+        "uuid": "qualified-design-1171-4a9b-b076-209d58b86f30",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Great Choice! UI/UX Design is Perfect for You</h2><p class=\"text-gray-600 mb-6\">Your creative interests and user-focused thinking make you an ideal candidate for UI/UX design roles in the tech industry.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Your design journey:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Learn design principles and user psychology</li><li>• Master design tools (Figma, Sketch, Adobe Creative Suite)</li><li>• Study user research methods</li><li>• Build a strong design portfolio</li><li>• Practice with real client projects</li></ul></div><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4\"><p class=\"text-sm text-gray-700\"><strong>Salary Range:</strong> $55,000 - $140,000+ for senior UX designers</p></div></div></div>",
+            "variableName": "",
+            "className": "",
+            "showContinueButton": true,
+            "navigationRules": [
+              {
+                "condition": "true",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              }
+            ],
+            "uuid": "qualified-design-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Tech Management Path",
+        "uuid": "qualified-management-1171-4a9b-b076-209d58b86f31",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Perfect! You're Built for Tech Management</h2><p class=\"text-gray-600 mb-6\">Your strong communication skills and interest in project management make you ideal for technical leadership roles.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Your leadership path:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Develop project management skills (Agile, Scrum)</li><li>• Learn basic technical concepts</li><li>• Study team leadership and communication</li><li>• Get certified in project management (PMP, CSM)</li><li>• Start as associate product manager or project coordinator</li></ul></div><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4\"><p class=\"text-sm text-gray-700\"><strong>Salary Range:</strong> $65,000 - $160,000+ for senior technical managers</p></div></div></div>",
+            "variableName": "",
+            "className": "",
+            "showContinueButton": true,
+            "navigationRules": [
+              {
+                "condition": "true",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              }
+            ],
+            "uuid": "qualified-management-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "General Tech Path",
+        "uuid": "qualified-general-1171-4a9b-b076-209d58b86f32",
+        "items": [
+          {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center\"><div class=\"mb-6\"><div class=\"mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center\"><svg class=\"w-8 h-8 text-green-600\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M5 13l4 4L19 7\"></path></svg></div></div><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">You Have Great Potential in Tech!</h2><p class=\"text-gray-600 mb-6\">Based on your responses, you have multiple strengths that could lead to success in various tech roles. We recommend exploring several areas to find your best fit.</p><div class=\"bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6\"><h3 class=\"font-semibold text-blue-900 mb-2\">Explore these areas:</h3><ul class=\"text-sm text-blue-800 space-y-1\"><li>• Try introductory courses in programming, design, and data analysis</li><li>• Attend tech meetups and networking events</li><li>• Consider a tech bootcamp with career exploration</li><li>• Shadow professionals in different tech roles</li><li>• Start with general tech support or operations roles</li></ul></div><div class=\"bg-gray-50 border border-gray-200 rounded-lg p-4 mt-4\"><p class=\"text-sm text-gray-700\"><strong>Entry Salary Range:</strong> $40,000 - $70,000 with growth potential to $100,000+</p></div></div></div>",
+            "variableName": "",
+            "className": "",
+            "showContinueButton": true,
+            "navigationRules": [
+            ],
+            "uuid": "qualified-general-html-uuid"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Get Your Personalized Career Plan",
         "uuid": "40bf913e-76ac-432a-bac8-981acdad2712",
         "items": [
           {
+            "type": "html",
+            "html": "<div class=\"w-full max-w-2xl mx-auto py-8 px-4\"><div class=\"text-center mb-8\"><h2 class=\"text-2xl font-bold text-gray-900 mb-4\">Ready to Start Your Tech Journey?</h2><p class=\"text-gray-600\">Get your personalized career roadmap, resource recommendations, and access to our mentorship program.</p></div></div>",
+            "variableName": "",
+            "className": "",
+            "uuid": "career-plan-intro-html"
+          },
+          {
             "type": "checkout",
-            "fieldName": "checkout6897",
-            "label": "Last step to go!",
-            "description": "Please provide your shipping details.",
-            "showContactInfo": false,
-            "showShippingAddress": true,
-            "showBillingAddress": true,
-            "sameAsBilling": true,
-            "requireEmail": false,
-            "requirePhone": false,
-            "collectFullName": false,
+            "fieldName": "careerPlanCheckout",
+            "label": "Get Your Career Plan",
+            "description": "Enter your contact information to receive your personalized tech career roadmap and resources.",
+            "showContactInfo": true,
+            "showShippingAddress": false,
+            "showBillingAddress": false,
+            "sameAsBilling": false,
+            "requireEmail": true,
+            "requirePhone": true,
+            "collectFullName": true,
             "allowCompany": false,
             "defaultCountry": "US",
             "className": "",
@@ -913,67 +861,67 @@ const sampleSurvey = {
     "en": {}
   },
   "theme": {
-    "name": "colorful",
-    "containerLayout": "max-w-full mx-auto py-6 px-4 sm:px-6",
-    "header": "mb-10",
-    "title": "text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6 text-center",
-    "description": "text-lg text-gray-700 mb-8 text-center",
-    "background": "bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50",
-    "card": "bg-white shadow-lg rounded-2xl p-8 mb-8 border border-purple-100",
+    "name": "clean",
+    "containerLayout": "max-w-2xl mx-auto py-8 px-4 sm:px-6",
+    "header": "mb-8",
+    "title": "text-3xl font-semibold text-gray-900 mb-4 text-left",
+    "description": "text-lg text-gray-600 mb-6 text-left",
+    "background": "bg-white",
+    "card": "bg-white shadow-sm rounded-lg p-6 mb-6 border border-gray-200",
     "container": {
-      "card": "bg-white border border-purple-200 rounded-2xl shadow-sm",
-      "border": "border-purple-200",
-      "activeBorder": "border-purple-500",
-      "activeBg": "bg-purple-50",
-      "header": "bg-gradient-to-r from-purple-500 to-pink-500"
+      "card": "bg-white border border-gray-200 rounded-lg shadow-sm",
+      "border": "border-gray-200",
+      "activeBorder": "border-gray-400",
+      "activeBg": "bg-gray-50",
+      "header": "bg-gray-100"
     },
     "field": {
-      "label": "block text-base font-semibold text-gray-800 mb-3",
-      "input": "w-full rounded-xl border-purple-200 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-base py-3 px-4",
+      "label": "block text-base font-medium text-gray-900 mb-4",
+      "input": "w-full rounded-lg border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 text-base py-3 px-4",
       "description": "mt-2 text-sm text-gray-600",
       "error": "mt-2 text-sm text-red-600 font-medium",
-      "radio": "focus:ring-purple-500 h-5 w-5 text-purple-600 border-purple-300",
-      "checkbox": "focus:ring-purple-500 h-5 w-5 text-purple-600 border-purple-300 rounded-md",
-      "select": "w-full rounded-xl border-purple-200 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-base py-3 px-4",
-      "textarea": "w-full rounded-xl border-purple-200 shadow-sm focus:border-purple-500 focus:ring-purple-500 text-base py-3 px-4",
-      "file": "w-full text-base text-gray-900 border border-purple-200 rounded-xl cursor-pointer bg-purple-50 py-3 px-4",
-      "matrix": "border-collapse w-full text-base rounded-xl overflow-hidden",
-      "range": "accent-purple-600",
-      "text": "text-gray-800",
-      "activeText": "text-purple-600",
-      "placeholder": "text-gray-400",
-      "boxBorder": "border-purple-300",
-      "selectableBox": "p-6 transition-all duration-300 cursor-pointer rounded-2xl transform hover:scale-105",
-      "selectableBoxDefault": "border-2 border-purple-200 bg-white shadow-sm",
-      "selectableBoxSelected": "border-purple-500 bg-gradient-to-r from-purple-50 to-pink-50 shadow-lg ring-2 ring-purple-200",
-      "selectableBoxHover": "hover:border-purple-400 hover:shadow-md",
-      "selectableBoxFocus": "focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2",
-      "selectableBoxDisabled": "opacity-50 cursor-not-allowed transform-none",
-      "selectableBoxContainer": "",
-      "selectableBoxText": "text-gray-800 text-base font-semibold",
-      "selectableBoxTextSelected": "text-purple-700 font-bold",
-      "selectableBoxIndicator": "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg",
+      "radio": "focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300",
+      "checkbox": "focus:ring-gray-500 h-4 w-4 text-gray-600 border-gray-300 rounded",
+      "select": "w-full rounded-lg border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 text-base py-3 px-4",
+      "textarea": "w-full rounded-lg border-gray-300 shadow-sm focus:border-gray-500 focus:ring-gray-500 text-base py-3 px-4",
+      "file": "w-full text-base text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 py-3 px-4",
+      "matrix": "border-collapse w-full text-base rounded-lg overflow-hidden",
+      "range": "accent-gray-600",
+      "text": "text-gray-900",
+      "activeText": "text-gray-900",
+      "placeholder": "text-gray-500",
+      "boxBorder": "border-gray-300",
+      "selectableBox": "p-5 transition-all duration-200 cursor-pointer rounded-lg",
+      "selectableBoxDefault": "border border-gray-300 bg-white hover:bg-gray-50",
+      "selectableBoxSelected": "border border-gray-400 bg-gray-50",
+      "selectableBoxHover": "hover:border-gray-400",
+      "selectableBoxFocus": "focus-within:ring-2 focus-within:ring-gray-500 focus-within:ring-offset-2",
+      "selectableBoxDisabled": "opacity-50 cursor-not-allowed",
+      "selectableBoxContainer": "space-y-3",
+      "selectableBoxText": "text-gray-900 text-base font-normal",
+      "selectableBoxTextSelected": "text-gray-900 font-normal",
+      "selectableBoxIndicator": "bg-gray-600 text-white",
       "selectableBoxIndicatorIcon": "text-white"
     },
     "progress": {
-      "bar": "h-3 bg-[#3B82F6] rounded-full overflow-hidden",
+      "bar": "h-2 bg-gray-600 rounded-full overflow-hidden",
       "dots": "flex space-x-2 justify-center",
       "numbers": "flex space-x-2 justify-center",
-      "percentage": "text-right text-base text-purple-600 font-semibold mb-2",
+      "percentage": "text-right text-base text-gray-600 font-medium mb-2",
       "label": "text-base text-gray-700 mb-2 font-medium"
     },
     "button": {
-      "primary": "inline-flex justify-center py-3 px-8 text-base font-semibold rounded-xl text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:scale-105 transition-all duration-200",
-      "secondary": "inline-flex justify-center py-3 px-8 border-2 border-purple-200 text-base font-semibold rounded-xl text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500",
-      "text": "text-base font-semibold text-purple-600 hover:text-purple-700",
-      "navigation": "inline-flex items-center px-8 py-3 text-base font-semibold rounded-xl text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transform hover:scale-105 transition-all duration-200"
+      "primary": "inline-flex justify-center py-3 px-6 text-base font-medium rounded-lg text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200",
+      "secondary": "inline-flex justify-center py-3 px-6 border border-gray-300 text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500",
+      "text": "text-base font-medium text-gray-600 hover:text-gray-800",
+      "navigation": "inline-flex items-center px-6 py-3 text-base font-medium rounded-lg text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200"
     },
     "colors": {
-      "primary": "#9333EA",
+      "primary": "#111827",
       "secondary": "#6B7280",
-      "accent": "#EC4899",
+      "accent": "#374151",
       "background": "#FFFFFF",
-      "text": "#1F2937",
+      "text": "#111827",
       "border": "#D1D5DB",
       "error": "#EF4444",
       "success": "#10B981"

@@ -48,6 +48,7 @@ export type SurveyTheme =
   | "modern"
   | "corporate"
   | "dark"
+  | "hims"
   | "custom";
 
 export interface ThemeDefinition {

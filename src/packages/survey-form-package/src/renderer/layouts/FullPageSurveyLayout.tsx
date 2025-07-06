@@ -296,7 +296,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
             className="flex-1 flex flex-col"
           >
             {/* Question Content - Centered Layout */}
-            <div className="flex-[0.8] flex flex-col justify-start items-center px-4 py-2">
+            <div className="flex-[0.8] flex flex-col justify-start items-center py-2">
               <div className="w-full max-w-lg min-w-80 sm:min-w-[32rem] space-y-6 px-4">
                 {currentPageBlocks[currentBlockIndex] && (
                   <div className="text-start">
