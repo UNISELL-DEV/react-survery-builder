@@ -55,15 +55,15 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
       const nodeData = node.data as NodeData & { containerSize?: { width: number; height: number } };
       return (
         <div className="flow-node-section h-full">
-          <div className="flex items-center gap-2 p-3 bg-blue-50 border-b border-blue-200">
-            <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
-            <span className="font-semibold text-sm text-blue-900">Survey Section</span>
+          <div className="flex items-center gap-2 p-3 bg-primary/10 border-b border-primary/20">
+            <div className="w-4 h-4 bg-primary rounded-full"></div>
+            <span className="font-semibold text-sm text-primary">Survey Section</span>
           </div>
           <div className="p-3">
-            <div className="text-sm font-medium text-gray-800">
+            <div className="text-sm font-medium text-foreground">
               {nodeData.name || "Untitled Section"}
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               {nodeData.nodes?.length || 0} pages, {nodeData.items?.length || 0} direct items
             </div>
           </div>
@@ -75,12 +75,12 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
       const nodeData = node.data as { name: string; type: string };
       return (
         <div className="flow-node-submit h-full">
-          <div className="flex items-center gap-2 p-2 bg-red-50 border-b border-red-200">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-            <span className="font-medium text-xs text-red-900">Submit</span>
+          <div className="flex items-center gap-2 p-2 bg-destructive/10 border-b border-destructive/20">
+            <div className="w-3 h-3 bg-destructive rounded-full"></div>
+            <span className="font-medium text-xs text-destructive">Submit</span>
           </div>
           <div className="p-2">
-            <div className="text-xs font-medium text-gray-800 text-center">
+            <div className="text-xs font-medium text-foreground text-center">
               {nodeData.name || "Submit Form"}
             </div>
           </div>
@@ -92,15 +92,15 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
       const nodeData = node.data as NodeData & { containerSize?: { width: number; height: number } };
       return (
         <div className="flow-node-set h-full">
-          <div className="flex items-center gap-2 p-2 bg-green-50 border-b border-green-200">
-            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-            <span className="font-medium text-xs text-green-900">Page</span>
+          <div className="flex items-center gap-2 p-2 bg-green-100 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800">
+            <div className="w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full"></div>
+            <span className="font-medium text-xs text-green-900 dark:text-green-100">Page</span>
           </div>
           <div className="p-2">
-            <div className="text-xs font-medium text-gray-800 truncate">
+            <div className="text-xs font-medium text-foreground truncate">
               {nodeData.name || "Untitled Page"}
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-muted-foreground mt-1">
               {nodeData.items?.length || 0} blocks
             </div>
           </div>
@@ -114,18 +114,18 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
       
       return (
         <div className="flow-node-block h-full">
-          <div className="flex items-center gap-1 p-1 bg-purple-50 border-b border-purple-200">
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <span className="font-medium text-xs text-purple-900 truncate">
+          <div className="flex items-center gap-1 p-1 bg-purple-100 dark:bg-purple-900/20 border-b border-purple-200 dark:border-purple-800">
+            <div className="w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full"></div>
+            <span className="font-medium text-xs text-purple-900 dark:text-purple-100 truncate">
               {definition?.name || blockData.type}
             </span>
           </div>
           <div className="p-1">
-            <div className="text-xs font-medium text-gray-800 truncate">
+            <div className="text-xs font-medium text-foreground truncate">
               {blockData.label || blockData.fieldName || 'Untitled'}
             </div>
             {blockData.required && (
-              <div className="text-xs text-red-500 mt-0.5">Required</div>
+              <div className="text-xs text-destructive mt-0.5">Required</div>
             )}
           </div>
         </div>
@@ -198,33 +198,33 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
   const getNodeClasses = () => {
     const cursorClass = isConnecting ? "cursor-crosshair" : "cursor-move"; // Change cursor in connection mode
     const baseClasses = `flow-node absolute ${cursorClass} transition-none`; // Remove transitions for smoother movement
-    const selectedClasses = selected ? "border-blue-500 shadow-xl ring-2 ring-blue-200" : "border-gray-200 hover:border-gray-300";
-    const dragOverClasses = isDragOver ? "ring-4 ring-green-300 border-green-400 bg-green-50/50" : "";
+    const selectedClasses = selected ? "border-primary shadow-xl ring-2 ring-primary/20" : "border-border hover:border-accent";
+    const dragOverClasses = isDragOver ? "ring-4 ring-green-300 border-green-400 bg-green-50/50 dark:bg-green-900/50" : "";
     
     // Connection state styling
     const isConnectionSource = connectionSourceId === node.id;
     const canBeTarget = isConnecting && connectionSourceId !== node.id && 
                        (node.type === "block" || node.type === "set" || node.type === "submit");
     const connectionClasses = isConnectionSource ? "ring-4 ring-orange-300 border-orange-400" : 
-                             canBeTarget ? "ring-2 ring-green-300 border-green-400 bg-green-50/30" : "";
+                             canBeTarget ? "ring-2 ring-green-300 border-green-400 bg-green-50/30 dark:bg-green-900/30" : "";
     
     if (node.type === "section") {
-      return `${baseClasses} bg-blue-25 border-2 border-blue-300 rounded-xl shadow-2xl ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
+      return `${baseClasses} bg-primary/5 border-2 border-primary/30 rounded-xl shadow-2xl ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
     }
     
     if (node.type === "set") {
-      return `${baseClasses} bg-white border-2 border-green-200 rounded-lg shadow-lg ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
+      return `${baseClasses} bg-card border-2 border-green-200 dark:border-green-800 rounded-lg shadow-lg ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
     }
     
     if (node.type === "block") {
-      return `${baseClasses} bg-white border border-purple-200 rounded-md shadow-sm ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
+      return `${baseClasses} bg-card border border-purple-200 dark:border-purple-800 rounded-md shadow-sm ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
     }
 
     if (node.type === "submit") {
-      return `${baseClasses} bg-white border border-red-200 rounded-md shadow-sm ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
+      return `${baseClasses} bg-card border border-destructive/20 rounded-md shadow-sm ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
     }
     
-    return `${baseClasses} bg-white rounded-lg shadow-lg border-2 ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
+    return `${baseClasses} bg-card rounded-lg shadow-lg border-2 ${selectedClasses} ${dragOverClasses} ${connectionClasses}`;
   };
 
   return (
@@ -237,21 +237,21 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
       {/* Connection handles - blocks have output handles, pages have both */}
       {node.type === "block" && (
         <>
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full border border-white shadow-sm" title="Input connection"></div>
-          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 rounded-full border border-white shadow-sm" title="Output connection"></div>
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full border border-background shadow-sm" title="Input connection"></div>
+          <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-purple-500 dark:bg-purple-400 rounded-full border border-background shadow-sm" title="Output connection"></div>
         </>
       )}
       
       {node.type === "set" && (
         <>
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 rounded-full border border-white shadow-sm" title="Input connection"></div>
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 rounded-full border border-white shadow-sm" title="Output connection"></div>
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full border border-background shadow-sm" title="Input connection"></div>
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 dark:bg-green-400 rounded-full border border-background shadow-sm" title="Output connection"></div>
         </>
       )}
 
       {node.type === "submit" && (
         <>
-          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-red-500 rounded-full border border-white shadow-sm" title="Input connection"></div>
+          <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-destructive rounded-full border border-background shadow-sm" title="Input connection"></div>
         </>
       )}
 
@@ -267,7 +267,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
             type="button"
             size="sm"
             variant="outline"
-            className="w-7 h-7 p-0 bg-white shadow-md hover:shadow-lg"
+            className="w-7 h-7 p-0 bg-background shadow-md hover:shadow-lg"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -283,7 +283,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
               type="button"
               size="sm"
               variant="outline"
-              className="w-7 h-7 p-0 bg-white shadow-md hover:shadow-lg"
+              className="w-7 h-7 p-0 bg-background shadow-md hover:shadow-lg"
               onClick={handleDelete}
               title="Delete Node"
             >
@@ -295,7 +295,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
 
       {/* Navigation rules indicator */}
       {node.type === "block" && (node.data as BlockData).navigationRules?.length > 0 && (
-        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-white"></div>
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-background"></div>
       )}
     </div>
   );

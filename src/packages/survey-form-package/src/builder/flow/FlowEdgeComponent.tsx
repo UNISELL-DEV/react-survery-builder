@@ -72,7 +72,7 @@ export const FlowEdgeComponent: React.FC<FlowEdgeComponentProps> = ({
           x={(sourceX + targetX) / 2}
           y={(sourceY + targetY) / 2}
           textAnchor="middle"
-          className="text-xs fill-gray-600 font-medium"
+          className="text-xs fill-muted-foreground font-medium"
           style={{
             fontSize: Math.max(10, 12 * zoom)
           }}

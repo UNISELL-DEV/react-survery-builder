@@ -399,7 +399,7 @@ export const FlowBuilder: React.FC = () => {
       />
       
       {/* Debug info */}
-      <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2 text-sm">
+      <div className="bg-muted border-b border-border px-4 py-2 text-sm">
         <div className="flex gap-4 items-center flex-wrap">
           <span>Root: {state.rootNode?.uuid || 'None'}</span>
           <span>Root Items: {state.rootNode?.items?.length || 0}</span>

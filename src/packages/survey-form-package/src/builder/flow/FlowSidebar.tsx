@@ -28,24 +28,24 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
     return (
       <div
         key={type}
-        className="flow-sidebar-card p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all cursor-move"
+        className="flow-sidebar-card p-3 bg-card rounded-lg border border-border hover:border-accent hover:shadow-sm transition-all cursor-move"
         draggable
         onDragStart={(e) => handleDragStart(e, type)}
         onClick={() => onNodeCreate?.(type)}
       >
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+          <div className="flex-shrink-0 w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
             {category === "container" ? (
-              <FolderOpen className="w-4 h-4 text-gray-600" />
+              <FolderOpen className="w-4 h-4 text-muted-foreground" />
             ) : (
-              <FileText className="w-4 h-4 text-gray-600" />
+              <FileText className="w-4 h-4 text-muted-foreground" />
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-sm text-gray-900 truncate">
+            <h4 className="font-medium text-sm text-foreground truncate">
               {definition.name}
             </h4>
-            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
               {definition.description || `Add a new ${definition.name.toLowerCase()}`}
             </p>
           </div>
@@ -61,10 +61,10 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
   const formBlocks = Object.entries(definitions.blocks);
 
   return (
-    <div className="flow-sidebar w-80 bg-gray-50 border-r border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <h3 className="font-semibold text-lg text-gray-900">Node Library</h3>
-        <p className="text-sm text-gray-600 mt-1">
+    <div className="flow-sidebar w-80 bg-background border-r border-border flex flex-col">
+      <div className="p-4 border-b border-border">
+        <h3 className="font-semibold text-lg text-foreground">Node Library</h3>
+        <p className="text-sm text-muted-foreground mt-1">
           Drag and drop to add nodes to your flow
         </p>
       </div>
@@ -85,21 +85,20 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
                   )
                 ) : (
                   <div className="text-center py-8">
-                    <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-600">
+                    <FolderOpen className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">
                       No container nodes available
                     </p>
                   </div>
                 )}
 
                 {/* Quick create buttons */}
-                <div className="pt-4 border-t border-gray-200">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => onNodeCreate?.("set")}
+                <div className="pt-4 border-t border-border">
+                  <Button type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => onNodeCreate?.("set")}
                   >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Page
@@ -118,8 +117,8 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
                   )
                 ) : (
                   <div className="text-center py-8">
-                    <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-600">
+                    <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">
                       No form blocks available
                     </p>
                   </div>

@@ -101,16 +101,16 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
     console.log("Node not found for ID:", nodeId);
     console.log("Available root node:", state.rootNode);
     return (
-      <div className="node-config-panel w-80 bg-white border-l border-gray-200 p-4">
+      <div className="node-config-panel w-80 bg-background border-l border-border p-4">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-lg">Node Configuration</h3>
+          <h3 className="font-semibold text-lg text-foreground">Node Configuration</h3>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-sm text-gray-600">Node not found</p>
-        <p className="text-xs text-gray-500 mt-2">ID: {nodeId}</p>
-        <p className="text-xs text-gray-500">Path: {nodePath || "Not found"}</p>
+        <p className="text-sm text-muted-foreground">Node not found</p>
+        <p className="text-xs text-muted-foreground mt-2">ID: {nodeId}</p>
+        <p className="text-xs text-muted-foreground">Path: {nodePath || "Not found"}</p>
       </div>
     );
   }
@@ -187,7 +187,7 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
             id="node-type"
             value={nodeData.type}
             disabled
-            className="bg-gray-50"
+            className="bg-muted"
           />
         </div>
 
@@ -204,9 +204,9 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
           </div>
         )}
 
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-muted p-3 rounded-lg">
           <div className="text-sm font-medium mb-2">Structure</div>
-          <div className="text-xs text-gray-600 space-y-1">
+          <div className="text-xs text-muted-foreground space-y-1">
             {nodeData.items && (
               <div>Blocks: {nodeData.items.length}</div>
             )}
@@ -220,22 +220,22 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
   };
 
   return (
-    <div className="node-config-panel w-80 bg-white border-l border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
+    <div className="node-config-panel w-80 bg-background border-l border-border flex flex-col">
+      <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Settings className="w-5 h-5 text-gray-600" />
-            <h3 className="font-semibold text-lg">Configuration</h3>
+            <Settings className="w-5 h-5 text-muted-foreground" />
+            <h3 className="font-semibold text-lg text-foreground">Configuration</h3>
           </div>
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             <X className="w-4 h-4" />
           </Button>
         </div>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-muted-foreground mt-1">
           {isBlockData(nodeData) ? `Block: ${nodeData.type}` : `Node: ${nodeData.type}`}
         </p>
-        <p className="text-xs text-gray-500">ID: {nodeId}</p>
-        {nodePath && <p className="text-xs text-gray-500">Path: {nodePath}</p>}
+        <p className="text-xs text-muted-foreground">ID: {nodeId}</p>
+        {nodePath && <p className="text-xs text-muted-foreground">Path: {nodePath}</p>}
       </div>
 
       <ScrollArea className="flex-1 p-4">

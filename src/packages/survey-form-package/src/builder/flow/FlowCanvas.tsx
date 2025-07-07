@@ -503,7 +503,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
 
   return (
     <div 
-      className="flow-canvas relative w-full h-full overflow-hidden bg-gray-50"
+      className="flow-canvas relative w-full h-full overflow-hidden bg-muted"
       onMouseEnter={handleCanvasMouseEnter}
       onMouseLeave={handleCanvasMouseLeave}
     >
@@ -533,8 +533,8 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           className="absolute inset-0 opacity-20"
           style={{
             backgroundImage: `
-              linear-gradient(to right, #e5e7eb 1px, transparent 1px),
-              linear-gradient(to bottom, #e5e7eb 1px, transparent 1px)
+              linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+              linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px)
             `,
             backgroundSize: `${20 * viewport.zoom}px ${20 * viewport.zoom}px`,
             backgroundPosition: `${viewport.x}px ${viewport.y}px`
@@ -552,7 +552,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           {/* Boundary visualization when dragging */}
           {dragState.isDragging && dragState.boundaries && (
             <div
-              className="absolute border-2 border-blue-400 border-dashed bg-blue-50/20 pointer-events-none"
+              className="absolute border-2 border-primary border-dashed bg-primary/20 pointer-events-none"
               style={{
                 left: dragState.boundaries.minX,
                 top: dragState.boundaries.minY,
@@ -561,7 +561,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
                 zIndex: 10
               }}
             >
-              <div className="absolute top-2 left-2 text-xs text-blue-600 bg-white/80 px-1 rounded">
+              <div className="absolute top-2 left-2 text-xs text-primary bg-background/80 px-1 rounded">
                 Allowed area
               </div>
             </div>
@@ -619,12 +619,12 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       </div>
 
       {/* Canvas info and controls */}
-      <div className="absolute bottom-4 left-4 bg-white/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-gray-600">
+      <div className="absolute bottom-4 left-4 bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 text-sm text-foreground border border-border">
         <div>Mode: {mode}</div>
         <div>Zoom: {Math.round(viewport.zoom * 100)}%</div>
         <div>Nodes: {nodes.length}</div>
         <div>Edges: {edges.length}</div>
-        <div className="text-xs text-gray-500 mt-1 space-y-0.5">
+        <div className="text-xs text-muted-foreground mt-1 space-y-0.5">
           <div>• Ctrl+Scroll to zoom</div>
           <div>• Scroll to pan canvas</div>
           <div>• Drag background to pan</div>
@@ -632,7 +632,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
           <div>• Double-click to add page</div>
           {mode === "connect" && (
             <>
-              <div className="text-orange-600 font-medium">Connection Mode:</div>
+              <div className="text-primary font-medium">Connection Mode:</div>
               <div>• Click block to start connection</div>
               <div>• Click target to complete</div>
             </>
@@ -643,14 +643,14 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
         <div className="mt-2 flex gap-1">
           <button
             onClick={fitView}
-            className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="px-2 py-1 text-xs bg-primary text-primary-foreground rounded hover:bg-primary/90"
             title="Fit to view"
           >
             Fit All
           </button>
           <button
             onClick={() => setViewport({ x: 0, y: 0, zoom: 1 })}
-            className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
+            className="px-2 py-1 text-xs bg-secondary text-secondary-foreground rounded hover:bg-secondary/90"
             title="Reset view"
           >
             Reset

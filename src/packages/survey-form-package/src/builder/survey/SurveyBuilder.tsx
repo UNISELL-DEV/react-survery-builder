@@ -60,6 +60,8 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
   } = useSurveyBuilder();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isThemeBuilderOpen, setIsThemeBuilderOpen] = useState(false);
+  const [isFlowBuilderOpen, setIsFlowBuilderOpen] = useState(false);
+  
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   
   // 1. Block definitions (once or on true changes only)
@@ -121,10 +123,43 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
       <TabsList>
         <TabsTrigger value="list">List View</TabsTrigger>
         <TabsTrigger value="graph">Graph View</TabsTrigger>
-        <TabsTrigger value="flow">Flow Builder</TabsTrigger>
+        {/* <TabsTrigger value="flow">Flow Builder</TabsTrigger> */}
         <TabsTrigger value="lang">Localizations</TabsTrigger>
       </TabsList>
     </Tabs>
+
+    {/* Flow Builder */}
+    <Sheet open={isFlowBuilderOpen} onOpenChange={setIsFlowBuilderOpen}>
+      <SheetTrigger asChild>
+        <Button type="button" variant="outline" className="grow lg:grow-0">
+          Flow Builder
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="right" className="w-full overflow-y-scroll"  style={{
+    position: "absolute",
+    top: "0",
+    left: "0",
+    right: "0",
+    bottom: "0",
+    maxWidth: "100%",
+    borderRadius: 0,
+  }}>
+        <SheetHeader><SheetTitle>Flow Builder</SheetTitle></SheetHeader>
+          <div className="survey-flow h-full">
+            {state.rootNode ? (
+              <FlowBuilder />
+            ) : (
+              <div className="text-center p-12 bg-muted rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">No Survey Created</h3>
+                <p className="text-muted-foreground mb-6">
+                  Create a survey first to use the visual flow builder.
+                </p>
+                <Button type="button" onClick={handleCreateRootNode}>Create Survey</Button>
+              </div>
+            )}
+          </div>
+      </SheetContent>
+    </Sheet>
 
     {/* Theme Builder */}
     <Sheet open={isThemeBuilderOpen} onOpenChange={setIsThemeBuilderOpen}>
@@ -223,7 +258,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           </div>
         )}
 
-        {state.displayMode === "flow" && (
+        {/* {state.displayMode === "flow" && (
           <div className="survey-flow h-full">
             {state.rootNode ? (
               <FlowBuilder />
@@ -237,7 +272,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
               </div>
             )}
           </div>
-        )}
+        )} */}
 
         {state.displayMode === "lang" && (
           <div className="survey-lang">

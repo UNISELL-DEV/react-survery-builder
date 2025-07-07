@@ -104,7 +104,7 @@ export const FlowToolbar: React.FC<FlowToolbarProps> = ({
   ];
 
   return (
-    <div className="flow-toolbar bg-white border-b border-gray-200 px-4 py-2">
+    <div className="flow-toolbar bg-background border-b border-border px-4 py-2">
       <div className="flex items-center gap-2">
         {toolbarItems.map((group, groupIndex) => (
           <React.Fragment key={group.group}>
