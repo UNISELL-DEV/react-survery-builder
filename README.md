@@ -130,19 +130,11 @@ cd react-survey-builder
 
 2. **Install dependencies**
 ```bash
-npm install
-# or
-yarn install
-# or
 bun install
 ```
 
 3. **Start the development server**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 bun dev
 ```
 
@@ -153,18 +145,18 @@ Navigate to [http://localhost:3000](http://localhost:3000)
 
 #### Main Application
 ```bash
-npm run dev      # Start development server with Turbopack
-npm run build    # Build the application
-npm run start    # Start production server
-npm run lint     # Run Next.js linting
+bun run dev      # Start development server with Turbopack
+bun run build    # Build the application
+bun run start    # Start production server
+bun run lint     # Run Next.js linting
 ```
 
 #### Survey Form Package
 ```bash
 cd src/packages/survey-form-package
-npm run build    # Build the package using tsup
-npm run dev      # Build package in watch mode
-npm run lint     # Run Biome linting
+bun run build    # Build the package using tsup
+bun run dev      # Build package in watch mode
+bun run lint     # Run Biome linting
 ```
 
 ## 📖 Usage Examples
@@ -466,7 +458,7 @@ import { YourCustomRenderer } from './YourCustomRenderer';
 - **Animations**: Framer Motion
 - **Drag & Drop**: @dnd-kit
 - **Type Safety**: TypeScript 5
-- **Package Management**: npm workspaces
+- **Package Management**: bun workspaces
 - **Bundling**: tsup for package builds
 
 ### **Performance Optimizations**
@@ -546,7 +538,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 2. Create a feature branch
 3. Make your changes
 4. Add tests if applicable
-5. Run linting: `npm run lint`
+5. Run linting: `bun run lint`
 6. Submit a pull request
 
 ## 📄 License

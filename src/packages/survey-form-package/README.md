@@ -30,16 +30,12 @@ A powerful, customizable React survey renderer and builder library with TypeScri
 ## 📦 Installation
 
 ```bash
-npm install survey-form-package
-# or
-yarn add survey-form-package
-# or
-pnpm add survey-form-package
+bun add survey-form-package
 ```
 
 ### Peer Dependencies
 ```bash
-npm install react@^19.1.0 react-dom@^19.1.0
+bun add react@^19.1.0 react-dom@^19.1.0
 ```
 
 ## 🎯 Quick Start
@@ -1347,16 +1343,16 @@ git clone https://github.com/UNISELL-DEV/react-survey-builder.git
 cd react-survey-builder/src/packages/survey-form-package
 
 # Install dependencies
-npm install
+bun install
 
 # Start development mode
-npm run dev
+bun run dev
 
 # Run tests
-npm test
+bun test
 
 # Build package
-npm run build
+bun run build
 ```
 
 ## 📄 License
