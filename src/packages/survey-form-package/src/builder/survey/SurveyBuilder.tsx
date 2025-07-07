@@ -131,7 +131,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           Theme&nbsp;Builder
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full">
+      <SheetContent side="right" className="w-full overflow-y-scroll">
         <SheetHeader><SheetTitle>Theme Builder</SheetTitle></SheetHeader>
         <ThemeBuilder onDataChange={onDataChange} />
       </SheetContent>
@@ -144,7 +144,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           Tools
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full lg:w-[540px]">
+      <SheetContent side="right" className="w-full lg:w-[540px] overflow-y-scroll">
         <SheetHeader><SheetTitle>Tools</SheetTitle></SheetHeader>
         <Tabs defaultValue="blocks" className="mt-4">
           <TabsList className="mb-4">
@@ -164,7 +164,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           Preview
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full">
+      <SheetContent side="right" className="w-full overflow-y-scroll">
         <SheetHeader><SheetTitle className="sr-only">Preview</SheetTitle></SheetHeader>
         <PreviewSurvey />
       </SheetContent>

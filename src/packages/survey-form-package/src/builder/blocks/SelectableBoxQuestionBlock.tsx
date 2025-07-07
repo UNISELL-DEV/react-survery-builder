@@ -308,7 +308,7 @@ export const SelectableBoxQuestionBlock: BlockDefinition = {
     description: "",
     boxSpacing: "4",
     defaultValue: "",
-    showSelectionIndicator: true,
+    showSelectionIndicator: false,
     options: [
       { id: uuidv4(), label: "Lose 5 to 20 lbs", value: "5-20" },
       { id: uuidv4(), label: "Lose 21 to 50 lbs", value: "21-50" },
