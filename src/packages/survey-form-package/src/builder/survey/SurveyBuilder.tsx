@@ -12,6 +12,7 @@ import { SurveyBuilderProvider, useSurveyBuilder } from "../../context/SurveyBui
 import { SurveyGraph } from "./SurveyGraph";
 import { ThemeBuilder } from "./panels/ThemeBuilder";
 import { PreviewSurvey } from "./panels/PreviewSurvey";
+import { FlowBuilder } from "../flow/FlowBuilder";
 
 // Define the props
 interface SurveyBuilderProps {
@@ -99,7 +100,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
   }, [state.rootNode, state.definitions.nodes, createNode]);
 
   // Handle display mode changes
-  const handleDisplayModeChange = (mode: "list" | "graph" | "lang") => {
+  const handleDisplayModeChange = (mode: "list" | "graph" | "flow" | "lang") => {
     setDisplayMode(mode);
   };
 
@@ -120,6 +121,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
       <TabsList>
         <TabsTrigger value="list">List View</TabsTrigger>
         <TabsTrigger value="graph">Graph View</TabsTrigger>
+        <TabsTrigger value="flow">Flow Builder</TabsTrigger>
         <TabsTrigger value="lang">Localizations</TabsTrigger>
       </TabsList>
     </Tabs>
@@ -214,6 +216,22 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
                 <h3 className="text-lg font-semibold mb-4">No Survey Created</h3>
                 <p className="text-muted-foreground mb-6">
                   Create a survey first to see the graph visualization.
+                </p>
+                <Button type="button" onClick={handleCreateRootNode}>Create Survey</Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {state.displayMode === "flow" && (
+          <div className="survey-flow h-full">
+            {state.rootNode ? (
+              <FlowBuilder />
+            ) : (
+              <div className="text-center p-12 bg-muted rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">No Survey Created</h3>
+                <p className="text-muted-foreground mb-6">
+                  Create a survey first to use the visual flow builder.
                 </p>
                 <Button type="button" onClick={handleCreateRootNode}>Create Survey</Button>
               </div>

@@ -1,4 +1,4 @@
-import type { SurveyTheme } from "../../types";
+import type { SurveyTheme } from "../types";
 
 export interface ThemeDefinition {
   name: SurveyTheme;

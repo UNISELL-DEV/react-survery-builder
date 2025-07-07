@@ -130,7 +130,7 @@ export interface SurveyBuilderState {
   localizations: LocalizationMap;
   theme: ThemeDefinition;
   selectedNode: UUID | null;
-  displayMode: 'list' | 'graph' | 'lang' | 'theme';
+  displayMode: 'list' | 'graph' | 'flow' | 'lang' | 'theme';
 }
 
 export interface SurveyBuilderAction {

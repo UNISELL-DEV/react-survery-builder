@@ -1,0 +1,476 @@
+import React, { useState, useCallback, useRef } from "react";
+import { Button } from "../../components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { FlowCanvas } from "./FlowCanvas";
+import { FlowSidebar } from "./FlowSidebar";
+import { NodeConfigPanel } from "./NodeConfigPanel";
+import { FlowToolbar } from "./FlowToolbar";
+import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
+import { NodeData, BlockData } from "../../types";
+import { flowToSurvey, surveyToFlow } from "./utils/flowTransforms";
+import { FlowNode, FlowEdge, FlowMode } from "./types";
+
+export const FlowBuilder: React.FC = () => {
+  const { state, updateNode, createNode, removeNode } = useSurveyBuilder();
+  const [flowMode, setFlowMode] = useState<FlowMode>("select");
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [showNodeConfig, setShowNodeConfig] = useState(false);
+  const [nodePositions, setNodePositions] = useState<Record<string, { x: number; y: number }>>({});
+  
+  // Convert survey structure to flow format with positions
+  const flowData = React.useMemo(() => {
+    if (!state.rootNode) {
+      console.log("No root node available for flow");
+      return { nodes: [], edges: [] };
+    }
+    
+    console.log("Converting survey to flow, root node:", state.rootNode);
+    const data = surveyToFlow(state.rootNode);
+    console.log("Flow data before applying positions:", data);
+    
+    // Apply stored positions
+    data.nodes = data.nodes.map(node => ({
+      ...node,
+      position: nodePositions[node.id] || node.position
+    }));
+    
+    console.log("Final flow data with positions:", data);
+    console.log("Current node positions:", nodePositions);
+    
+    return data;
+  }, [state.rootNode, nodePositions]);
+
+  // Effect to handle when new nodes are created and we need to assign positions
+  React.useEffect(() => {
+    if (flowData.nodes.length > 0) {
+      const nodesWithoutPositions = flowData.nodes.filter(node => !nodePositions[node.id]);
+      if (nodesWithoutPositions.length > 0) {
+        console.log("Found nodes without positions:", nodesWithoutPositions);
+        const newPositions: Record<string, { x: number; y: number }> = {};
+        
+        nodesWithoutPositions.forEach((node, index) => {
+          // Improved auto-layout based on node type
+          if (node.type === "set") {
+            // Layout pages in an optimal grid
+            const pagesPerRow = Math.min(3, Math.ceil(Math.sqrt(nodesWithoutPositions.filter(n => n.type === "set").length)));
+            const pageIndex = nodesWithoutPositions.filter(n => n.type === "set").indexOf(node);
+            const row = Math.floor(pageIndex / pagesPerRow);
+            const col = pageIndex % pagesPerRow;
+            newPositions[node.id] = {
+              x: 100 + col * 400, // Increased spacing for pages
+              y: 100 + row * 300
+            };
+          } else if (node.type === "block") {
+            // Position blocks within their parent page
+            const parentPageMatch = node.id.match(/^(.+)-block-(\d+)$/);
+            if (parentPageMatch) {
+              const [, pageUuid, blockIndexStr] = parentPageMatch;
+              const blockIndex = parseInt(blockIndexStr);
+              const parentPagePos = newPositions[pageUuid] || nodePositions[pageUuid] || { x: 100, y: 100 };
+              
+              // Layout blocks in a 2x2 grid within the page
+              const blockRow = Math.floor(blockIndex / 2);
+              const blockCol = blockIndex % 2;
+              newPositions[node.id] = {
+                x: parentPagePos.x + 20 + blockCol * 160,
+                y: parentPagePos.y + 50 + blockRow * 100
+              };
+            } else {
+              // Fallback for orphaned blocks
+              newPositions[node.id] = {
+                x: 100 + (index % 3) * 300,
+                y: 100 + Math.floor(index / 3) * 200
+              };
+            }
+          } else {
+            // Default positioning for other node types
+            newPositions[node.id] = {
+              x: 100 + (index % 3) * 300,
+              y: 100 + Math.floor(index / 3) * 200
+            };
+          }
+        });
+        
+        if (Object.keys(newPositions).length > 0) {
+          console.log("Setting auto-layout positions:", newPositions);
+          setNodePositions(prev => ({ ...prev, ...newPositions }));
+        }
+      }
+    }
+  }, [flowData.nodes, nodePositions]);
+
+  // Handle node position updates with relative positioning for children
+  const handleNodePositionUpdate = useCallback((nodeId: string, position: { x: number; y: number }) => {
+    setNodePositions(prev => {
+      const oldPosition = prev[nodeId];
+      if (!oldPosition) {
+        return { ...prev, [nodeId]: position };
+      }
+      
+      // Calculate the delta movement
+      const deltaX = position.x - oldPosition.x;
+      const deltaY = position.y - oldPosition.y;
+      
+      // Update the node's position
+      const newPositions = { ...prev, [nodeId]: position };
+      
+      // If moving a page (set), also move all its child blocks
+      const nodeInFlow = flowData.nodes.find(n => n.id === nodeId);
+      if (nodeInFlow?.type === "set") {
+        console.log(`Moving page ${nodeId} and its children by (${deltaX}, ${deltaY})`);
+        
+        // Find all child blocks of this page
+        flowData.nodes.forEach(node => {
+          if (node.type === "block" && node.id.startsWith(`${nodeId}-block-`)) {
+            const childOldPos = prev[node.id];
+            if (childOldPos) {
+              newPositions[node.id] = {
+                x: childOldPos.x + deltaX,
+                y: childOldPos.y + deltaY
+              };
+              console.log(`Moving child block ${node.id} to (${newPositions[node.id].x}, ${newPositions[node.id].y})`);
+            }
+          }
+        });
+      }
+      
+      // Section movement logic removed since we no longer have section nodes
+      
+      return newPositions;
+    });
+  }, [flowData.nodes]);
+
+  // Handle node creation from sidebar
+  const handleNodeCreate = useCallback((position: { x: number; y: number }, nodeType: string, targetPageId?: string) => {
+    if (!state.rootNode) return;
+
+    console.log("Creating node of type:", nodeType, "at position:", position, "targetPage:", targetPageId);
+    console.log("Available node definitions:", Object.keys(state.definitions.nodes));
+    console.log("Available block definitions:", Object.keys(state.definitions.blocks));
+
+    // Create node based on type
+    if (nodeType === "set") {
+      // Create a new page/set node - use the node definition if available
+      const nodeDefinition = state.definitions.nodes[nodeType];
+      
+      if (nodeDefinition) {
+        console.log("Using node definition for set:", nodeDefinition);
+        // Store the position for the new node (we'll generate an ID)
+        const tempId = `page_${Date.now()}`;
+        setNodePositions(prev => ({
+          ...prev,
+          [tempId]: position
+        }));
+        
+        // Use createNode with proper partial data
+        createNode(state.rootNode.uuid!, "set", {
+          name: `Page ${(state.rootNode.nodes?.length || 0) + 1}`,
+          items: [],
+          nodes: []
+        });
+      } else {
+        console.error("No node definition found for type 'set'");
+        // Fallback: manually add the node
+        const newPageData: NodeData = {
+          uuid: `page_${Date.now()}`,
+          type: "set",
+          name: `Page ${(state.rootNode.nodes?.length || 0) + 1}`,
+          items: [],
+          nodes: []
+        };
+        
+        setNodePositions(prev => ({
+          ...prev,
+          [newPageData.uuid!]: position
+        }));
+
+        // Manually update the root node
+        const updatedRootNode = {
+          ...state.rootNode,
+          nodes: [...(state.rootNode.nodes || []), newPageData]
+        };
+        updateNode(state.rootNode.uuid!, updatedRootNode);
+      }
+    } else {
+      // It's a block type - add to specific page if provided, otherwise first available page
+      let targetPage: NodeData | null = null;
+      
+      if (targetPageId) {
+        // Find the target page by ID
+        const findPageById = (node: NodeData, id: string): NodeData | null => {
+          if (node.uuid === id) return node;
+          
+          // Check in items (for nested pages)
+          if (node.items) {
+            for (const item of node.items) {
+              if (item.type === 'set' && typeof item !== 'string') {
+                const found = findPageById(item as NodeData, id);
+                if (found) return found;
+              }
+            }
+          }
+          
+          // Check in child nodes
+          if (node.nodes) {
+            for (const childNode of node.nodes) {
+              if (typeof childNode !== 'string') {
+                const found = findPageById(childNode, id);
+                if (found) return found;
+              }
+            }
+          }
+          
+          return null;
+        };
+        
+        targetPage = findPageById(state.rootNode, targetPageId);
+        console.log("Found target page:", targetPage);
+      }
+      
+      if (!targetPage) {
+        // Fallback to first available page
+        targetPage = state.rootNode.nodes?.[0] as NodeData;
+        if (!targetPage || typeof targetPage === 'string') {
+          // Check in items array
+          const pageFromItems = state.rootNode.items?.find(item => item.type === 'set') as NodeData;
+          targetPage = pageFromItems || null;
+        }
+      }
+      
+      if (targetPage && typeof targetPage !== 'string') {
+        const blockId = `${targetPage.uuid}-block-${(targetPage.items?.length || 0)}`;
+        const blockData: BlockData = {
+          type: nodeType,
+          fieldName: `field_${Date.now()}`,
+          label: `New ${nodeType}`,
+          required: false,
+          description: "",
+          navigationRules: [],
+          visibleIf: null,
+          placeholder: "",
+          defaultValue: "",
+          options: [],
+          validation: {},
+          props: {}
+        };
+        
+        // Store the position for the new block
+        setNodePositions(prev => ({
+          ...prev,
+          [blockId]: position
+        }));
+        
+        const updatedPage = {
+          ...targetPage,
+          items: [...(targetPage.items || []), blockData]
+        };
+        updateNode(targetPage.uuid!, updatedPage);
+        
+        console.log(`Added block ${nodeType} to page ${targetPage.name || targetPage.uuid}`);
+      } else {
+        console.error("No page available to add block to");
+      }
+    }
+  }, [createNode, updateNode, state.rootNode, state.definitions]);
+
+  // Handle node selection
+  const handleNodeSelect = useCallback((nodeId: string) => {
+    console.log("Node selected:", nodeId);
+    if (nodeId) {
+      setSelectedNodeId(nodeId);
+      setShowNodeConfig(true);
+    } else {
+      setSelectedNodeId(null);
+      setShowNodeConfig(false);
+    }
+  }, []);
+
+  // Handle node update
+  const handleNodeUpdate = useCallback((nodeId: string, data: any) => {
+    updateNode(nodeId, data);
+  }, [updateNode]);
+
+  // Handle node deletion
+  const handleNodeDelete = useCallback((nodeId: string) => {
+    removeNode(nodeId);
+    if (selectedNodeId === nodeId) {
+      setSelectedNodeId(null);
+      setShowNodeConfig(false);
+    }
+  }, [removeNode, selectedNodeId]);
+
+  // Handle flow mode changes
+  const handleModeChange = useCallback((mode: FlowMode) => {
+    setFlowMode(mode);
+  }, []);
+
+  // Handle node configuration
+  const handleNodeConfigure = useCallback((nodeId: string) => {
+    console.log("Configure node requested:", nodeId);
+    setSelectedNodeId(nodeId);
+    setShowNodeConfig(true);
+  }, []);
+
+  // Handle connection creation for navigation rules
+  const handleConnectionCreate = useCallback((sourceNodeId: string, targetNodeId: string) => {
+    console.log("Creating connection from", sourceNodeId, "to", targetNodeId);
+    
+    // Find the source node data
+    const sourceNode = flowData.nodes.find(n => n.id === sourceNodeId);
+    if (sourceNode?.type !== "block") {
+      console.warn("Connections can only be created from block nodes");
+      return;
+    }
+
+    // Find the target node
+    const targetNode = flowData.nodes.find(n => n.id === targetNodeId);
+    if (!targetNode) {
+      console.warn("Target node not found");
+      return;
+    }
+
+    // Extract the actual block data from the source node
+    const blockData = sourceNode.data as any;
+    
+    // Determine the target string based on target node type
+    let targetString = "";
+    if (targetNode.type === "submit") {
+      targetString = "submit";
+    } else if (targetNode.type === "block") {
+      // For block targets, use the field name
+      const targetBlockData = targetNode.data as any;
+      targetString = targetBlockData.fieldName || targetBlockData.label || targetNode.id;
+    } else if (targetNode.type === "set") {
+      // For page targets, use the page name or UUID
+      const targetPageData = targetNode.data as any;
+      targetString = targetPageData.name || targetPageData.uuid || targetNode.id;
+    }
+
+    if (!targetString) {
+      console.warn("Could not determine target string for connection");
+      return;
+    }
+
+    // Add the navigation rule to the source block
+    const existingRules = blockData.navigationRules || [];
+    const newRule = {
+      condition: "", // Default empty condition - user will need to configure this
+      target: targetString,
+      isPage: targetNode.type === "set",
+      isDefault: false
+    };
+
+    const updatedBlockData = {
+      ...blockData,
+      navigationRules: [...existingRules, newRule]
+    };
+
+    // Update the node with the new navigation rule
+    updateNode(sourceNodeId, updatedBlockData);
+    
+    console.log("Added navigation rule:", newRule);
+  }, [flowData.nodes, updateNode]);
+
+  // Handle fit view
+  const fitViewRef = useRef<(() => void) | undefined>(undefined);
+  const handleFitView = useCallback(() => {
+    if (fitViewRef.current) {
+      fitViewRef.current();
+    }
+  }, []);
+
+  // Handle node creation from click (place at center of canvas)
+  const handleNodeCreateFromClick = useCallback((nodeType: string) => {
+    // Place new nodes at a default position (center of visible area)
+    const defaultPosition = { x: 400, y: 300 };
+    handleNodeCreate(defaultPosition, nodeType);
+  }, [handleNodeCreate]);
+
+  return (
+    <div className="flow-builder h-full flex flex-col">
+      {/* Flow Toolbar */}
+      <FlowToolbar
+        mode={flowMode}
+        onModeChange={handleModeChange}
+        onUndo={() => {}}
+        onRedo={() => {}}
+        onFitView={handleFitView}
+        onExport={() => {}}
+      />
+      
+      {/* Debug info */}
+      <div className="bg-yellow-50 border-b border-yellow-200 px-4 py-2 text-sm">
+        <div className="flex gap-4 items-center flex-wrap">
+          <span>Root: {state.rootNode?.uuid || 'None'}</span>
+          <span>Root Items: {state.rootNode?.items?.length || 0}</span>
+          <span>Root Nodes: {state.rootNode?.nodes?.length || 0}</span>
+          <span>Pages in Items: {state.rootNode?.items?.filter(i => i.type === 'set').length || 0}</span>
+          <span>Total Blocks: {state.rootNode?.items?.reduce((sum, item) => {
+            if (item.type === 'set') {
+              return sum + (item.items?.length || 0);
+            }
+            return sum;
+          }, 0) || 0}</span>
+          <span>Flow Nodes: {flowData.nodes.length}</span>
+          <Button 
+            type="button"
+            size="sm"
+            variant="default"
+            onClick={() => handleNodeCreateFromClick('set')}
+            className="text-xs h-6"
+          >
+            Debug: Add Page
+          </Button>
+          <Button 
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => console.log("Root Node Structure:", state.rootNode)}
+            className="text-xs h-6"
+          >
+            Log Structure
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar with node types */}
+        <FlowSidebar 
+          definitions={state.definitions}
+          onNodeDragStart={(nodeType) => {
+            console.log("Dragging node type:", nodeType);
+          }}
+          onNodeCreate={handleNodeCreateFromClick}
+        />
+
+        {/* Main canvas area */}
+        <div className="flex-1 relative">
+          <FlowCanvas
+            nodes={flowData.nodes}
+            edges={flowData.edges}
+            mode={flowMode}
+            selectedNodeId={selectedNodeId}
+            onNodeCreate={handleNodeCreate}
+            onNodeSelect={handleNodeSelect}
+            onNodeUpdate={handleNodeUpdate}
+            onNodePositionUpdate={handleNodePositionUpdate}
+            onNodeDelete={handleNodeDelete}
+            onNodeConfigure={handleNodeConfigure}
+            onModeChange={handleModeChange}
+            onFitView={fitViewRef}
+            onConnectionCreate={handleConnectionCreate}
+          />
+        </div>
+
+        {/* Node configuration panel */}
+        {showNodeConfig && selectedNodeId && (
+          <NodeConfigPanel
+            nodeId={selectedNodeId}
+            onClose={() => setShowNodeConfig(false)}
+            onUpdate={handleNodeUpdate}
+          />
+        )}
+      </div>
+    </div>
+  );
+};

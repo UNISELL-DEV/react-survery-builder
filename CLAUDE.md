@@ -3,18 +3,19 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Development Commands
+We use Bun package manager.
 
 ### Main Application
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build the application
-- `npm run start` - Start production server  
-- `npm run lint` - Run Next.js linting
+- `bun run dev` - Start development server with Turbopack
+- `bun run build` - Build the application
+- `bun run start` - Start production server  
+- `bun run lint` - Run Next.js linting
 
 ### Survey Form Package (Workspace)
 - `cd src/packages/survey-form-package`
-- `npm run build` - Build the package using tsup
-- `npm run dev` - Build package in watch mode
-- `npm run lint` - Run Biome linting
+- `bun run build` - Build the package using tsup
+- `bun run dev` - Build package in watch mode
+- `bun run lint` - Run Biome linting
 
 ## Architecture Overview
 
