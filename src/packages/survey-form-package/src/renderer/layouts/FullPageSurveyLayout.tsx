@@ -177,7 +177,7 @@ export const FullPageSurveyLayout: React.FC<FullPageSurveyLayoutProps> = ({
       {/* Logo Section - Positioned after header */}
       {logo && (
         <div className="w-full flex py-2 px-4 border-gray-100 mb-4">
-          <div className="w-full flex max-w-lg mx-auto">
+          <div className="w-full flex max-w-lg mx-auto px-2">
           <div className="justify-start">
             {logo}
           </div>
