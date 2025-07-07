@@ -268,16 +268,74 @@ export const FlowBuilder: React.FC = () => {
   const handleNodeUpdate = useCallback((nodeId: string, data: any) => {
     console.log("Updating node:", nodeId, "with data:", data);
     
-    // Check if this is a block node ID (format: pageUuid-block-index)
+    if (!state.rootNode) {
+      console.error("No root node available for update");
+      return;
+    }
+    
+    // Universal function to find and update a block by UUID (works for both flow and survey builder created blocks)
+    const findAndUpdateBlock = (node: NodeData, blockId: string): NodeData | null => {
+      // Check if this node has items (blocks)
+      if (node.items) {
+        for (let i = 0; i < node.items.length; i++) {
+          const item = node.items[i];
+          
+          // Check if this item is a block and matches our target
+          if (item.type !== 'set' && ((item as any).uuid === blockId || (item as any).fieldName === blockId)) {
+            // Found the block - update it
+            const updatedItems = [...node.items];
+            updatedItems[i] = { ...updatedItems[i], ...data };
+            return {
+              ...node,
+              items: updatedItems
+            };
+          }
+          
+          // If this item is a nested page, search within it
+          if (item.type === 'set' && typeof item !== 'string') {
+            const updated = findAndUpdateBlock(item as NodeData, blockId);
+            if (updated) {
+              const updatedItems = [...node.items];
+              updatedItems[i] = updated;
+              return {
+                ...node,
+                items: updatedItems
+              };
+            }
+          }
+        }
+      }
+      
+      // Check in child nodes
+      if (node.nodes) {
+        for (let i = 0; i < node.nodes.length; i++) {
+          const childNode = node.nodes[i];
+          if (typeof childNode !== 'string') {
+            const updated = findAndUpdateBlock(childNode, blockId);
+            if (updated) {
+              const updatedNodes = [...node.nodes];
+              updatedNodes[i] = updated;
+              return {
+                ...node,
+                nodes: updatedNodes
+              };
+            }
+          }
+        }
+      }
+      
+      return null;
+    };
+    
+    // Handle composite block IDs (flow builder format: pageUuid-block-index)
     const blockMatch = nodeId.match(/^(.+)-block-(\d+)$/);
     if (blockMatch) {
       const [, pageUuid, blockIndexStr] = blockMatch;
       const blockIndex = parseInt(blockIndexStr, 10);
       
-      // Find the page that contains this block
-      const findAndUpdateBlockInPage = (node: NodeData): NodeData | null => {
+      // Find the page and update the block at the specific index
+      const findAndUpdateBlockByIndex = (node: NodeData): NodeData | null => {
         if (node.uuid === pageUuid && node.items && node.items[blockIndex]) {
-          // Update the specific block in the page
           const updatedItems = [...node.items];
           updatedItems[blockIndex] = { ...updatedItems[blockIndex], ...data };
           return {
@@ -291,7 +349,7 @@ export const FlowBuilder: React.FC = () => {
           for (let i = 0; i < node.items.length; i++) {
             const item = node.items[i];
             if (item.type === 'set' && typeof item !== 'string') {
-              const updated = findAndUpdateBlockInPage(item as NodeData);
+              const updated = findAndUpdateBlockByIndex(item as NodeData);
               if (updated) {
                 const updatedItems = [...node.items];
                 updatedItems[i] = updated;
@@ -307,17 +365,22 @@ export const FlowBuilder: React.FC = () => {
         return null;
       };
       
-      if (state.rootNode) {
-        const updatedRootNode = findAndUpdateBlockInPage(state.rootNode);
-        if (updatedRootNode) {
-          console.log("Updated root node with block changes");
-          updateNode(state.rootNode.uuid!, updatedRootNode);
-        } else {
-          console.error("Failed to find and update block in page");
-        }
+      const updatedRootNode = findAndUpdateBlockByIndex(state.rootNode);
+      if (updatedRootNode) {
+        console.log("Updated root node with composite block ID changes");
+        updateNode(state.rootNode.uuid!, updatedRootNode);
+        return;
       }
+    }
+    
+    // Try to find and update as a regular block UUID (survey builder format)
+    const updatedRootNode = findAndUpdateBlock(state.rootNode, nodeId);
+    if (updatedRootNode) {
+      console.log("Updated root node with block UUID changes");
+      updateNode(state.rootNode.uuid!, updatedRootNode);
     } else {
-      // Regular node update
+      // If not found as a block, treat as regular node update
+      console.log("Treating as regular node update");
       updateNode(nodeId, data);
     }
   }, [updateNode, state.rootNode]);
