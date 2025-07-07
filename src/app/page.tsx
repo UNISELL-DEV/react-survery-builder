@@ -59,7 +59,7 @@ const sampleSurvey = {
             "navigationRules": [
               {
                 "condition": "experienceLevel == \"none\"",
-                "target": "f6366314-ec4a-4af5-8843-5928b7d8b515",
+                "target": "1c14950b-1171-4a9b-b076-209d58b86f10",
                 "isPage": true
               },
               {
@@ -68,7 +68,14 @@ const sampleSurvey = {
                 "isPage": true
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 2 - Education Background",
+        "uuid": "1c14950b-1171-4a9b-b076-209d58b86f10",
+        "items": [
           {
             "type": "selectablebox",
             "fieldName": "educationBackground",
@@ -114,90 +121,13 @@ const sampleSurvey = {
             "uuid": "ac93f201-0f57-4629-b567-46e13b2ced88",
             "navigationRules": [
               {
-                "condition": "educationBackground == \"high-school\" && experienceLevel == \"none\"",
+                "condition": "educationBackground == \"high-school\"",
                 "target": "disq-education-1171-4a9b-b076-209d58b86f24",
                 "isPage": true
               },
               {
-                "condition": "educationBackground != \"high-school\" || experienceLevel != \"none\"",
-                "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
-                "isPage": true
-              }
-            ]
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "careerChange",
-            "label": "Are you looking to change careers or advance in your current field?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "change-career",
-                "label": "Change careers entirely",
-                "value": "change"
-              },
-              {
-                "id": "advance-current",
-                "label": "Advance in current field",
-                "value": "advance"
-              },
-              {
-                "id": "explore-options",
-                "label": "Just exploring options",
-                "value": "explore"
-              }
-            ],
-            "uuid": "54197f31-8da6-450c-af52-5ec8f664f5c9",
-            "navigationRules": [
-              {
-                "condition": "careerChange == \"change\" || careerChange == \"advance\" || careerChange == \"explore\"",
-                "target": "g1c14950b-1171-4a9b-b076-209d58b86f12",
-                "isPage": true
-              }
-            ]
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "workEnvironment",
-            "label": "What work environment do you prefer?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "remote-only",
-                "label": "Remote only",
-                "value": "remote"
-              },
-              {
-                "id": "office-only",
-                "label": "Office only",
-                "value": "office"
-              },
-              {
-                "id": "hybrid",
-                "label": "Hybrid (mix of remote and office)",
-                "value": "hybrid"
-              },
-              {
-                "id": "no-preference",
-                "label": "No preference",
-                "value": "no-preference"
-              }
-            ],
-            "uuid": "f4197f31-8da6-450c-af52-5ec8f664f5c0",
-            "navigationRules": [
-              {
-                "condition": "workEnvironment == \"remote\" || workEnvironment == \"office\" || workEnvironment == \"hybrid\" || workEnvironment == \"no-preference\"",
-                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "condition": "educationBackground != \"high-school\"",
+                "target": "f6366314-ec4a-4af5-8843-5928b7d8b515",
                 "isPage": true
               }
             ]
@@ -206,20 +136,19 @@ const sampleSurvey = {
       },
       {
         "type": "set",
-        "name": "Page 2 - Skills & Interests Assessment",
+        "name": "Page 3 - Skills & Interests Assessment",
         "uuid": "f6366314-ec4a-4af5-8843-5928b7d8b515",
         "items": [
           {
             "type": "selectablebox",
-            "fieldName": "technicalSkills",
-            "label": "Which technical areas interest you most? (Select all that apply)",
+            "fieldName": "primarySkill",
+            "label": "Which technical area interests you most?",
             "description": "",
             "boxSpacing": "4",
             "defaultValue": "",
             "showSelectionIndicator": false,
             "autoContinueOnSelect": true,
             "showContinueButton": false,
-            "multiSelect": true,
             "options": [
               {
                 "id": "skill-programming",
@@ -270,17 +199,24 @@ const sampleSurvey = {
             "uuid": "a775a4da-b947-4b4b-8067-df8b462ca635",
             "navigationRules": [
               {
-                "condition": "technicalSkills.includes(\"none\")",
+                "condition": "primarySkill == \"none\"",
                 "target": "disq-interest-1171-4a9b-b076-209d58b86f25",
                 "isPage": true
               },
               {
-                "condition": "!technicalSkills.includes(\"none\")",
+                "condition": "primarySkill != \"none\"",
                 "target": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
                 "isPage": true
               }
             ]
-          },
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 4 - Learning Style",
+        "uuid": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
+        "items": [
           {
             "type": "selectablebox",
             "fieldName": "learningStyle",
@@ -316,27 +252,23 @@ const sampleSurvey = {
             "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c990",
             "navigationRules": [
               {
-                "condition": "learningStyle == \"formal\" || learningStyle == \"online\" || learningStyle == \"hands-on\" || learningStyle == \"mentorship\"",
+                "condition": "learningStyle == \"formal\"",
+                "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
+                "isPage": true
+              },
+              {
+                "condition": "learningStyle != \"formal\"",
                 "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
                 "isPage": true
               }
             ]
-          },
-          {
-            "type": "textfield",
-            "fieldName": "previousExperience",
-            "label": "Briefly describe any relevant experience or projects you've worked on",
-            "placeholder": "e.g., Built a personal website, completed online courses, worked on team projects...",
-            "description": "This helps us better understand your background",
-            "defaultValue": "",
-            "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb"
           }
         ]
       },
       {
         "type": "set",
-        "name": "Page 3 - Work Style Assessment",
-        "uuid": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+        "name": "Page 5 - Problem Solving Assessment",
+        "uuid": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
         "items": [
           {
             "type": "selectablebox",
@@ -375,143 +307,27 @@ const sampleSurvey = {
                 "value": "5"
               }
             ],
-            "uuid": "j4197f31-8da6-450c-af52-5ec8f664f5c2"
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "teamwork",
-            "label": "Rate your teamwork and collaboration skills on a scale of 1-5 (5 being excellent)",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
+            "uuid": "j4197f31-8da6-450c-af52-5ec8f664f5c2",
+            "navigationRules": [
               {
-                "id": "team-1",
-                "label": "1 - Prefer working alone",
-                "value": "1"
+                "condition": "problemSolving >= \"4\"",
+                "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
+                "isPage": true
               },
               {
-                "id": "team-2",
-                "label": "2 - Below average",
-                "value": "2"
-              },
-              {
-                "id": "team-3",
-                "label": "3 - Average",
-                "value": "3"
-              },
-              {
-                "id": "team-4",
-                "label": "4 - Above average",
-                "value": "4"
-              },
-              {
-                "id": "team-5",
-                "label": "5 - Excellent team player",
-                "value": "5"
+                "condition": "problemSolving < \"4\"",
+                "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
+                "isPage": true
               }
-            ],
-            "uuid": "l4197f31-8da6-450c-af52-5ec8f664f5c3"
+            ]
           }
         ]
       },
       {
         "type": "set",
-        "name": "Page 4 - Career Motivation Assessment",
-        "uuid": "m1c14950b-1171-4a9b-b076-209d58b86f15",
+        "name": "Page 6 - Communication Assessment",
+        "uuid": "e1c14950b-1171-4a9b-b076-209d58b86f11",
         "items": [
-          {
-            "type": "selectablebox",
-            "fieldName": "motivationFactors",
-            "label": "What motivates you most in a career? (Select up to 3)",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "multiSelect": true,
-            "options": [
-              {
-                "id": "motiv-salary",
-                "label": "High salary potential",
-                "value": "salary"
-              },
-              {
-                "id": "motiv-creativity",
-                "label": "Creative expression",
-                "value": "creativity"
-              },
-              {
-                "id": "motiv-impact",
-                "label": "Making a positive impact",
-                "value": "impact"
-              },
-              {
-                "id": "motiv-flexibility",
-                "label": "Work-life balance and flexibility",
-                "value": "flexibility"
-              },
-              {
-                "id": "motiv-growth",
-                "label": "Continuous learning and growth",
-                "value": "growth"
-              },
-              {
-                "id": "motiv-stability",
-                "label": "Job security and stability",
-                "value": "stability"
-              },
-              {
-                "id": "motiv-innovation",
-                "label": "Working with cutting-edge technology",
-                "value": "innovation"
-              },
-              {
-                "id": "motiv-leadership",
-                "label": "Leadership opportunities",
-                "value": "leadership"
-              }
-            ],
-            "uuid": "n4197f31-8da6-450c-af52-5ec8f664f5c4"
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "workPace",
-            "label": "What work pace do you prefer?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "pace-fast",
-                "label": "Fast-paced, dynamic environment",
-                "value": "fast"
-              },
-              {
-                "id": "pace-moderate",
-                "label": "Moderate pace with steady progress",
-                "value": "moderate"
-              },
-              {
-                "id": "pace-methodical",
-                "label": "Methodical, careful approach",
-                "value": "methodical"
-              },
-              {
-                "id": "pace-variable",
-                "label": "Variable pace depending on project",
-                "value": "variable"
-              }
-            ],
-            "uuid": "p4197f31-8da6-450c-af52-5ec8f664f5c5"
-          },
           {
             "type": "selectablebox",
             "fieldName": "communicationPreference",
@@ -544,14 +360,54 @@ const sampleSurvey = {
                 "value": "avoid"
               }
             ],
-            "uuid": "r4197f31-8da6-450c-af52-5ec8f664f5c6"
+            "uuid": "r4197f31-8da6-450c-af52-5ec8f664f5c6",
+            "navigationRules": [
+              {
+                "condition": "communicationPreference == \"love\"",
+                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "isPage": true
+              },
+              {
+                "condition": "communicationPreference != \"love\"",
+                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+                "isPage": true
+              }
+            ]
           }
         ]
       },
       {
         "type": "set",
-        "name": "Page 5 - Final Preferences",
-        "uuid": "u1c14950b-1171-4a9b-b076-209d58b86f19",
+        "name": "Page 7 - Experience Details",
+        "uuid": "i1c14950b-1171-4a9b-b076-209d58b86f13",
+        "items": [
+          {
+            "type": "textfield",
+            "fieldName": "previousExperience",
+            "label": "Briefly describe any relevant experience or projects you've worked on",
+            "placeholder": "e.g., Built a personal website, completed online courses, worked on team projects...",
+            "description": "This helps us better understand your background",
+            "defaultValue": "",
+            "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb",
+            "navigationRules": [
+              {
+                "condition": "previousExperience != \"\"",
+                "target": "m1c14950b-1171-4a9b-b076-209d58b86f15",
+                "isPage": true
+              },
+              {
+                "condition": "previousExperience == \"\"",
+                "target": "m1c14950b-1171-4a9b-b076-209d58b86f15",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Page 8 - Final Preferences",
+        "uuid": "m1c14950b-1171-4a9b-b076-209d58b86f15",
         "items": [
           {
             "type": "selectablebox",
@@ -590,93 +446,45 @@ const sampleSurvey = {
                 "value": "unsure"
               }
             ],
-            "uuid": "v4197f31-8da6-450c-af52-5ec8f664f5c8"
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "timeToCommit",
-            "label": "How much time can you dedicate to skill development per week?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "time-5",
-                "label": "Less than 5 hours",
-                "value": "under-5"
-              },
-              {
-                "id": "time-10",
-                "label": "5-10 hours",
-                "value": "5-10"
-              },
-              {
-                "id": "time-20",
-                "label": "10-20 hours",
-                "value": "10-20"
-              },
-              {
-                "id": "time-20plus",
-                "label": "20+ hours (full-time commitment)",
-                "value": "20+"
-              }
-            ],
-            "uuid": "x4197f31-8da6-450c-af52-5ec8f664f5c9"
-          },
-          {
-            "type": "selectablebox",
-            "fieldName": "startupVsCorporate",
-            "label": "Do you prefer startup culture or corporate environment?",
-            "description": "",
-            "boxSpacing": "4",
-            "defaultValue": "",
-            "showSelectionIndicator": false,
-            "autoContinueOnSelect": true,
-            "showContinueButton": false,
-            "options": [
-              {
-                "id": "culture-startup",
-                "label": "Startup - fast-paced, innovative, wearing many hats",
-                "value": "startup"
-              },
-              {
-                "id": "culture-corporate",
-                "label": "Corporate - structured, stable, defined roles",
-                "value": "corporate"
-              },
-              {
-                "id": "culture-either",
-                "label": "Either works for me",
-                "value": "either"
-              }
-            ],
-            "uuid": "z4197f31-8da6-450c-af52-5ec8f664f5d0",
+            "uuid": "v4197f31-8da6-450c-af52-5ec8f664f5c8",
             "navigationRules": [
               {
-                "condition": "technicalSkills.includes(\"programming\") || technicalSkills.includes(\"mobile\")",
+                "condition": "primarySkill == \"programming\"",
                 "target": "qualified-developer-1171-4a9b-b076-209d58b86f28",
                 "isPage": true
               },
               {
-                "condition": "technicalSkills.includes(\"data\") || technicalSkills.includes(\"ai\")",
+                "condition": "primarySkill == \"mobile\"",
+                "target": "qualified-developer-1171-4a9b-b076-209d58b86f28",
+                "isPage": true
+              },
+              {
+                "condition": "primarySkill == \"data\"",
                 "target": "qualified-data-1171-4a9b-b076-209d58b86f29",
                 "isPage": true
               },
               {
-                "condition": "technicalSkills.includes(\"design\")",
+                "condition": "primarySkill == \"ai\"",
+                "target": "qualified-data-1171-4a9b-b076-209d58b86f29",
+                "isPage": true
+              },
+              {
+                "condition": "primarySkill == \"design\"",
                 "target": "qualified-design-1171-4a9b-b076-209d58b86f30",
                 "isPage": true
               },
               {
-                "condition": "technicalSkills.includes(\"project-management\") || communicationPreference == \"love\"",
+                "condition": "primarySkill == \"project-management\"",
                 "target": "qualified-management-1171-4a9b-b076-209d58b86f31",
                 "isPage": true
               },
               {
-                "condition": "true",
+                "condition": "primarySkill == \"cybersecurity\"",
+                "target": "qualified-general-1171-4a9b-b076-209d58b86f32",
+                "isPage": true
+              },
+              {
+                "condition": "primarySkill == \"cloud\"",
                 "target": "qualified-general-1171-4a9b-b076-209d58b86f32",
                 "isPage": true
               }
@@ -727,7 +535,12 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "true",
+                "condition": "primarySkill == \"programming\"",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              },
+              {
+                "condition": "primarySkill == \"mobile\"",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -749,7 +562,12 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "true",
+                "condition": "primarySkill == \"data\"",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              },
+              {
+                "condition": "primarySkill == \"ai\"",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -771,7 +589,7 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "true",
+                "condition": "primarySkill == \"design\"",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -793,7 +611,7 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "true",
+                "condition": "primarySkill == \"project-management\"",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -814,6 +632,16 @@ const sampleSurvey = {
             "className": "",
             "showContinueButton": true,
             "navigationRules": [
+              {
+                "condition": "primarySkill == \"cybersecurity\"",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              },
+              {
+                "condition": "primarySkill == \"cloud\"",
+                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
+                "isPage": true
+              }
             ],
             "uuid": "qualified-general-html-uuid"
           }
@@ -862,7 +690,7 @@ const sampleSurvey = {
   },
   "theme": {
     "name": "clean",
-    "containerLayout": "max-w-2xl mx-auto py-8 px-4 sm:px-6",
+    "containerLayout": "max-w-full mx-auto py-8 px-4 sm:px-6",
     "header": "mb-8",
     "title": "text-3xl font-semibold text-gray-900 mb-4 text-left",
     "description": "text-lg text-gray-600 mb-6 text-left",
