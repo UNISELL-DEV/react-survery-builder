@@ -266,8 +266,61 @@ export const FlowBuilder: React.FC = () => {
 
   // Handle node update
   const handleNodeUpdate = useCallback((nodeId: string, data: any) => {
-    updateNode(nodeId, data);
-  }, [updateNode]);
+    console.log("Updating node:", nodeId, "with data:", data);
+    
+    // Check if this is a block node ID (format: pageUuid-block-index)
+    const blockMatch = nodeId.match(/^(.+)-block-(\d+)$/);
+    if (blockMatch) {
+      const [, pageUuid, blockIndexStr] = blockMatch;
+      const blockIndex = parseInt(blockIndexStr, 10);
+      
+      // Find the page that contains this block
+      const findAndUpdateBlockInPage = (node: NodeData): NodeData | null => {
+        if (node.uuid === pageUuid && node.items && node.items[blockIndex]) {
+          // Update the specific block in the page
+          const updatedItems = [...node.items];
+          updatedItems[blockIndex] = { ...updatedItems[blockIndex], ...data };
+          return {
+            ...node,
+            items: updatedItems
+          };
+        }
+        
+        // Search in nested items
+        if (node.items) {
+          for (let i = 0; i < node.items.length; i++) {
+            const item = node.items[i];
+            if (item.type === 'set' && typeof item !== 'string') {
+              const updated = findAndUpdateBlockInPage(item as NodeData);
+              if (updated) {
+                const updatedItems = [...node.items];
+                updatedItems[i] = updated;
+                return {
+                  ...node,
+                  items: updatedItems
+                };
+              }
+            }
+          }
+        }
+        
+        return null;
+      };
+      
+      if (state.rootNode) {
+        const updatedRootNode = findAndUpdateBlockInPage(state.rootNode);
+        if (updatedRootNode) {
+          console.log("Updated root node with block changes");
+          updateNode(state.rootNode.uuid!, updatedRootNode);
+        } else {
+          console.error("Failed to find and update block in page");
+        }
+      }
+    } else {
+      // Regular node update
+      updateNode(nodeId, data);
+    }
+  }, [updateNode, state.rootNode]);
 
   // Handle node deletion
   const handleNodeDelete = useCallback((nodeId: string) => {
