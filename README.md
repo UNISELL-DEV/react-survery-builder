@@ -61,7 +61,7 @@ This project follows a **monorepo structure** with two main components:
 - **Renderer Components** (`/src/renderer/`) - Survey form rendering engine
 - **Block Definitions** (`/src/builder/blocks/`) - Individual form element types
 - **Layout System** (`/src/renderer/layouts/`) - Different survey presentation modes
-- **Theme Engine** (`/src/renderer/themes/`) - Comprehensive styling system
+- **Theme Engine** (`/src/themes/`) - Comprehensive styling system
 
 ## 🎯 Block Types
 
@@ -389,10 +389,10 @@ react-survey-builder/
 │   │       │   ├── renderer/         # Survey renderer
 │   │       │   │   ├── layouts/      # Layout components
 │   │       │   │   ├── renderers/    # Block renderers
-│   │       │   │   └── themes/       # Theme definitions
 │   │       │   ├── components/       # UI components
 │   │       │   ├── context/          # React contexts
 │   │       │   ├── hooks/            # Custom hooks
+│   │       │   |── themes/           # Theme definitions
 │   │       │   ├── utils/            # Utility functions
 │   │       │   └── types.ts          # TypeScript definitions
 │   │       └── package.json
