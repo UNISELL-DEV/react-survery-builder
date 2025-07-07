@@ -689,7 +689,7 @@ const sampleSurvey = {
     "en": {}
   },
   "theme": {
-    "name": "clean",
+    "name": "default",
     "containerLayout": "max-w-full mx-auto py-8 px-4 sm:px-6",
     "header": "mb-8",
     "title": "text-3xl font-semibold text-gray-900 mb-4 text-left",
@@ -732,7 +732,7 @@ const sampleSurvey = {
       "selectableBoxIndicatorIcon": "text-white"
     },
     "progress": {
-      "bar": "h-2 bg-gray-600 rounded-full overflow-hidden",
+      "bar": "h-2 bg-[#757575] rounded-full overflow-hidden",
       "dots": "flex space-x-2 justify-center",
       "numbers": "flex space-x-2 justify-center",
       "percentage": "text-right text-base text-gray-600 font-medium mb-2",
