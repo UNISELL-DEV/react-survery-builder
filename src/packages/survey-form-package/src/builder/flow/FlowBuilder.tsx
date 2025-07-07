@@ -151,46 +151,24 @@ export const FlowBuilder: React.FC = () => {
     // Create node based on type
     if (nodeType === "set") {
       // Create a new page/set node - use the node definition if available
-      const nodeDefinition = state.definitions.nodes[nodeType];
+      const newPageData = {
+        uuid: `page_${Date.now()}`,
+        type: "set",
+        name: `Page ${(state.rootNode.items?.filter(item => item.type === 'set').length || 0) + 1}`,
+        items: [],
+      };
       
-      if (nodeDefinition) {
-        console.log("Using node definition for set:", nodeDefinition);
-        // Store the position for the new node (we'll generate an ID)
-        const tempId = `page_${Date.now()}`;
-        setNodePositions(prev => ({
-          ...prev,
-          [tempId]: position
-        }));
-        
-        // Use createNode with proper partial data
-        createNode(state.rootNode.uuid!, "set", {
-          name: `Page ${(state.rootNode.nodes?.length || 0) + 1}`,
-          items: [],
-          nodes: []
-        });
-      } else {
-        console.error("No node definition found for type 'set'");
-        // Fallback: manually add the node
-        const newPageData: NodeData = {
-          uuid: `page_${Date.now()}`,
-          type: "set",
-          name: `Page ${(state.rootNode.nodes?.length || 0) + 1}`,
-          items: [],
-          nodes: []
-        };
-        
-        setNodePositions(prev => ({
-          ...prev,
-          [newPageData.uuid!]: position
-        }));
+      setNodePositions(prev => ({
+        ...prev,
+        [newPageData.uuid!]: position
+      }));
 
-        // Manually update the root node
-        const updatedRootNode = {
-          ...state.rootNode,
-          nodes: [...(state.rootNode.nodes || []), newPageData]
-        };
-        updateNode(state.rootNode.uuid!, updatedRootNode);
-      }
+      // Manually update the root node - add to items array
+      const updatedRootNode = {
+        ...state.rootNode,
+        items: [...(state.rootNode.items || []), newPageData]
+      };
+      updateNode(state.rootNode.uuid!, updatedRootNode);
     } else {
       // It's a block type - add to specific page if provided, otherwise first available page
       let targetPage: NodeData | null = null;
@@ -228,30 +206,31 @@ export const FlowBuilder: React.FC = () => {
       }
       
       if (!targetPage) {
-        // Fallback to first available page
-        targetPage = state.rootNode.nodes?.[0] as NodeData;
-        if (!targetPage || typeof targetPage === 'string') {
-          // Check in items array
-          const pageFromItems = state.rootNode.items?.find(item => item.type === 'set') as NodeData;
-          targetPage = pageFromItems || null;
+        // Fallback to first available page - check items array first
+        const pageFromItems = state.rootNode.items?.find(item => item.type === 'set') as NodeData;
+        if (pageFromItems) {
+          targetPage = pageFromItems;
+        } else {
+          // Fallback to nodes array
+          targetPage = state.rootNode.nodes?.[0] as NodeData;
+          if (targetPage && typeof targetPage === 'string') {
+            targetPage = null;
+          }
         }
       }
       
       if (targetPage && typeof targetPage !== 'string') {
+        // Use the same format as ContentBlockPage.tsx handleAddBlockItem
+        const blockDefinition = state.definitions.blocks[nodeType];
+        if (!blockDefinition) {
+          console.error(`No block definition found for type '${nodeType}'`);
+          return;
+        }
+
         const blockId = `${targetPage.uuid}-block-${(targetPage.items?.length || 0)}`;
         const blockData: BlockData = {
-          type: nodeType,
-          fieldName: `field_${Date.now()}`,
-          label: `New ${nodeType}`,
-          required: false,
-          description: "",
-          navigationRules: [],
-          visibleIf: null,
-          placeholder: "",
-          defaultValue: "",
-          options: [],
-          validation: {},
-          props: {}
+          ...blockDefinition.defaultData,
+          uuid: `block_${Date.now()}`,
         };
         
         // Store the position for the new block
