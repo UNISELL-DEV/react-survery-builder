@@ -9,21 +9,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Textarea } from "../../../components/ui/textarea";
 import { Separator } from "../../../components/ui/separator";
-import { Switch } from "../../../components/ui/switch";
-import { Slider } from "../../../components/ui/slider";
 import { Badge } from "../../../components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "../../../components/ui/toggle-group";
 import { Popover, PopoverContent, PopoverTrigger } from "../../../components/ui/popover";
 import { 
   ClipboardCopy, Palette, Type, Layout, MousePointer, BarChart3, Package, 
   RefreshCw, Download, Upload, Plus, X, Info, Eye, EyeOff, Sparkles,
-  Square, Circle, RotateCcw, Sliders, Paintbrush, Grid3X3, Move, CheckSquare,
+  Square, Sliders, Paintbrush, Grid3X3, CheckSquare,
   ArrowLeft, ArrowRight, Settings, Brush, Wrench, Check, ChevronRight, Zap
 } from "lucide-react";
 import { useSurveyBuilder } from "../../../context/SurveyBuilderContext";
 import { ThemeDefinition, SurveyTheme, SurveyBuilderState, NodeData, LocalizationMap } from "../../../types";
 import { SurveyForm } from "../../../renderer/SurveyForm";
-import { themes } from "../../../renderer/themes";
+import { themes } from "../../../themes";
 
 // Theme creation steps
 type ThemeStep = 'selection' | 'basics' | 'advanced' | 'review';
