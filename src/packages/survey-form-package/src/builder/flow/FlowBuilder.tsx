@@ -7,7 +7,7 @@ import { NodeConfigPanel } from "./NodeConfigPanel";
 import { FlowToolbar } from "./FlowToolbar";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { NodeData, BlockData } from "../../types";
-import { flowToSurvey, surveyToFlow } from "./utils/flowTransforms";
+import { flowToSurvey, surveyToFlow, hierarchicalLayoutNodes, repositionBlocksInPage } from "./utils/flowTransforms";
 import { FlowNode, FlowEdge, FlowMode } from "./types";
 
 export const FlowBuilder: React.FC = () => {
@@ -41,64 +41,100 @@ export const FlowBuilder: React.FC = () => {
     return data;
   }, [state.rootNode, nodePositions]);
 
-  // Effect to handle when new nodes are created and we need to assign positions
+  // Track previous flow data to detect changes
+  const prevFlowDataRef = React.useRef<{ nodeCount: number; pageCount: number; blockCount: number }>({
+    nodeCount: 0,
+    pageCount: 0,
+    blockCount: 0
+  });
+
+  // Effect to handle hierarchical layout when flow structure changes
   React.useEffect(() => {
     if (flowData.nodes.length > 0) {
-      const nodesWithoutPositions = flowData.nodes.filter(node => !nodePositions[node.id]);
-      if (nodesWithoutPositions.length > 0) {
-        console.log("Found nodes without positions:", nodesWithoutPositions);
-        const newPositions: Record<string, { x: number; y: number }> = {};
+      const currentPageCount = flowData.nodes.filter(n => n.type === "set").length;
+      const currentBlockCount = flowData.nodes.filter(n => n.type === "block").length;
+      const currentNodeCount = flowData.nodes.length;
+      
+      const prevData = prevFlowDataRef.current;
+      const isInitialLoad = Object.keys(nodePositions).length === 0;
+      const pageCountChanged = currentPageCount !== prevData.pageCount;
+      const newNodesWithoutPositions = flowData.nodes.filter(node => !nodePositions[node.id]);
+      
+      console.log("Layout check:", {
+        isInitialLoad,
+        pageCountChanged,
+        currentPageCount,
+        prevPageCount: prevData.pageCount,
+        currentBlockCount,
+        prevBlockCount: prevData.blockCount,
+        newNodesWithoutPositions: newNodesWithoutPositions.length
+      });
+      
+      // Full layout reset conditions:
+      // 1. Initial load
+      // 2. Page count changed (new page added)
+      // 3. Major structural changes
+      if (isInitialLoad || pageCountChanged) {
+        console.log("Applying full hierarchical layout");
         
-        nodesWithoutPositions.forEach((node, index) => {
-          // Improved auto-layout based on node type
-          if (node.type === "set") {
-            // Layout pages in an optimal grid
-            const pagesPerRow = Math.min(3, Math.ceil(Math.sqrt(nodesWithoutPositions.filter(n => n.type === "set").length)));
-            const pageIndex = nodesWithoutPositions.filter(n => n.type === "set").indexOf(node);
-            const row = Math.floor(pageIndex / pagesPerRow);
-            const col = pageIndex % pagesPerRow;
-            newPositions[node.id] = {
-              x: 100 + col * 400, // Increased spacing for pages
-              y: 100 + row * 300
-            };
-          } else if (node.type === "block") {
-            // Position blocks within their parent page
-            const parentPageMatch = node.id.match(/^(.+)-block-(\d+)$/);
-            if (parentPageMatch) {
-              const [, pageUuid, blockIndexStr] = parentPageMatch;
-              const blockIndex = parseInt(blockIndexStr);
-              const parentPagePos = newPositions[pageUuid] || nodePositions[pageUuid] || { x: 100, y: 100 };
-              
-              // Layout blocks in a 2x2 grid within the page
-              const blockRow = Math.floor(blockIndex / 2);
-              const blockCol = blockIndex % 2;
-              newPositions[node.id] = {
-                x: parentPagePos.x + 20 + blockCol * 160,
-                y: parentPagePos.y + 50 + blockRow * 100
-              };
-            } else {
-              // Fallback for orphaned blocks
-              newPositions[node.id] = {
-                x: 100 + (index % 3) * 300,
-                y: 100 + Math.floor(index / 3) * 200
-              };
+        // Apply hierarchical layout based on navigation rules
+        const layoutedNodes = hierarchicalLayoutNodes(flowData.nodes, flowData.edges);
+        
+        // Extract positions from layouted nodes
+        const newPositions: Record<string, { x: number; y: number }> = {};
+        layoutedNodes.forEach(node => {
+          newPositions[node.id] = node.position;
+        });
+        
+        console.log("Setting full layout positions:", newPositions);
+        setNodePositions(newPositions); // Complete replacement
+      }
+      // Partial layout for block additions within existing pages
+      else if (currentBlockCount !== prevData.blockCount && newNodesWithoutPositions.length > 0) {
+        console.log("Applying partial layout for new blocks");
+        
+        const partialPositions: Record<string, { x: number; y: number }> = {};
+        const affectedPages = new Set<string>();
+        
+        // Find which pages are affected by new blocks
+        newNodesWithoutPositions.forEach(node => {
+          if (node.type === "block") {
+            const match = node.id.match(/^(.+)-block-(\d+)$/);
+            if (match) {
+              const [, parentPageId] = match;
+              affectedPages.add(parentPageId);
             }
-          } else {
-            // Default positioning for other node types
-            newPositions[node.id] = {
-              x: 100 + (index % 3) * 300,
-              y: 100 + Math.floor(index / 3) * 200
+          } else if (node.type === "submit") {
+            // Position submit node at the bottom
+            const pageNodes = flowData.nodes.filter(n => n.type === "set");
+            const maxY = Math.max(...pageNodes.map(n => nodePositions[n.id]?.y || 0));
+            partialPositions[node.id] = {
+              x: 200,
+              y: maxY + 400
             };
           }
         });
         
-        if (Object.keys(newPositions).length > 0) {
-          console.log("Setting auto-layout positions:", newPositions);
-          setNodePositions(prev => ({ ...prev, ...newPositions }));
+        // Reposition all blocks in affected pages to maintain proper layout
+        affectedPages.forEach(pageId => {
+          const repositionedBlocks = repositionBlocksInPage(pageId, flowData.nodes, nodePositions);
+          Object.assign(partialPositions, repositionedBlocks);
+        });
+        
+        if (Object.keys(partialPositions).length > 0) {
+          console.log("Setting partial layout positions:", partialPositions);
+          setNodePositions(prev => ({ ...prev, ...partialPositions }));
         }
       }
+      
+      // Update reference for next comparison
+      prevFlowDataRef.current = {
+        nodeCount: currentNodeCount,
+        pageCount: currentPageCount,
+        blockCount: currentBlockCount
+      };
     }
-  }, [flowData.nodes, nodePositions]);
+  }, [flowData.nodes, flowData.edges, nodePositions]);
 
   // Handle node position updates with relative positioning for children
   const handleNodePositionUpdate = useCallback((nodeId: string, position: { x: number; y: number }) => {

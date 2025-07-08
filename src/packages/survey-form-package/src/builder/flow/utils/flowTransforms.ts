@@ -18,11 +18,8 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
     rootNode.uuid = `root_${Date.now()}`;
   }
   
-  // Layout configuration for hierarchical structure - removed large section container
+  // Layout configuration for node sizing
   const layout = {
-    startPosition: { x: 100, y: 100 },
-    pageSpacing: { x: 50, y: 50 },
-    blockSpacing: { x: 20, y: 20 },
     pageSize: { width: 350, height: 250 },
     blockSize: { width: 140, height: 80 }
   };
@@ -81,8 +78,9 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
       
       // Calculate dynamic page size to accommodate all blocks
       const blockCount = actualChildNode.items?.filter(item => item.type !== "set").length || 0;
+      const blockSpacing = { x: 20, y: 20 }; // Local spacing for calculations
       const blocksPerRow = Math.min(
-        Math.floor(layout.pageSize.width / (layout.blockSize.width + layout.blockSpacing.x)), 
+        Math.floor(layout.pageSize.width / (layout.blockSize.width + blockSpacing.x)), 
         Math.max(1, Math.ceil(Math.sqrt(blockCount)))
       );
       const blockRows = Math.max(1, Math.ceil(blockCount / blocksPerRow));
@@ -90,11 +88,11 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
       // Calculate required space for all blocks with generous padding
       const requiredWidth = Math.max(
         layout.pageSize.width, 
-        blocksPerRow * (layout.blockSize.width + layout.blockSpacing.x) + layout.blockSpacing.x * 2 + 40 // Extra padding
+        blocksPerRow * (layout.blockSize.width + blockSpacing.x) + blockSpacing.x * 2 + 40 // Extra padding
       );
       const requiredHeight = Math.max(
         layout.pageSize.height, 
-        60 + blockRows * (layout.blockSize.height + layout.blockSpacing.y) + layout.blockSpacing.y * 2 + 40 // Extra padding
+        60 + blockRows * (layout.blockSize.height + blockSpacing.y) + blockSpacing.y * 2 + 40 // Extra padding
       );
       
       // Dynamic page size with generous boundaries
@@ -103,19 +101,13 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
         height: requiredHeight
       };
       
-      // Position pages using dynamic sizing to prevent overlap
-      const row = Math.floor(pageIndex / optimalPagesPerRow);
-      const col = pageIndex % optimalPagesPerRow;
-      const pageX = layout.startPosition.x + col * (dynamicPageSize.width + layout.pageSpacing.x);
-      const pageY = layout.startPosition.y + row * (dynamicPageSize.height + layout.pageSpacing.y);
+      console.log(`Adding page node ${pageIndex} with size (${dynamicPageSize.width} x ${dynamicPageSize.height}):`, actualChildNode);
       
-      console.log(`Adding page node ${pageIndex} at (${pageX}, ${pageY}) with size (${dynamicPageSize.width} x ${dynamicPageSize.height}):`, actualChildNode);
-      
-      // Add page node with dynamic container size
+      // Add page node with dynamic container size, position will be set by hierarchical layout
       nodes.push({
         id: actualChildNode.uuid,
         type: "set",
-        position: { x: pageX, y: pageY },
+        position: { x: 0, y: 0 }, // Default position, will be overridden by layout
         data: { ...actualChildNode, containerSize: dynamicPageSize }
       });
       
@@ -125,12 +117,7 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
       if (actualChildNode.items && actualChildNode.items.length > 0) {
         console.log(`Processing ${actualChildNode.items.length} blocks in page:`, actualChildNode.name);
         
-        // Dynamic block layout based on page size and number of blocks
-        const availableWidth = layout.pageSize.width - (layout.blockSpacing.x * 2);
-        const blocksPerRow = Math.min(
-          Math.floor(availableWidth / (layout.blockSize.width + layout.blockSpacing.x)), 
-          Math.max(1, Math.ceil(Math.sqrt(actualChildNode.items.length)))
-        );
+        // Process blocks within this page
         
         actualChildNode.items.forEach((item, blockIndex) => {
           // Skip non-block items (like other sets)
@@ -151,19 +138,13 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
             hasNavigationRules: !!(block.navigationRules && block.navigationRules.length > 0)
           });
           
-          // Position blocks in an optimal grid layout within the page
-          const blockRow = Math.floor(blockIndex / blocksPerRow);
-          const blockCol = blockIndex % blocksPerRow;
-          const blockX = pageX + layout.blockSpacing.x + blockCol * (layout.blockSize.width + layout.blockSpacing.x);
-          const blockY = pageY + 45 + layout.blockSpacing.y + blockRow * (layout.blockSize.height + layout.blockSpacing.y); // 45px for page header
+          console.log(`Adding block node ${blockIndex}:`, block);
           
-          console.log(`Adding block node ${blockIndex} at (${blockX}, ${blockY}):`, block);
-          
-          // Add block node
+          // Add block node, position will be set by hierarchical layout
           nodes.push({
             id: blockId,
             type: "block",
-            position: { x: blockX, y: blockY },
+            position: { x: 0, y: 0 }, // Default position, will be overridden by layout
             data: { ...block, containerSize: layout.blockSize }
           });
           
@@ -221,15 +202,10 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
       // Add a virtual submit node if it doesn't exist
       const submitNodeId = "submit-node";
       if (!nodes.find(n => n.id === submitNodeId)) {
-        // Position submit node to the right of the last page
-        const lastPageNode = nodes.find(n => n.type === "set" && sequentialBlocks.some(b => b.blockId.startsWith(n.id)));
-        const submitX = lastPageNode ? lastPageNode.position.x + 400 : 800;
-        const submitY = lastPageNode ? lastPageNode.position.y + 100 : 400;
-        
         nodes.push({
           id: submitNodeId,
           type: "submit",
-          position: { x: submitX, y: submitY },
+          position: { x: 0, y: 0 }, // Default position, will be overridden by layout
           data: { 
             name: "Submit", 
             type: "submit",
@@ -478,4 +454,246 @@ export function autoLayoutNodes(nodes: FlowNode[], edges: FlowEdge[]): FlowNode[
   }
   
   return layoutNodes;
+}
+
+export function hierarchicalLayoutNodes(nodes: FlowNode[], edges: FlowEdge[]): FlowNode[] {
+  const layoutNodes = [...nodes];
+  
+  // Layout configuration
+  const layout = {
+    pageSpacing: { x: 500, y: 400 }, // Large spacing between pages
+    blockSpacing: { x: 160, y: 100 }, // Spacing between blocks within a page
+    levelSpacing: 300, // Vertical spacing between hierarchy levels
+    startPosition: { x: 200, y: 100 },
+    blockOffset: { x: 20, y: 60 } // Offset of blocks relative to their parent page
+  };
+  
+  // Separate pages and blocks
+  const pageNodes = layoutNodes.filter(node => node.type === "set");
+  const blockNodes = layoutNodes.filter(node => node.type === "block");
+  const submitNodes = layoutNodes.filter(node => node.type === "submit");
+  
+  console.log("Pages:", pageNodes.length, "Blocks:", blockNodes.length, "Submit:", submitNodes.length);
+  
+  // Build navigation graph for conditional flows
+  const navigationEdges = edges.filter(edge => edge.type === "conditional");
+  
+  // Build page-to-page navigation by analyzing block navigation rules
+  const pageNavigationGraph = new Map<string, string[]>();
+  
+  navigationEdges.forEach(edge => {
+    // Check if this edge connects blocks to pages or pages
+    const sourceNode = layoutNodes.find(n => n.id === edge.source);
+    const targetNode = layoutNodes.find(n => n.id === edge.target);
+    
+    if (sourceNode && targetNode) {
+      let sourcePage = sourceNode.type === "set" ? sourceNode.id : null;
+      let targetPage = targetNode.type === "set" ? targetNode.id : null;
+      
+      // If source is a block, find its parent page
+      if (sourceNode.type === "block") {
+        const match = sourceNode.id.match(/^(.+)-block-(\d+)$/);
+        if (match) {
+          sourcePage = match[1];
+        }
+      }
+      
+      // If target is a block, find its parent page
+      if (targetNode.type === "block") {
+        const match = targetNode.id.match(/^(.+)-block-(\d+)$/);
+        if (match) {
+          targetPage = match[1];
+        }
+      }
+      
+      // Create page-to-page connection if they are different pages
+      if (sourcePage && targetPage && sourcePage !== targetPage) {
+        if (!pageNavigationGraph.has(sourcePage)) {
+          pageNavigationGraph.set(sourcePage, []);
+        }
+        if (!pageNavigationGraph.get(sourcePage)!.includes(targetPage)) {
+          pageNavigationGraph.get(sourcePage)!.push(targetPage);
+        }
+      }
+    }
+  });
+  
+  // Find root pages (pages with no incoming navigation from other pages)
+  const rootPages = pageNodes.filter(page => {
+    return !Array.from(pageNavigationGraph.values()).flat().includes(page.id);
+  });
+  
+  console.log("Root pages:", rootPages.map(p => p.id));
+  console.log("Page navigation graph:", Array.from(pageNavigationGraph.entries()));
+  
+  // Calculate levels for pages using BFS
+  const pageLevels = new Map<string, number>();
+  const levelPages = new Map<number, string[]>();
+  const visited = new Set<string>();
+  const queue: Array<{ pageId: string; level: number }> = [];
+  
+  // Start from root pages
+  rootPages.forEach(page => {
+    queue.push({ pageId: page.id, level: 0 });
+  });
+  
+  // If no root pages found, start with the first page
+  if (rootPages.length === 0 && pageNodes.length > 0) {
+    queue.push({ pageId: pageNodes[0].id, level: 0 });
+  }
+  
+  // BFS to assign levels to pages
+  while (queue.length > 0) {
+    const { pageId, level } = queue.shift()!;
+    
+    if (visited.has(pageId)) continue;
+    visited.add(pageId);
+    
+    pageLevels.set(pageId, level);
+    
+    if (!levelPages.has(level)) {
+      levelPages.set(level, []);
+    }
+    levelPages.get(level)!.push(pageId);
+    
+    // Add child pages to queue
+    const children = pageNavigationGraph.get(pageId) || [];
+    children.forEach(childId => {
+      if (!visited.has(childId)) {
+        queue.push({ pageId: childId, level: level + 1 });
+      }
+    });
+  }
+  
+  // Handle unvisited pages (no navigation connections)
+  // Put them at the last level + 1 to appear at the bottom
+  const maxLevel = visited.size > 0 ? Math.max(...Array.from(pageLevels.values())) : -1;
+  const newPageLevel = maxLevel + 1;
+  
+  pageNodes.forEach(page => {
+    if (!visited.has(page.id)) {
+      pageLevels.set(page.id, newPageLevel);
+      if (!levelPages.has(newPageLevel)) {
+        levelPages.set(newPageLevel, []);
+      }
+      levelPages.get(newPageLevel)!.push(page.id);
+    }
+  });
+  
+  // Position pages
+  const pagePositions = new Map<string, { x: number; y: number }>();
+  levelPages.forEach((pageIds, level) => {
+    const y = layout.startPosition.y + level * layout.levelSpacing;
+    
+    // Calculate horizontal spacing for pages at this level
+    const totalWidth = (pageIds.length - 1) * layout.pageSpacing.x;
+    const startX = layout.startPosition.x + (pageIds.length > 1 ? -totalWidth / 2 : 0);
+    
+    pageIds.forEach((pageId, index) => {
+      const x = startX + index * layout.pageSpacing.x;
+      pagePositions.set(pageId, { x, y });
+    });
+  });
+  
+  // Position blocks relative to their parent pages
+  const blockPositions = new Map<string, { x: number; y: number }>();
+  blockNodes.forEach(blockNode => {
+    // Extract parent page ID from block ID (format: pageId-block-index)
+    const match = blockNode.id.match(/^(.+)-block-(\d+)$/);
+    if (match) {
+      const [, parentPageId, blockIndexStr] = match;
+      const blockIndex = parseInt(blockIndexStr);
+      
+      const parentPagePos = pagePositions.get(parentPageId);
+      if (parentPagePos) {
+        // Layout blocks in a grid within the page
+        const blocksInPage = blockNodes.filter(b => b.id.startsWith(`${parentPageId}-block-`));
+        const blocksPerRow = Math.min(2, blocksInPage.length); // Max 2 blocks per row
+        const row = Math.floor(blockIndex / blocksPerRow);
+        const col = blockIndex % blocksPerRow;
+        
+        const blockX = parentPagePos.x + layout.blockOffset.x + col * layout.blockSpacing.x;
+        const blockY = parentPagePos.y + layout.blockOffset.y + row * layout.blockSpacing.y;
+        
+        blockPositions.set(blockNode.id, { x: blockX, y: blockY });
+      }
+    }
+  });
+  
+  // Position submit node
+  if (submitNodes.length > 0) {
+    const maxLevel = Math.max(...Array.from(pageLevels.values()));
+    const submitX = layout.startPosition.x;
+    const submitY = layout.startPosition.y + (maxLevel + 1) * layout.levelSpacing;
+    
+    submitNodes.forEach(submitNode => {
+      submitNode.position = { x: submitX, y: submitY };
+    });
+  }
+  
+  // Apply all calculated positions
+  layoutNodes.forEach(node => {
+    if (node.type === "set") {
+      const position = pagePositions.get(node.id);
+      if (position) {
+        node.position = position;
+      }
+    } else if (node.type === "block") {
+      const position = blockPositions.get(node.id);
+      if (position) {
+        node.position = position;
+      }
+    }
+  });
+  
+  console.log("Hierarchical layout results:");
+  console.log("Page levels:", Array.from(pageLevels.entries()));
+  console.log("Page positions:", Array.from(pagePositions.entries()));
+  console.log("Block positions:", Array.from(blockPositions.entries()));
+  
+  return layoutNodes;
+}
+
+export function repositionBlocksInPage(
+  pageId: string, 
+  nodes: FlowNode[], 
+  nodePositions: Record<string, { x: number; y: number }>
+): Record<string, { x: number; y: number }> {
+  const updatedPositions: Record<string, { x: number; y: number }> = {};
+  
+  // Find the page position
+  const pagePos = nodePositions[pageId];
+  if (!pagePos) return updatedPositions;
+  
+  // Find all blocks in this page
+  const blocksInPage = nodes.filter(node => 
+    node.type === "block" && node.id.startsWith(`${pageId}-block-`)
+  );
+  
+  if (blocksInPage.length === 0) return updatedPositions;
+  
+  // Layout configuration
+  const blockOffset = { x: 20, y: 60 };
+  const blockSpacing = { x: 160, y: 100 };
+  const blocksPerRow = Math.min(2, blocksInPage.length);
+  
+  // Reposition all blocks in this page
+  blocksInPage.forEach(blockNode => {
+    const match = blockNode.id.match(/^(.+)-block-(\d+)$/);
+    if (match) {
+      const [, , blockIndexStr] = match;
+      const blockIndex = parseInt(blockIndexStr);
+      
+      const row = Math.floor(blockIndex / blocksPerRow);
+      const col = blockIndex % blocksPerRow;
+      
+      updatedPositions[blockNode.id] = {
+        x: pagePos.x + blockOffset.x + col * blockSpacing.x,
+        y: pagePos.y + blockOffset.y + row * blockSpacing.y
+      };
+    }
+  });
+  
+  console.log(`Repositioned ${blocksInPage.length} blocks in page ${pageId}:`, updatedPositions);
+  return updatedPositions;
 }
