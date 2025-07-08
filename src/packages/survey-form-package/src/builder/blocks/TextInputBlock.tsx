@@ -3,12 +3,7 @@ import type { BlockDefinition, ContentBlockItemProps } from "../../types";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { LucideTextCursor } from "lucide-react";
-// Utility to generate unique field names
-const generateFieldName = (prefix: string): string => {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 5);
-  return `${prefix}${timestamp}${random}`;
-};
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({

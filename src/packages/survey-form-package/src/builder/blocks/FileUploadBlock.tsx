@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { FileUp, Upload, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox } from "../../components/ui/checkbox";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const FileUploadBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -319,7 +320,7 @@ export const FileUploadBlock: BlockDefinition = {
   icon: <Upload className="w-4 h-4" />,
   defaultData: {
     type: "fileupload",
-    fieldName: `file${uuidv4().substring(0, 4)}`,
+    fieldName: generateFieldName("file"),
     label: "Upload files",
     description: "",
     acceptedFileTypes: [".jpg", ".jpeg", ".png", ".pdf"],
@@ -329,6 +330,18 @@ export const FileUploadBlock: BlockDefinition = {
     showPreview: true,
     required: false,
   },
+  generateDefaultData: () => ({
+    type: "fileupload",
+    fieldName: generateFieldName("file"),
+    label: "Upload files",
+    description: "",
+    acceptedFileTypes: [".jpg", ".jpeg", ".png", ".pdf"],
+    maxFileSize: "5",
+    maxFiles: "1",
+    helpText: "Drag and drop files here or click to browse",
+    showPreview: true,
+    required: false,
+  }),
   renderItem: (props) => <FileUploadBlockItem {...props} />,
   renderFormFields: (props) => <FileUploadBlockForm {...props} />,
   renderPreview: () => <FileUploadBlockPreview/>,

@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { AlignLeft } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const TextareaBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -145,13 +146,22 @@ export const TextareaBlock: BlockDefinition = {
   icon: <AlignLeft className="w-4 h-4" />,
   defaultData: {
     type: "textarea",
-    fieldName: `textArea${uuidv4().slice(0, 4)}`,
+    fieldName: generateFieldName("textArea"),
     label: "Text Area Question",
     placeholder: "Type your answer here",
     description: "",
     defaultValue: "",
     rows: "3",
   },
+  generateDefaultData: () => ({
+    type: "textarea",
+    fieldName: generateFieldName("textArea"),
+    label: "Text Area Question",
+    placeholder: "Type your answer here",
+    description: "",
+    defaultValue: "",
+    rows: "3",
+  }),
   renderItem: (props) => <TextareaBlockItem {...props} />,
   renderFormFields: (props) => <TextareaBlockForm {...props} />,
   renderPreview: () => <TextareaBlockPreview/>,

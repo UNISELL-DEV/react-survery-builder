@@ -9,6 +9,7 @@ import { Calendar as CalendarComponent } from "../../components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
 import { Switch } from "../../components/ui/switch";
 import { cn } from "../../lib/utils";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Simple date formatter function since we're not using date-fns
 const formatDate = (date: Date, format: string = 'PPP'): string => {
@@ -321,7 +322,7 @@ export const DatePickerBlock: BlockDefinition = {
   icon: <Calendar className="w-4 h-4" />,
   defaultData: {
     type: "datepicker",
-    fieldName: `date${uuidv4().substring(0, 4)}`,
+    fieldName: generateFieldName("date"),
     label: "Select a date",
     description: "",
     placeholder: "Pick a date",
@@ -331,6 +332,18 @@ export const DatePickerBlock: BlockDefinition = {
     maxDate: "",
     disabledDays: "",
   },
+  generateDefaultData: () => ({
+    type: "datepicker",
+    fieldName: generateFieldName("date"),
+    label: "Select a date",
+    description: "",
+    placeholder: "Pick a date",
+    dateFormat: "PPP",
+    showCalendarOnFocus: true,
+    minDate: "",
+    maxDate: "",
+    disabledDays: "",
+  }),
   renderItem: (props) => <DatePickerBlockItem {...props} />,
   renderFormFields: (props) => <DatePickerBlockForm {...props} />,
   renderPreview: () => <DatePickerBlockPreview/>,

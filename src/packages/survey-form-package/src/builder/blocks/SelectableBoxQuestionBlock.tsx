@@ -7,13 +7,7 @@ import { Card } from "../../components/ui/card";
 import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { CirclePlus, CircleX, CheckSquare } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-
-// Utility to generate unique field names
-const generateFieldName = (prefix: string): string => {
-  const timestamp = Date.now().toString(36);
-  const random = Math.random().toString(36).substring(2, 5);
-  return `${prefix}${timestamp}${random}`;
-};
+import { generateFieldName } from "./utils/GenFieldName";
 
 interface BoxOption {
   id: string;
@@ -320,18 +314,13 @@ export const SelectableBoxQuestionBlock: BlockDefinition = {
   },
   generateDefaultData: () => ({
     type: "selectablebox",
-    fieldName: generateFieldName("boxq"),
+    fieldName: "", // Will be generated when block is created
     label: "What's your goal?",
     description: "",
     boxSpacing: "4",
     defaultValue: "",
     showSelectionIndicator: false,
-    options: [
-      { id: uuidv4(), label: "Lose 5 to 20 lbs", value: "5-20" },
-      { id: uuidv4(), label: "Lose 21 to 50 lbs", value: "21-50" },
-      { id: uuidv4(), label: "Lose 51+ lbs", value: "51+" },
-      { id: uuidv4(), label: "I'm not sure yet", value: "unsure" },
-    ],
+    options: [],
   }),
   renderItem: (props) => <SelectableBoxQuestionItem {...props} />,
   renderFormFields: (props) => <SelectableBoxQuestionForm {...props} />,

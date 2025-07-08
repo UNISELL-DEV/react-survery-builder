@@ -6,6 +6,7 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { v4 as uuidv4 } from "uuid";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const CheckoutBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate }) => {
@@ -243,7 +244,7 @@ export const CheckoutBlock: BlockDefinition = {
   icon: React.createElement(ShoppingCart, { className: "w-4 h-4" }),
   defaultData: {
     type: "checkout",
-    fieldName: `checkout${uuidv4().substring(0,4)}`,
+    fieldName: generateFieldName("checkout"),
     label: "Checkout Information",
     description: "Please provide your contact and shipping details",
     showContactInfo: true,
@@ -257,6 +258,22 @@ export const CheckoutBlock: BlockDefinition = {
     defaultCountry: "US",
     className: "",
   },
+  generateDefaultData: () => ({
+    type: "checkout",
+    fieldName: generateFieldName("checkout"),
+    label: "Checkout Information",
+    description: "Please provide your contact and shipping details",
+    showContactInfo: true,
+    showShippingAddress: true,
+    showBillingAddress: false,
+    sameAsBilling: true,
+    requireEmail: true,
+    requirePhone: true,
+    collectFullName: true,
+    allowCompany: false,
+    defaultCountry: "US",
+    className: "",
+  }),
   renderItem: (props) => <CheckoutBlockItem {...props} />,
   renderFormFields: (props) => <CheckoutBlockForm {...props} />,
   renderPreview: () => <CheckoutBlockPreview />,

@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { CheckSquare } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const CheckboxBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -170,7 +171,7 @@ export const CheckboxBlock: BlockDefinition = {
   icon: <CheckSquare className="w-4 h-4" />,
   defaultData: {
     type: "checkbox",
-    fieldName: `checkbox${uuidv4().substring(0, 4)}`,
+    fieldName: generateFieldName("checkbox"),
     label: "Check this option",
     description: "",
     value: "true",
@@ -179,6 +180,17 @@ export const CheckboxBlock: BlockDefinition = {
     trueLabel: "Yes",
     falseLabel: "No",
   },
+  generateDefaultData: () => ({
+    type: "checkbox",
+    fieldName: generateFieldName("checkbox"),
+    label: "Check this option",
+    description: "",
+    value: "true",
+    defaultValue: false,
+    showYesNo: false,
+    trueLabel: "Yes",
+    falseLabel: "No",
+  }),
   renderItem: (props) => <CheckboxBlockItem {...props} />,
   renderFormFields: (props) => <CheckboxBlockForm {...props} />,
   renderPreview: () => <CheckboxBlockPreview/>,

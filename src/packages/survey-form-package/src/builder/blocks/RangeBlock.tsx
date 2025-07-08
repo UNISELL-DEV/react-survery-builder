@@ -5,6 +5,7 @@ import { Label } from "../../components/ui/label";
 import { Slider } from "../../components/ui/slider";
 import { ArrowRightToLine } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -232,7 +233,7 @@ export const RangeBlock: BlockDefinition = {
   icon: <ArrowRightToLine className="w-4 h-4" />,
   defaultData: {
     type: "range",
-    fieldName: `range${uuidv4().substring(0, 4)}`,
+    fieldName: generateFieldName("range"),
     label: "Select a value",
     description: "",
     min: 0,
@@ -242,6 +243,19 @@ export const RangeBlock: BlockDefinition = {
     showValue: "Selected: {value}",
     markStep: 25,
   },
+  generateDefaultData: () => ({
+    type: "range",
+    fieldName: generateFieldName("range"),
+    label: "Select a value",
+    description: "",
+    min: 0,
+    max: 100,
+    step: 1,
+    defaultValue: 0,
+    showValue: "Selected: {value}",
+    markStep: 25,
+  }),
+
   renderItem: (props) => <RangeBlockItem {...props} />,
   renderFormFields: (props) => <RangeBlockForm {...props} />,
   renderPreview: () => <RangeBlockPreview/>,

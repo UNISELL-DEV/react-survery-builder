@@ -7,6 +7,7 @@ import { Button } from "../../components/ui/button";
 import { CircleCheck, CirclePlus, CircleX } from "lucide-react";
 import { Circle } from "lucide-react";  // optional, for an SVG circle
 import { v4 as uuidv4 } from "uuid";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const RadioBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -227,13 +228,23 @@ export const RadioBlock: BlockDefinition = {
   icon: <CircleCheck className="w-4 h-4" />,
   defaultData: {
     type: "radio",
-    fieldName: `radioOption${uuidv4().substring(0, 4)}`,
+    fieldName: generateFieldName("radioOptions"),
     label: "Select an option",
     description: "",
     labels: ["Option 1", "Option 2", "Option 3"],
     values: ["1", "2", "3"],
     defaultValue: "1",
   },
+  generateDefaultData: () => ({
+    type: "radio",
+    fieldName: generateFieldName("radioOptions"),
+    label: "Select an option",
+    description: "",
+    labels: ["Option 1", "Option 2", "Option 3"],
+    values: ["1", "2", "3"],
+    defaultValue: "1",
+  }),
+
   renderItem: (props) => <RadioBlockItem {...props} />,
   renderFormFields: (props) => <RadioBlockForm {...props} />,
   renderPreview: () => <RadioBlockPreview/>,

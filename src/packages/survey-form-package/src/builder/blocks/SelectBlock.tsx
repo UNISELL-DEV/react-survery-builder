@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { CirclePlus, CircleX, ListFilter } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import { generateFieldName } from "./utils/GenFieldName";
 
 // Form component for editing the block configuration
 const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -253,7 +254,7 @@ export const SelectBlock: BlockDefinition = {
   icon: <ListFilter className="w-4 h-4" />,
   defaultData: {
     type: "select",
-    fieldName: `select${uuidv4().substring(0, 4)}`,
+    fieldName: generateFieldName("select"),
     label: "Select an option",
     description: "",
     placeholder: "Choose from the list...",
@@ -261,6 +262,17 @@ export const SelectBlock: BlockDefinition = {
     values: ["1", "2", "3"],
     defaultValue: "",
   },
+  generateDefaultData: () => ({
+    type: "select",
+    fieldName: generateFieldName("select"),
+    label: "Select an option",
+    description: "",
+    placeholder: "Choose from the list...",
+    labels: ["Option 1", "Option 2", "Option 3"],
+    values: ["1", "2", "3"],
+    defaultValue: "",
+  }),
+
   renderItem: (props) => <SelectBlockItem {...props} />,
   renderFormFields: (props) => <SelectBlockForm {...props} />,
   renderPreview: () => <SelectBlockPreview/>,
