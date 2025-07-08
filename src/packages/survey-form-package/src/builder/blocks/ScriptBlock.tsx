@@ -4,6 +4,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { Label } from "../../components/ui/label";
 import { Terminal } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import { Input } from "../../components/ui/input";
 
 // Form component for editing the block configuration
 const ScriptBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -20,6 +21,18 @@ const ScriptBlockForm: React.FC<ContentBlockItemProps> = ({
 
   return (
     <div className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="label">Label</Label>
+        <Input
+          id="label"
+          value={data.label || ""}
+          onChange={(e) => handleChange("label", e.target.value)}
+          placeholder="HTML Block"
+        />
+        <p className="text-xs text-muted-foreground">
+          Only shown in flow builder.
+        </p>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="script">JavaScript Code</Label>
         <p className="text-xs text-muted-foreground">
@@ -79,6 +92,7 @@ export const ScriptBlock: BlockDefinition = {
   icon: <Terminal className="w-4 h-4" />,
   defaultData: {
     type: "script",
+    label: "Script Block",
     script: "// This script runs when the page loads\nconsole.log('Script block executed');\n\n// You can access and modify form data\n// formData.calculated = formData.input1 + formData.input2;",
   },
   renderItem: (props) => <ScriptBlockItem {...props} />,
