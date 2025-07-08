@@ -528,7 +528,7 @@ export const FlowBuilder: React.FC = () => {
       />
       
       {/* Debug info */}
-      <div className="bg-muted border-b border-border px-4 py-2 text-sm">
+      {/* <div className="bg-muted border-b border-border px-4 py-2 text-sm">
         <div className="flex gap-4 items-center flex-wrap">
           <span>Root: {state.rootNode?.uuid || 'None'}</span>
           <span>Root Items: {state.rootNode?.items?.length || 0}</span>
@@ -560,7 +560,7 @@ export const FlowBuilder: React.FC = () => {
             Log Structure
           </Button>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar with node types */}

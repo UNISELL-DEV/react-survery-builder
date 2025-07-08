@@ -56,6 +56,9 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
   }>({
     isConnecting: false
   });
+  
+  // Track if mouse is over canvas for better scroll handling
+  const [isMouseOverCanvas, setIsMouseOverCanvas] = useState(false);
 
   // Handle canvas click
   const handleCanvasClick = useCallback((e: React.MouseEvent) => {
@@ -342,20 +345,19 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
     }
   }, [mode]);
 
-  // Handle zoom with better control and event containment
+  // Handle zoom with better control
   const handleWheel = useCallback((e: React.WheelEvent) => {
-    // Always prevent default and stop propagation to contain events in canvas
+    // Always prevent default to stop page scrolling when over canvas
     e.preventDefault();
     e.stopPropagation();
+    
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
     
     // Zoom when Ctrl/Cmd is held, otherwise pan
     if (e.ctrlKey || e.metaKey) {
       // Zoom mode
-      const rect = canvasRef.current!.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      
-      // Smaller zoom increments for smoother zooming
       const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05;
       const newZoom = Math.max(0.2, Math.min(3, viewport.zoom * zoomFactor));
       
@@ -371,7 +373,7 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
       }));
     } else {
       // Pan mode - scroll to move the canvas
-      const panSpeed = 1.5; // Adjust for faster/slower panning
+      const panSpeed = 1.5;
       setViewport(prev => ({
         ...prev,
         x: prev.x - e.deltaX * panSpeed,
@@ -451,6 +453,11 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [fitView]);
 
+  // Expose fit view to parent
+  React.useEffect(() => {
+    fitView();
+  }, []);
+
   // Render nodes and edges
   const renderedNodes = useMemo(() => {
     return nodes.map(node => (
@@ -488,15 +495,16 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
     e.stopPropagation();
   }, []);
 
-  // Prevent page scroll when mouse enters canvas
+
+  // Track mouse over canvas
   const handleCanvasMouseEnter = useCallback(() => {
-    document.body.style.overflow = 'hidden';
+    setIsMouseOverCanvas(true);
   }, []);
 
-  // Restore page scroll when mouse leaves canvas
+  // Track mouse leave canvas
   const handleCanvasMouseLeave = useCallback(() => {
-    document.body.style.overflow = '';
-    // Also stop any active dragging/panning
+    setIsMouseOverCanvas(false);
+    // Stop any active dragging/panning
     setDragState({ isDragging: false });
     setIsPanning(false);
   }, []);

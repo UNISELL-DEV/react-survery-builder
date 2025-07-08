@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../../components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../../components/ui/sheet";
 import { SurveyNode } from "./SurveyNode";
 import { LocalizationEditor } from "./helpers/LocalizationEditor";
 import { v4 as uuidv4 } from "uuid";
@@ -13,6 +13,7 @@ import { SurveyGraph } from "./SurveyGraph";
 import { ThemeBuilder } from "./panels/ThemeBuilder";
 import { PreviewSurvey } from "./panels/PreviewSurvey";
 import { FlowBuilder } from "../flow/FlowBuilder";
+import { X } from "lucide-react";
 
 // Define the props
 interface SurveyBuilderProps {
@@ -135,8 +136,8 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           Flow Builder
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full overflow-y-scroll">
-        <SheetHeader><SheetTitle>Flow Builder</SheetTitle></SheetHeader>
+      <SheetContent side="right" className="w-screen h-screen sm:max-w-none p-0 overflow-auto">
+        <SheetHeader style={{display: "none"}}><SheetTitle>Flow Builder</SheetTitle></SheetHeader>
           <div className="survey-flow h-full">
             {state.rootNode ? (
               <FlowBuilder />
