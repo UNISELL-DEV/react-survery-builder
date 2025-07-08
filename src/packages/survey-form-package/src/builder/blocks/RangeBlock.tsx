@@ -23,7 +23,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fieldName">Field Name</Label>
+          <Label className="text-sm" htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
             value={data.fieldName || ""}
@@ -36,7 +36,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="label">Question Label</Label>
+          <Label className="text-sm" htmlFor="label">Question Label</Label>
           <Input
             id="label"
             value={data.label || ""}
@@ -50,7 +50,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description/Help Text</Label>
+        <Label className="text-sm" htmlFor="description">Description/Help Text</Label>
         <Input
           id="description"
           value={data.description || ""}
@@ -61,7 +61,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
 
       <div className="grid grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="min">Minimum Value</Label>
+          <Label className="text-sm" htmlFor="min">Minimum Value</Label>
           <Input
             id="min"
             type="number"
@@ -71,7 +71,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="max">Maximum Value</Label>
+          <Label className="text-sm" htmlFor="max">Maximum Value</Label>
           <Input
             id="max"
             type="number"
@@ -81,7 +81,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="step">Step</Label>
+          <Label className="text-sm" htmlFor="step">Step</Label>
           <Input
             id="step"
             type="number"
@@ -92,7 +92,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="defaultValue">Default Value</Label>
+        <Label className="text-sm" htmlFor="defaultValue">Default Value</Label>
         <div className="pt-4">
           <Slider
             id="defaultValue"
@@ -112,7 +112,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="showValue">Value Label</Label>
+          <Label className="text-sm" htmlFor="showValue">Value Label</Label>
           <Input
             id="showValue"
             value={data.showValue || "Selected: {value}"}
@@ -125,7 +125,7 @@ const RangeBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="markStep">Show Marks Every</Label>
+          <Label className="text-sm" htmlFor="markStep">Show Marks Every</Label>
           <Input
             id="markStep"
             type="number"
@@ -177,7 +177,7 @@ const RangeBlockItem: React.FC<ContentBlockItemProps> = ({
   return (
     <div className="space-y-4">
       {data.label && (
-        <Label htmlFor={data.fieldName}>{data.label}</Label>
+        <Label className="text-sm" htmlFor={data.fieldName}>{data.label}</Label>
       )}
 
       {data.description && (

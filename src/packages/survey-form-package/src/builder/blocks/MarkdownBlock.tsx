@@ -58,7 +58,7 @@ const MarkdownBlockForm: React.FC<ContentBlockItemProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="label">Label</Label>
+          <Label className="text-sm" htmlFor="label">Label</Label>
           <Input
             id="label"
             value={data.label || ""}
@@ -71,7 +71,7 @@ const MarkdownBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="variableName">Variable Name (Optional)</Label>
+          <Label className="text-sm" htmlFor="variableName">Variable Name (Optional)</Label>
           <Input
             id="variableName"
             value={data.variableName || ""}
@@ -84,7 +84,7 @@ const MarkdownBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="className">CSS Class Names</Label>
+          <Label className="text-sm" htmlFor="className">CSS Class Names</Label>
           <Input
             id="className"
             value={data.className || ""}
@@ -102,12 +102,12 @@ const MarkdownBlockForm: React.FC<ContentBlockItemProps> = ({
             handleChange("updateContent", !!checked);
           }}
         />
-        <Label htmlFor="updateContent">Auto-update content from variables</Label>
+        <Label className="text-sm" htmlFor="updateContent">Auto-update content from variables</Label>
       </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="text">Markdown Content</Label>
+          <Label className="text-sm" htmlFor="text">Markdown Content</Label>
           <button
             type="button"
             className="text-xs text-primary hover:underline"

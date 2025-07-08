@@ -3,7 +3,12 @@ import type { BlockDefinition, ContentBlockItemProps } from "../../types";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { LucideTextCursor } from "lucide-react";
-import { v4 as uuidv4 } from "uuid";
+// Utility to generate unique field names
+const generateFieldName = (prefix: string): string => {
+  const timestamp = Date.now().toString(36);
+  const random = Math.random().toString(36).substring(2, 5);
+  return `${prefix}${timestamp}${random}`;
+};
 
 // Form component for editing the block configuration
 const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({
@@ -22,7 +27,7 @@ const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fieldName">Field Name</Label>
+          <Label className="text-sm" htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
             value={data.fieldName || ""}
@@ -35,7 +40,7 @@ const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="label">Label</Label>
+          <Label className="text-sm" htmlFor="label">Label</Label>
           <Input
             id="label"
             value={data.label || ""}
@@ -50,7 +55,7 @@ const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="placeholder">Placeholder</Label>
+          <Label className="text-sm" htmlFor="placeholder">Placeholder</Label>
           <Input
             id="placeholder"
             value={data.placeholder || ""}
@@ -60,7 +65,7 @@ const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="defaultValue">Default Value</Label>
+          <Label className="text-sm" htmlFor="defaultValue">Default Value</Label>
           <Input
             id="defaultValue"
             value={data.defaultValue || ""}
@@ -70,7 +75,7 @@ const TextInputBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description/Help Text</Label>
+        <Label className="text-sm" htmlFor="description">Description/Help Text</Label>
         <Input
           id="description"
           value={data.description || ""}
@@ -89,7 +94,7 @@ const TextInputBlockItem: React.FC<ContentBlockItemProps> = ({
   return (
     <div className="space-y-2">
       {data.label && (
-        <Label htmlFor={data.fieldName}>{data.label}</Label>
+        <Label className="text-sm" htmlFor={data.fieldName}>{data.label}</Label>
       )}
 
       {data.description && (
@@ -127,12 +132,20 @@ export const TextInputBlock: BlockDefinition = {
   icon: <LucideTextCursor className="w-4 h-4" />,
   defaultData: {
     type: "textfield",
-    fieldName: `textInput${uuidv4().substring(0, 4)}`,
+    fieldName: "", // Will be generated when block is created
     label: "Text Input Question",
     placeholder: "Type your answer here",
     description: "",
     defaultValue: "",
   },
+  generateDefaultData: () => ({
+    type: "textfield",
+    fieldName: generateFieldName("textInput"),
+    label: "Text Input Question",
+    placeholder: "Type your answer here",
+    description: "",
+    defaultValue: "",
+  }),
   renderItem: (props) => <TextInputBlockItem {...props} />,
   renderFormFields: (props) => <TextInputBlockForm {...props} />,
   renderPreview: () => <TextInputBlockPreview/>,

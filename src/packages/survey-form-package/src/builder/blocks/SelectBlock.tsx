@@ -62,7 +62,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fieldName">Field Name</Label>
+          <Label className="text-sm" htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
             value={data.fieldName || ""}
@@ -75,7 +75,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="label">Question Label</Label>
+          <Label className="text-sm" htmlFor="label">Question Label</Label>
           <Input
             id="label"
             value={data.label || ""}
@@ -89,7 +89,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description/Help Text</Label>
+        <Label className="text-sm" htmlFor="description">Description/Help Text</Label>
         <Input
           id="description"
           value={data.description || ""}
@@ -100,7 +100,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="placeholder">Placeholder</Label>
+          <Label className="text-sm" htmlFor="placeholder">Placeholder</Label>
           <Input
             id="placeholder"
             value={data.placeholder || ""}
@@ -110,7 +110,7 @@ const SelectBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="defaultValue">Default Value</Label>
+          <Label className="text-sm" htmlFor="defaultValue">Default Value</Label>
           <Select
             value={data.defaultValue as string || ""}
             onValueChange={(value) => handleChange("defaultValue", value)}
@@ -209,7 +209,7 @@ const SelectBlockItem: React.FC<ContentBlockItemProps> = ({
   return (
     <div className="space-y-2">
       {data.label && (
-        <Label htmlFor={data.fieldName}>{data.label}</Label>
+        <Label className="text-sm" htmlFor={data.fieldName}>{data.label}</Label>
       )}
 
       {data.description && (

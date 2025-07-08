@@ -21,6 +21,7 @@ export interface BlockDefinition {
   description: string;
   icon?: ReactNode;
   defaultData: BlockData;
+  generateDefaultData?: () => BlockData;
   renderItem?: (props: ContentBlockItemProps) => JSX.Element;
   renderFormFields?: (props: ContentBlockItemProps) => JSX.Element;
   renderPreview?: () => JSX.Element;

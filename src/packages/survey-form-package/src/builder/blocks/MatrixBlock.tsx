@@ -112,7 +112,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fieldName">Field Name</Label>
+          <Label className="text-sm" htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
             value={data.fieldName || ""}
@@ -125,7 +125,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="label">Matrix Title</Label>
+          <Label className="text-sm" htmlFor="label">Matrix Title</Label>
           <Input
             id="label"
             value={data.label || ""}
@@ -136,7 +136,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description/Help Text</Label>
+        <Label className="text-sm" htmlFor="description">Description/Help Text</Label>
         <Input
           id="description"
           value={data.description || ""}
@@ -265,7 +265,7 @@ const MatrixBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="columnHeader">Column Header (Optional)</Label>
+        <Label className="text-sm" htmlFor="columnHeader">Column Header (Optional)</Label>
         <Input
           id="columnHeader"
           value={data.columnHeader || ""}

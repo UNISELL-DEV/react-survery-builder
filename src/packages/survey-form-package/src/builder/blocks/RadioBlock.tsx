@@ -63,7 +63,7 @@ const RadioBlockForm: React.FC<ContentBlockItemProps> = ({
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="fieldName">Field Name</Label>
+          <Label className="text-sm" htmlFor="fieldName">Field Name</Label>
           <Input
             id="fieldName"
             value={data.fieldName || ""}
@@ -76,7 +76,7 @@ const RadioBlockForm: React.FC<ContentBlockItemProps> = ({
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="label">Question Label</Label>
+          <Label className="text-sm" htmlFor="label">Question Label</Label>
           <Input
             id="label"
             value={data.label || ""}
@@ -90,7 +90,7 @@ const RadioBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="description">Description/Help Text</Label>
+        <Label className="text-sm" htmlFor="description">Description/Help Text</Label>
         <Input
           id="description"
           value={data.description || ""}
@@ -193,7 +193,7 @@ const RadioBlockItem: React.FC<ContentBlockItemProps> = ({
               value={(data.values || [])[index] as string}
               id={`${data.fieldName}-${index}`}
             />
-            <Label htmlFor={`${data.fieldName}-${index}`}>{label}</Label>
+            <Label className="text-sm" htmlFor={`${data.fieldName}-${index}`}>{label}</Label>
           </div>
         ))}
       </RadioGroup>
@@ -208,11 +208,11 @@ const RadioBlockPreview: React.FC = () => {
       <RadioGroup defaultValue="1" className="w-4/5 max-w-full space-y-1 grid gap-2">
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="1" id="preview-1" />
-          <Label htmlFor="preview-1">Option 1</Label>
+          <Label className="text-sm" htmlFor="preview-1">Option 1</Label>
         </div>
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="2" id="preview-2" />
-          <Label htmlFor="preview-2">Option 2</Label>
+          <Label className="text-sm" htmlFor="preview-2">Option 2</Label>
         </div>
       </RadioGroup>
     </div>

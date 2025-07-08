@@ -22,7 +22,7 @@ const ScriptBlockForm: React.FC<ContentBlockItemProps> = ({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="label">Label</Label>
+        <Label className="text-sm" htmlFor="label">Label</Label>
         <Input
           id="label"
           value={data.label || ""}
@@ -34,7 +34,7 @@ const ScriptBlockForm: React.FC<ContentBlockItemProps> = ({
         </p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="script">JavaScript Code</Label>
+        <Label className="text-sm" htmlFor="script">JavaScript Code</Label>
         <p className="text-xs text-muted-foreground">
           This script will be executed when the page is rendered.
           The script has access to <code>formData</code>, <code>pageData</code>,
