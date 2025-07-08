@@ -3,23 +3,25 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
-import { ScrollArea } from "../../components/ui/scroll-area";
 import { Separator } from "../../components/ui/separator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { NodeData, BlockData } from "../../types";
-import { X, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import { NavigationRulesEditor } from "../common/NavigationRulesEditor";
 import { CommonBlockRules } from "../common/CommonBlockRules";
 
 interface NodeConfigPanelProps {
-  nodeId: string;
-  onClose: () => void;
+  nodeId: string | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onUpdate: (nodeId: string, data: any) => void;
 }
 
 export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
   nodeId,
-  onClose,
+  open,
+  onOpenChange,
   onUpdate
 }) => {
   const { state } = useSurveyBuilder();
@@ -93,34 +95,23 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
     return null;
   };
 
+  // Don't render anything if no nodeId
+  if (!nodeId) {
+    return null;
+  }
+
   const nodeResult = findNodeData(state.rootNode, nodeId);
   const nodeData = nodeResult?.data;
   const nodePath = nodeResult?.path;
 
-  if (!nodeData) {
-    console.log("Node not found for ID:", nodeId);
-    console.log("Available root node:", state.rootNode);
-    return (
-      <div className="node-config-panel w-80 bg-background border-l border-border p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-lg text-foreground">Node Configuration</h3>
-          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-        <p className="text-sm text-muted-foreground">Node not found</p>
-        <p className="text-xs text-muted-foreground mt-2">ID: {nodeId}</p>
-        <p className="text-xs text-muted-foreground">Path: {nodePath || "Not found"}</p>
-      </div>
-    );
-  }
-
   const isBlockData = (data: any): data is BlockData => {
-    return data && typeof data === 'object' && 'fieldName' in data;
+    // A block is anything that's not a section or set type
+    return data && typeof data === 'object' && data.type && data.type !== 'section' && data.type !== 'set';
   };
 
   const isNodeData = (data: any): data is NodeData => {
-    return data && typeof data === 'object' && 'uuid' in data;
+    // A node is a section or set type
+    return data && typeof data === 'object' && (data.type === 'section' || data.type === 'set');
   };
 
   const handleUpdateField = (field: string, value: any) => {
@@ -220,27 +211,35 @@ export const NodeConfigPanel: React.FC<NodeConfigPanelProps> = ({
   };
 
   return (
-    <div className="node-config-panel w-80 bg-background border-l border-border flex flex-col">
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-3xl overflow-y-scroll max-h-screen">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5 text-muted-foreground" />
-            <h3 className="font-semibold text-lg text-foreground">Configuration</h3>
-          </div>
-          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
+            {nodeData ? (
+              <>
+                {isBlockData(nodeData) ? `Edit ${nodeData.type} Block` : `Edit ${nodeData.type} Node`}
+                <span className="text-sm font-normal text-muted-foreground ml-2">
+                  ID: {nodeId}
+                </span>
+              </>
+            ) : (
+              "Node Configuration"
+            )}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="py-4">
+          {nodeData ? (
+            isBlockData(nodeData) ? renderBlockConfig(nodeData) : renderNodeConfig(nodeData)
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-sm text-muted-foreground">Node not found</p>
+              <p className="text-xs text-muted-foreground mt-2">ID: {nodeId}</p>
+            </div>
+          )}
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
-          {isBlockData(nodeData) ? `Block: ${nodeData.type}` : `Node: ${nodeData.type}`}
-        </p>
-        <p className="text-xs text-muted-foreground">ID: {nodeId}</p>
-        {nodePath && <p className="text-xs text-muted-foreground">Path: {nodePath}</p>}
-      </div>
-
-      <ScrollArea className="flex-1 p-4">
-        {isBlockData(nodeData) ? renderBlockConfig(nodeData) : renderNodeConfig(nodeData)}
-      </ScrollArea>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

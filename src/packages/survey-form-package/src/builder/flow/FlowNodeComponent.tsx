@@ -39,9 +39,22 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Don't start drag if clicking on control buttons
+    const target = e.target as HTMLElement;
+    if (target.closest('button')) {
+      return;
+    }
+    
     e.stopPropagation();
     e.preventDefault();
     onDragStart(e, node.id);
+  };
+
+  const handleConfigure = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log("Opening config for node:", node.id);
+    onConfigure?.(node.id);
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -199,7 +212,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
     const cursorClass = isConnecting ? "cursor-crosshair" : "cursor-move"; // Change cursor in connection mode
     const baseClasses = `flow-node absolute ${cursorClass} transition-none`; // Remove transitions for smoother movement
     const selectedClasses = selected ? "border-primary shadow-xl ring-2 ring-primary/20" : "border-border hover:border-accent";
-    const dragOverClasses = isDragOver ? "ring-4 ring-green-300 border-green-400 bg-green-50/50 dark:bg-green-900/50" : "";
+    const dragOverClasses = isDragOver ? "ring-4 ring-green-400 border-green-500 bg-green-100/70 dark:bg-green-900/70 shadow-xl shadow-green-400/20" : "";
     
     // Connection state styling
     const isConnectionSource = connectionSourceId === node.id;
@@ -268,12 +281,8 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
             size="sm"
             variant="outline"
             className="w-7 h-7 p-0 bg-background shadow-md hover:shadow-lg"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              console.log("Opening config for node:", node.id);
-              onConfigure?.(node.id);
-            }}
+            onClick={handleConfigure}
+            onMouseDown={(e) => e.stopPropagation()}
             title="Configure Node"
           >
             <Settings className="w-3.5 h-3.5" />
@@ -285,6 +294,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
               variant="outline"
               className="w-7 h-7 p-0 bg-background shadow-md hover:shadow-lg"
               onClick={handleDelete}
+              onMouseDown={(e) => e.stopPropagation()}
               title="Delete Node"
             >
               <X className="w-3.5 h-3.5" />

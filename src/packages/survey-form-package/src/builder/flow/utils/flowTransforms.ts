@@ -42,13 +42,21 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
   console.log("Pages from nodes:", pagesFromNodes.length);
   console.log("Total pages to process:", pagesToProcess.length);
 
+  // Create a sequential flow map to track all blocks in order
+  const sequentialBlocks: Array<{
+    blockId: string;
+    pageIndex: number;
+    blockIndex: number;
+    hasNavigationRules: boolean;
+  }> = [];
+
   if (pagesToProcess.length > 0) {
     console.log("Processing pages:", pagesToProcess);
     
     // Better page layout algorithm - calculate optimal grid layout
     const optimalPagesPerRow = Math.min(pagesToProcess.length, 3); // Max 3 pages per row for better visibility
     
-    pagesToProcess.forEach((childNode, index) => {
+    pagesToProcess.forEach((childNode, pageIndex) => {
       // Handle both string UUIDs and actual NodeData objects
       let actualChildNode: NodeData;
       
@@ -57,7 +65,7 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
         actualChildNode = {
           uuid: childNode,
           type: "set",
-          name: `Page ${index + 1}`,
+          name: `Page ${pageIndex + 1}`,
           items: [],
           nodes: []
         };
@@ -68,10 +76,10 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
       // Ensure child node has UUID
       if (!actualChildNode.uuid) {
         console.error("Child node missing UUID, generating one");
-        actualChildNode.uuid = `page_${Date.now()}_${index}`;
+        actualChildNode.uuid = `page_${Date.now()}_${pageIndex}`;
       }
       
-      // Calculate dynamic page size first to position correctly
+      // Calculate dynamic page size to accommodate all blocks
       const blockCount = actualChildNode.items?.filter(item => item.type !== "set").length || 0;
       const blocksPerRow = Math.min(
         Math.floor(layout.pageSize.width / (layout.blockSize.width + layout.blockSpacing.x)), 
@@ -79,19 +87,29 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
       );
       const blockRows = Math.max(1, Math.ceil(blockCount / blocksPerRow));
       
-      // Dynamic page size
+      // Calculate required space for all blocks with generous padding
+      const requiredWidth = Math.max(
+        layout.pageSize.width, 
+        blocksPerRow * (layout.blockSize.width + layout.blockSpacing.x) + layout.blockSpacing.x * 2 + 40 // Extra padding
+      );
+      const requiredHeight = Math.max(
+        layout.pageSize.height, 
+        60 + blockRows * (layout.blockSize.height + layout.blockSpacing.y) + layout.blockSpacing.y * 2 + 40 // Extra padding
+      );
+      
+      // Dynamic page size with generous boundaries
       const dynamicPageSize = {
-        width: Math.max(layout.pageSize.width, blocksPerRow * (layout.blockSize.width + layout.blockSpacing.x) + layout.blockSpacing.x),
-        height: Math.max(layout.pageSize.height, 60 + blockRows * (layout.blockSize.height + layout.blockSpacing.y) + layout.blockSpacing.y)
+        width: requiredWidth,
+        height: requiredHeight
       };
       
       // Position pages using dynamic sizing to prevent overlap
-      const row = Math.floor(index / optimalPagesPerRow);
-      const col = index % optimalPagesPerRow;
+      const row = Math.floor(pageIndex / optimalPagesPerRow);
+      const col = pageIndex % optimalPagesPerRow;
       const pageX = layout.startPosition.x + col * (dynamicPageSize.width + layout.pageSpacing.x);
       const pageY = layout.startPosition.y + row * (dynamicPageSize.height + layout.pageSpacing.y);
       
-      console.log(`Adding page node ${index} at (${pageX}, ${pageY}):`, actualChildNode);
+      console.log(`Adding page node ${pageIndex} at (${pageX}, ${pageY}) with size (${dynamicPageSize.width} x ${dynamicPageSize.height}):`, actualChildNode);
       
       // Add page node with dynamic container size
       nodes.push({
@@ -125,6 +143,14 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
           const block = item as BlockData;
           const blockId = `${actualChildNode.uuid}-block-${blockIndex}`;
           
+          // Add to sequential tracking
+          sequentialBlocks.push({
+            blockId,
+            pageIndex,
+            blockIndex,
+            hasNavigationRules: !!(block.navigationRules && block.navigationRules.length > 0)
+          });
+          
           // Position blocks in an optimal grid layout within the page
           const blockRow = Math.floor(blockIndex / blocksPerRow);
           const blockCol = blockIndex % blocksPerRow;
@@ -141,33 +167,152 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
             data: { ...block, containerSize: layout.blockSize }
           });
           
-          // Add edge from page to block
-          edges.push({
-            id: `${actualChildNode.uuid}-${blockId}`,
-            source: actualChildNode.uuid,
-            target: blockId,
-            type: "default"
-          });
+          // Only connect page to first block of the page
+          if (blockIndex === 0) {
+            edges.push({
+              id: `${actualChildNode.uuid}-${blockId}`,
+              source: actualChildNode.uuid,
+              target: blockId,
+              type: "default",
+              style: {
+                stroke: '#10b981', // Green color for page entry
+                strokeWidth: 1.5
+              },
+              data: {
+                label: "Start",
+                isPageEntry: true
+              }
+            });
+          }
+        });
+      }
+    });
+
+    // Now add sequential flow connections and navigation rule connections
+    console.log("Sequential blocks order:", sequentialBlocks);
+    
+    // Add sequential flow edges between all blocks
+    for (let i = 0; i < sequentialBlocks.length - 1; i++) {
+      const currentBlock = sequentialBlocks[i];
+      const nextBlock = sequentialBlocks[i + 1];
+      
+      // Add sequential flow edge (unless the current block has navigation rules that override)
+      const sequentialEdgeId = `${currentBlock.blockId}-sequential-${nextBlock.blockId}`;
+      edges.push({
+        id: sequentialEdgeId,
+        source: currentBlock.blockId,
+        target: nextBlock.blockId,
+        type: "default",
+        style: { 
+          stroke: '#94a3b8', // Gray color for sequential flow
+          strokeDasharray: currentBlock.hasNavigationRules ? '5,5' : undefined // Dashed if has nav rules
+        },
+        data: {
+          label: currentBlock.hasNavigationRules ? "Default" : "",
+          isSequential: true
+        }
+      });
+    }
+
+    // Add final sequential edge to submit for the last block (if no navigation rules)
+    if (sequentialBlocks.length > 0) {
+      const lastBlock = sequentialBlocks[sequentialBlocks.length - 1];
+      
+      // Add a virtual submit node if it doesn't exist
+      const submitNodeId = "submit-node";
+      if (!nodes.find(n => n.id === submitNodeId)) {
+        // Position submit node to the right of the last page
+        const lastPageNode = nodes.find(n => n.type === "set" && sequentialBlocks.some(b => b.blockId.startsWith(n.id)));
+        const submitX = lastPageNode ? lastPageNode.position.x + 400 : 800;
+        const submitY = lastPageNode ? lastPageNode.position.y + 100 : 400;
+        
+        nodes.push({
+          id: submitNodeId,
+          type: "submit",
+          position: { x: submitX, y: submitY },
+          data: { 
+            name: "Submit", 
+            type: "submit",
+            containerSize: { width: 100, height: 60 }
+          }
+        });
+      }
+      
+      // Add sequential edge to submit for last block
+      edges.push({
+        id: `${lastBlock.blockId}-sequential-submit`,
+        source: lastBlock.blockId,
+        target: submitNodeId,
+        type: "default",
+        style: { 
+          stroke: '#94a3b8',
+          strokeDasharray: lastBlock.hasNavigationRules ? '5,5' : undefined
+        },
+        data: {
+          label: lastBlock.hasNavigationRules ? "Default" : "",
+          isSequential: true
+        }
+      });
+    }
+
+    // Now add navigation rule edges (conditional branches)
+    pagesToProcess.forEach((childNode, pageIndex) => {
+      let actualChildNode: NodeData;
+      
+      if (typeof childNode === 'string') {
+        actualChildNode = {
+          uuid: childNode,
+          type: "set", 
+          name: `Page ${pageIndex + 1}`,
+          items: [],
+          nodes: []
+        };
+      } else {
+        actualChildNode = childNode as NodeData;
+      }
+
+      if (actualChildNode.items && actualChildNode.items.length > 0) {
+        actualChildNode.items.forEach((item, blockIndex) => {
+          if (item.type === "set") return;
           
-          // Add navigation rule edges
+          const block = item as BlockData;
+          const blockId = `${actualChildNode.uuid}-block-${blockIndex}`;
+          
+          // Add navigation rule edges (conditional branches)
           if (block.navigationRules && block.navigationRules.length > 0) {
             block.navigationRules.forEach((rule, ruleIndex) => {
               if (rule.target && rule.target !== "submit") {
-                // Try to find target in current page blocks first
                 let targetNodeId = null;
                 
-                // Look for target in current page
-                const targetInCurrentPage = actualChildNode.items?.findIndex(item => 
-                  item.fieldName === rule.target || 
-                  item.label === rule.target ||
-                  (item as any).uuid === rule.target
-                );
-                
-                if (targetInCurrentPage !== undefined && targetInCurrentPage >= 0) {
-                  targetNodeId = `${actualChildNode.uuid}-block-${targetInCurrentPage}`;
+                if (rule.isPage) {
+                  // Target is a page - find the page and connect to its first block
+                  const targetPage = pagesToProcess.find(page => {
+                    const pageNode = typeof page === 'string' ? { uuid: page, name: page } : page;
+                    return pageNode.name === rule.target || pageNode.uuid === rule.target;
+                  });
+                  
+                  if (targetPage) {
+                    const targetPageNode = typeof targetPage === 'string' ? { uuid: targetPage, items: [] } : targetPage;
+                    if (targetPageNode.items && targetPageNode.items.length > 0) {
+                      // Connect to first block of target page
+                      targetNodeId = `${targetPageNode.uuid}-block-0`;
+                    } else {
+                      // Connect to page itself if no blocks
+                      targetNodeId = targetPageNode.uuid;
+                    }
+                  }
                 } else {
-                  // Look for target in other pages
-                  targetNodeId = findNodeIdByTarget(nodes, rule.target);
+                  // Target is a specific block - search through all blocks
+                  const targetBlock = sequentialBlocks.find(seqBlock => {
+                    const blockData = nodes.find(n => n.id === seqBlock.blockId)?.data as BlockData;
+                    return blockData?.fieldName === rule.target || 
+                           blockData?.label === rule.target ||
+                           blockData?.uuid === rule.target;
+                  });
+                  
+                  if (targetBlock) {
+                    targetNodeId = targetBlock.blockId;
+                  }
                 }
                 
                 if (targetNodeId) {
@@ -177,38 +322,32 @@ export function surveyToFlow(rootNode: NodeData): FlowData {
                     target: targetNodeId,
                     type: "conditional",
                     animated: true,
+                    style: {
+                      stroke: rule.isDefault ? '#f59e0b' : '#3b82f6', // Orange for default, blue for conditional
+                      strokeWidth: 2
+                    },
                     data: {
                       condition: rule.condition,
-                      label: rule.condition ? `If ${rule.condition}` : "Default",
+                      label: rule.condition || "Default",
                       isDefault: rule.isDefault || false
                     }
                   });
                 }
               } else if (rule.target === "submit") {
-                // Add a virtual submit node if it doesn't exist
                 const submitNodeId = "submit-node";
-                if (!nodes.find(n => n.id === submitNodeId)) {
-                  nodes.push({
-                    id: submitNodeId,
-                    type: "submit",
-                    position: { x: pageX + 200, y: pageY + 300 },
-                    data: { 
-                      name: "Submit", 
-                      type: "submit",
-                      containerSize: { width: 100, height: 60 }
-                    }
-                  });
-                }
-                
                 edges.push({
                   id: `${blockId}-submit-${ruleIndex}`,
                   source: blockId,
                   target: submitNodeId,
-                  type: "conditional",
+                  type: "conditional", 
                   animated: true,
+                  style: {
+                    stroke: rule.isDefault ? '#f59e0b' : '#10b981', // Orange for default, green for submit
+                    strokeWidth: 2
+                  },
                   data: {
                     condition: rule.condition,
-                    label: rule.condition ? `If ${rule.condition} → Submit` : "Submit",
+                    label: rule.condition ? rule.condition : "Submit",
                     isDefault: rule.isDefault || false
                   }
                 });
@@ -282,19 +421,6 @@ export function flowToSurvey(flowData: FlowData): NodeData | null {
   return result;
 }
 
-function findNodeIdByTarget(nodes: FlowNode[], target: string): string | null {
-  // This is a simplified version - in a real implementation,
-  // you'd need to map survey targets to node IDs
-  const targetNode = nodes.find(n => {
-    if (n.type === "set") {
-      const nodeData = n.data as NodeData;
-      return nodeData.name === target || nodeData.uuid === target;
-    }
-    return false;
-  });
-  
-  return targetNode ? targetNode.id : null;
-}
 
 function findTargetByNodeId(nodes: FlowNode[], nodeId: string): string {
   const node = nodes.find(n => n.id === nodeId);

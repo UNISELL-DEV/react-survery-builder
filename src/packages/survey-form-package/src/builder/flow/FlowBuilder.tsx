@@ -14,6 +14,7 @@ export const FlowBuilder: React.FC = () => {
   const { state, updateNode, createNode, removeNode } = useSurveyBuilder();
   const [flowMode, setFlowMode] = useState<FlowMode>("select");
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [configNodeId, setConfigNodeId] = useState<string | null>(null);
   const [showNodeConfig, setShowNodeConfig] = useState(false);
   const [nodePositions, setNodePositions] = useState<Record<string, { x: number; y: number }>>({});
   
@@ -255,13 +256,7 @@ export const FlowBuilder: React.FC = () => {
   // Handle node selection
   const handleNodeSelect = useCallback((nodeId: string) => {
     console.log("Node selected:", nodeId);
-    if (nodeId) {
-      setSelectedNodeId(nodeId);
-      setShowNodeConfig(true);
-    } else {
-      setSelectedNodeId(null);
-      setShowNodeConfig(false);
-    }
+    setSelectedNodeId(nodeId || null);
   }, []);
 
   // Handle node update
@@ -390,9 +385,12 @@ export const FlowBuilder: React.FC = () => {
     removeNode(nodeId);
     if (selectedNodeId === nodeId) {
       setSelectedNodeId(null);
+    }
+    if (configNodeId === nodeId) {
+      setConfigNodeId(null);
       setShowNodeConfig(false);
     }
-  }, [removeNode, selectedNodeId]);
+  }, [removeNode, selectedNodeId, configNodeId]);
 
   // Handle flow mode changes
   const handleModeChange = useCallback((mode: FlowMode) => {
@@ -402,7 +400,7 @@ export const FlowBuilder: React.FC = () => {
   // Handle node configuration
   const handleNodeConfigure = useCallback((nodeId: string) => {
     console.log("Configure node requested:", nodeId);
-    setSelectedNodeId(nodeId);
+    setConfigNodeId(nodeId);
     setShowNodeConfig(true);
   }, []);
 
@@ -557,14 +555,13 @@ export const FlowBuilder: React.FC = () => {
           />
         </div>
 
-        {/* Node configuration panel */}
-        {showNodeConfig && selectedNodeId && (
-          <NodeConfigPanel
-            nodeId={selectedNodeId}
-            onClose={() => setShowNodeConfig(false)}
-            onUpdate={handleNodeUpdate}
-          />
-        )}
+        {/* Node configuration dialog */}
+        <NodeConfigPanel
+          nodeId={configNodeId}
+          open={showNodeConfig}
+          onOpenChange={setShowNodeConfig}
+          onUpdate={handleNodeUpdate}
+        />
       </div>
     </div>
   );

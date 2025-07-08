@@ -582,6 +582,39 @@ export const FlowCanvas: React.FC<FlowCanvasProps> = ({
             
             {/* Arrow marker definitions */}
             <defs>
+              {/* Default arrowhead for page-to-block and sequential connections */}
+              <marker
+                id="arrowhead-default"
+                markerWidth="10"
+                markerHeight="7"
+                refX="9"
+                refY="3.5"
+                orient="auto"
+              >
+                <polygon
+                  points="0 0, 10 3.5, 0 7"
+                  fill="#6b7280"
+                />
+              </marker>
+              
+              {/* Conditional arrowhead for navigation rules */}
+              <marker
+                id="arrowhead-conditional"
+                markerWidth="12"
+                markerHeight="8"
+                refX="11"
+                refY="4"
+                orient="auto"
+              >
+                <polygon
+                  points="0 0, 12 4, 0 8"
+                  fill="#3b82f6"
+                  stroke="#3b82f6"
+                  strokeWidth="0.5"
+                />
+              </marker>
+              
+              {/* Legacy markers for backward compatibility */}
               <marker
                 id="arrowhead"
                 markerWidth="10"

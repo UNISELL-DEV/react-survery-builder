@@ -135,15 +135,7 @@ const SurveyBuilderContent: React.FC<Omit<SurveyBuilderProps, 'initialData'>> = 
           Flow Builder
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-full overflow-y-scroll"  style={{
-    position: "absolute",
-    top: "0",
-    left: "0",
-    right: "0",
-    bottom: "0",
-    maxWidth: "100%",
-    borderRadius: 0,
-  }}>
+      <SheetContent side="right" className="w-full overflow-y-scroll">
         <SheetHeader><SheetTitle>Flow Builder</SheetTitle></SheetHeader>
           <div className="survey-flow h-full">
             {state.rootNode ? (

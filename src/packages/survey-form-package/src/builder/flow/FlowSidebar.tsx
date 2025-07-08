@@ -71,7 +71,7 @@ export const FlowSidebar: React.FC<FlowSidebarProps> = ({
 
       <div className="flex-1 overflow-hidden">
         <Tabs defaultValue="containers" className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-2 mx-4 mt-4">
+          <TabsList className="grid w-fit grid-cols-2 mx-4 mt-4">
             <TabsTrigger value="containers">Containers</TabsTrigger>
             <TabsTrigger value="blocks">Form Blocks</TabsTrigger>
           </TabsList>

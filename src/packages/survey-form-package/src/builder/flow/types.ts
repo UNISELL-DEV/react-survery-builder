@@ -20,13 +20,15 @@ export interface FlowEdge {
   target: string;
   sourceHandle?: string;
   targetHandle?: string;
-  type?: "default" | "conditional" | "navigation";
+  type?: "default" | "conditional" | "navigation" | "sequential";
   animated?: boolean;
   style?: React.CSSProperties;
   data?: {
     condition?: string;
     label?: string;
     isDefault?: boolean;
+    isSequential?: boolean;
+    isPageEntry?: boolean;
   };
 }
 
