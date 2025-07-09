@@ -276,7 +276,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
       </div>
 
       {/* Node controls */}
-      {selected && (
+      {selected && node.type !== "submit" && node.type !== "set" && (
         <div className="absolute -top-3 -right-3 flex gap-1">
           <Button
             type="button"
