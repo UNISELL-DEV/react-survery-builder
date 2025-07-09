@@ -4,6 +4,7 @@ import { NodeData, BlockData } from "../../types";
 import { useSurveyBuilder } from "../../context/SurveyBuilderContext";
 import { Button } from "../../components/ui/button";
 import { X, Settings, Copy } from "lucide-react";
+import { useBuilderDebug } from "../../utils/debugUtils";
 
 interface FlowNodeComponentProps {
   node: FlowNode;
@@ -31,6 +32,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
   connectionSourceId
 }) => {
   const { state } = useSurveyBuilder();
+  const debug = useBuilderDebug();
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -53,7 +55,7 @@ export const FlowNodeComponent: React.FC<FlowNodeComponentProps> = ({
   const handleConfigure = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log("Opening config for node:", node.id);
+    debug.log("Opening config for node:", node.id);
     onConfigure?.(node.id);
   };
 
