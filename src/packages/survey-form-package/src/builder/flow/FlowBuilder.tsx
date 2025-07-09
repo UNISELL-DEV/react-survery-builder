@@ -418,7 +418,59 @@ export const FlowBuilder: React.FC = () => {
 
   // Handle node deletion
   const handleNodeDelete = useCallback((nodeId: string) => {
-    removeNode(nodeId);
+    if (!state.rootNode) {
+      console.error("No root node available for deletion");
+      return;
+    }
+    
+    // Handle composite block IDs (flow builder format: pageUuid-block-index)
+    const blockMatch = nodeId.match(/^(.+)-block-(\d+)$/);
+    if (blockMatch) {
+      const [, pageUuid, blockIndexStr] = blockMatch;
+      const blockIndex = parseInt(blockIndexStr, 10);
+      
+      // Find the page and remove the block at the specific index
+      const findAndRemoveBlockByIndex = (node: NodeData): NodeData | null => {
+        if (node.uuid === pageUuid && node.items && node.items[blockIndex]) {
+          const updatedItems = [...node.items];
+          updatedItems.splice(blockIndex, 1);
+          return {
+            ...node,
+            items: updatedItems
+          };
+        }
+        
+        // Search in nested items
+        if (node.items) {
+          for (let i = 0; i < node.items.length; i++) {
+            const item = node.items[i];
+            if (item.type === 'set' && typeof item !== 'string') {
+              const updated = findAndRemoveBlockByIndex(item as NodeData);
+              if (updated) {
+                const updatedItems = [...node.items];
+                updatedItems[i] = updated;
+                return {
+                  ...node,
+                  items: updatedItems
+                };
+              }
+            }
+          }
+        }
+        
+        return null;
+      };
+      
+      const updatedRootNode = findAndRemoveBlockByIndex(state.rootNode);
+      if (updatedRootNode) {
+        console.log("Updated root node with block removal");
+        updateNode(state.rootNode.uuid!, updatedRootNode);
+      }
+    } else {
+      // Handle regular node deletion (pages, submit nodes, etc.)
+      removeNode(nodeId);
+    }
+    
     if (selectedNodeId === nodeId) {
       setSelectedNodeId(null);
     }
@@ -426,7 +478,7 @@ export const FlowBuilder: React.FC = () => {
       setConfigNodeId(null);
       setShowNodeConfig(false);
     }
-  }, [removeNode, selectedNodeId, configNodeId]);
+  }, [removeNode, selectedNodeId, configNodeId, state.rootNode, updateNode]);
 
   // Handle flow mode changes
   const handleModeChange = useCallback((mode: FlowMode) => {
