@@ -33,6 +33,16 @@ This is a **monorepo** with a Next.js app and a custom survey package built as a
   - `blocks/` - Individual form element definitions (TextInput, Radio, Checkbox, etc.)
   - `survey/SurveyBuilder.tsx` - Main builder component
   - `survey/SurveyNode.tsx` - Node-based survey structure
+  - `flow/` - **Flow Builder** - Visual node-based survey flow editor
+    - `FlowBuilder.tsx` - Main flow builder interface
+    - `FlowCanvas.tsx` - Interactive canvas for visual editing
+    - `FlowSidebar.tsx` - Block library and tools sidebar
+    - `FlowToolbar.tsx` - Flow editing tools and controls
+    - `FlowNodeComponent.tsx` - Individual node rendering
+    - `FlowEdgeComponent.tsx` - Connection line rendering
+    - `NodeConfigPanel.tsx` - Node configuration dialog
+    - `types.ts` - Flow-specific TypeScript interfaces
+    - `utils/` - Flow transformation and layout utilities
 - **Renderer Components** (`src/renderer/`) - Survey form rendering engine
   - `SurveyForm.tsx` - Main form renderer
   - `layouts/` - Different layout options (page-by-page, continuous, accordion, etc.)
@@ -58,12 +68,53 @@ Surveys use a hierarchical structure:
 - `BlockData` - Individual form elements with field configurations
 - Navigation rules and conditional logic supported via `navigationRules` and `visibleIf`
 
+### Flow Builder System
+
+The **Flow Builder** provides a visual, node-based interface for creating and editing survey flows:
+
+**Architecture:**
+- `FlowNode` interface representing visual survey elements (pages, blocks, start/submit nodes)
+- `FlowEdge` interface for connections showing survey flow and conditional logic
+- Real-time transformation between hierarchical survey data and visual flow representation
+- Automatic layout algorithms for optimal node positioning
+
+**Node Types:**
+- **Start Node** - Entry point for the survey flow
+- **Page Nodes (Set)** - Survey pages containing multiple form blocks
+- **Block Nodes** - Individual form elements (text input, radio, etc.)
+- **Submit Node** - Survey completion endpoint
+
+**Edge Types:**
+- **Sequential Edges** - Default flow between pages and blocks
+- **Conditional Edges** - Navigation rules based on user responses
+- **Page Entry Edges** - Connections from pages to their first blocks
+- **Start Entry Edges** - Connection from start node to first page
+
+**Flow Modes:**
+- **Select Mode** - Default mode for selecting and configuring nodes
+- **Connect Mode** - Create connections between nodes for navigation rules
+- **Pan Mode** - Navigate around large survey flows
+
+**Key Features:**
+- Drag-and-drop node creation from sidebar block library
+- Visual connection editing with automatic edge routing
+- Real-time navigation rule configuration via node connections
+- Hierarchical layout with automatic positioning
+- Node configuration panel for detailed block/page settings
+- Flow transformation utilities for converting between survey data and visual representation
+
 ### Theme System
 
 Extensive theming support with predefined themes (`default`, `minimal`, `colorful`, `modern`, `corporate`, `dark`) and custom theme definitions. Themes control styling for containers, fields, buttons, progress indicators, and colors.
 
 ### Key Features
 
+- **Flow Builder** - Visual node-based survey design with drag-and-drop interface
+  - Interactive canvas for visual survey flow creation
+  - Real-time connection editing between survey elements
+  - Node-based configuration with inline editing
+  - Visual representation of conditional logic and navigation rules
+  - Automatic layout and positioning with hierarchical organization
 - **Conditional Logic** - Show/hide blocks based on user responses
 - **Navigation Rules** - Custom routing between survey sections  
 - **Calculated Fields** - Dynamic field calculations based on other responses
