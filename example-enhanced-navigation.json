@@ -1,0 +1,260 @@
+{
+  "uuid": "survey-example-enhanced",
+  "name": "Enhanced Navigation Rules Demo",
+  "type": "set",
+  "items": [
+    {
+      "uuid": "page-1",
+      "type": "set",
+      "name": "Personal Info",
+      "items": [
+        {
+          "uuid": "age-field",
+          "type": "number",
+          "fieldName": "age",
+          "label": "What is your age?",
+          "required": true,
+          "navigationRules": [
+            {
+              "condition": "age < 18",
+              "target": "page-minors",
+              "isPage": true
+            },
+            {
+              "condition": "age between [18, 65]",
+              "target": "page-adults", 
+              "isPage": true
+            },
+            {
+              "condition": "age > 65",
+              "target": "page-seniors",
+              "isPage": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "page-2",
+      "type": "set", 
+      "name": "Interests",
+      "items": [
+        {
+          "uuid": "hobbies-field",
+          "type": "checkbox",
+          "fieldName": "hobbies",
+          "label": "Select your hobbies:",
+          "options": ["Reading", "Sports", "Music", "Gaming", "Travel", "Cooking"],
+          "navigationRules": [
+            {
+              "condition": "hobbies.containsAny([\"Sports\", \"Gaming\"])",
+              "target": "page-active",
+              "isPage": true
+            },
+            {
+              "condition": "hobbies.containsAll([\"Reading\", \"Music\"])",
+              "target": "page-creative",
+              "isPage": true
+            },
+            {
+              "condition": "hobbies.containsNone([\"Sports\", \"Gaming\", \"Travel\"])",
+              "target": "page-indoor",
+              "isPage": true
+            },
+            {
+              "condition": "true",
+              "target": "page-general",
+              "isPage": true,
+              "isDefault": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "page-3",
+      "type": "set",
+      "name": "Contact Preference",
+      "items": [
+        {
+          "uuid": "email-field",
+          "type": "text",
+          "fieldName": "email",
+          "label": "Email address:",
+          "navigationRules": [
+            {
+              "condition": "email.matches(\".*@company\\\\.com$\")",
+              "target": "page-corporate",
+              "isPage": true
+            },
+            {
+              "condition": "email.isEmpty()",
+              "target": "page-no-contact",
+              "isPage": true
+            },
+            {
+              "condition": "true",
+              "target": "page-standard",
+              "isPage": true,
+              "isDefault": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "page-minors",
+      "type": "set",
+      "name": "Minor's Survey",
+      "items": [
+        {
+          "uuid": "guardian-field",
+          "type": "text",
+          "fieldName": "guardian",
+          "label": "Guardian's name:",
+          "required": true
+        }
+      ]
+    },
+    {
+      "uuid": "page-adults",
+      "type": "set",
+      "name": "Adult's Survey",
+      "items": [
+        {
+          "uuid": "occupation-field",
+          "type": "select",
+          "fieldName": "occupation",
+          "label": "Your occupation:",
+          "options": ["Student", "Employed", "Self-employed", "Unemployed", "Other"],
+          "navigationRules": [
+            {
+              "condition": "occupation in [\"Student\", \"Unemployed\"]",
+              "target": "page-benefits",
+              "isPage": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uuid": "page-seniors",
+      "type": "set",
+      "name": "Senior's Survey", 
+      "items": [
+        {
+          "uuid": "retirement-field",
+          "type": "radio",
+          "fieldName": "retired",
+          "label": "Are you retired?",
+          "options": ["Yes", "No"]
+        }
+      ]
+    },
+    {
+      "uuid": "page-active",
+      "type": "set",
+      "name": "Active Lifestyle",
+      "items": [
+        {
+          "uuid": "exercise-field",
+          "type": "text",
+          "fieldName": "exercise",
+          "label": "Favorite sport or activity:"
+        }
+      ]
+    },
+    {
+      "uuid": "page-creative",
+      "type": "set",
+      "name": "Creative Interests",
+      "items": [
+        {
+          "uuid": "creative-field",
+          "type": "text",
+          "fieldName": "creative",
+          "label": "Favorite book or music genre:"
+        }
+      ]
+    },
+    {
+      "uuid": "page-indoor",
+      "type": "set",
+      "name": "Indoor Activities",
+      "items": [
+        {
+          "uuid": "indoor-field",
+          "type": "text",
+          "fieldName": "indoor",
+          "label": "Favorite indoor activity:"
+        }
+      ]
+    },
+    {
+      "uuid": "page-general",
+      "type": "set",
+      "name": "General Interests",
+      "items": [
+        {
+          "uuid": "general-field",
+          "type": "text",
+          "fieldName": "general",
+          "label": "Tell us about your interests:"
+        }
+      ]
+    },
+    {
+      "uuid": "page-corporate",
+      "type": "set",
+      "name": "Corporate Account",
+      "items": [
+        {
+          "uuid": "department-field",
+          "type": "text",
+          "fieldName": "department",
+          "label": "Department:"
+        }
+      ]
+    },
+    {
+      "uuid": "page-no-contact",
+      "type": "set",
+      "name": "No Contact Info",
+      "items": [
+        {
+          "uuid": "reason-field",
+          "type": "text",
+          "fieldName": "reason",
+          "label": "How would you prefer to be contacted?"
+        }
+      ]
+    },
+    {
+      "uuid": "page-standard",
+      "type": "set",
+      "name": "Standard Contact",
+      "items": [
+        {
+          "uuid": "phone-field",
+          "type": "text",
+          "fieldName": "phone",
+          "label": "Phone number (optional):"
+        }
+      ]
+    },
+    {
+      "uuid": "page-benefits",
+      "type": "set",
+      "name": "Benefits Information",
+      "items": [
+        {
+          "uuid": "benefits-field",
+          "type": "checkbox",
+          "fieldName": "interestedBenefits",
+          "label": "Are you interested in learning about:",
+          "options": ["Student discounts", "Job opportunities", "Training programs", "Financial assistance"]
+        }
+      ]
+    }
+  ]
+}

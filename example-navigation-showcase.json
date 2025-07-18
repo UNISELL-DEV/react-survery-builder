@@ -1,0 +1,360 @@
+{
+  "rootNode": {
+    "type": "section",
+    "name": "Product Recommendation Survey",
+    "uuid": "root-survey",
+    "items": [
+      {
+        "type": "set",
+        "name": "Basic Information",
+        "uuid": "page-basic-info",
+        "items": [
+          {
+            "type": "number",
+            "fieldName": "budget",
+            "label": "What's your budget range? (in USD)",
+            "placeholder": "Enter amount",
+            "required": true,
+            "uuid": "field-budget",
+            "navigationRules": [
+              {
+                "condition": "budget < 500",
+                "target": "page-budget-products",
+                "isPage": true
+              },
+              {
+                "condition": "budget >= 500 && budget <= 2000",
+                "target": "page-mid-products",
+                "isPage": true
+              },
+              {
+                "condition": "budget > 2000",
+                "target": "page-premium-products",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Usage Preferences",
+        "uuid": "page-usage",
+        "items": [
+          {
+            "type": "checkbox",
+            "fieldName": "features",
+            "label": "Which features are important to you?",
+            "options": [
+              "Performance",
+              "Portability", 
+              "Battery Life",
+              "Display Quality",
+              "Storage",
+              "Gaming",
+              "Professional Work",
+              "Budget Friendly"
+            ],
+            "uuid": "field-features",
+            "navigationRules": [
+              {
+                "condition": "features.containsAll([\"Gaming\", \"Performance\"])",
+                "target": "page-gaming-specs",
+                "isPage": true
+              },
+              {
+                "condition": "features.containsAny([\"Professional Work\", \"Display Quality\"])",
+                "target": "page-professional-specs",
+                "isPage": true
+              },
+              {
+                "condition": "features.containsAll([\"Portability\", \"Battery Life\"])",
+                "target": "page-mobile-specs",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Contact Information",
+        "uuid": "page-contact",
+        "items": [
+          {
+            "type": "text",
+            "fieldName": "email",
+            "label": "Email address for recommendations:",
+            "placeholder": "your@email.com",
+            "uuid": "field-email",
+            "navigationRules": [
+              {
+                "condition": "email.endsWith(\".edu\")",
+                "target": "page-student-discount",
+                "isPage": true
+              },
+              {
+                "condition": "email.matches(\".*@(company|corporate|business)\\\\.com$\")",
+                "target": "page-business-account",
+                "isPage": true
+              },
+              {
+                "condition": "!email || email === \"\"",
+                "target": "page-no-email",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Budget Products",
+        "uuid": "page-budget-products",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Budget-Friendly Options</h3><p>Based on your budget under $500, we recommend entry-level products with great value.</p>",
+            "uuid": "budget-content"
+          },
+          {
+            "type": "radio",
+            "fieldName": "budgetChoice",
+            "label": "Select your preferred category:",
+            "options": ["Refurbished Premium", "New Entry-Level", "Previous Generation"],
+            "uuid": "field-budget-choice"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Mid-Range Products",
+        "uuid": "page-mid-products",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Mid-Range Selection</h3><p>Your budget of $500-$2000 opens up great mid-range options.</p>",
+            "uuid": "mid-content"
+          },
+          {
+            "type": "select",
+            "fieldName": "midChoice",
+            "label": "Primary use case:",
+            "options": ["Home Office", "Creative Work", "General Computing", "Light Gaming"],
+            "uuid": "field-mid-choice"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Premium Products",
+        "uuid": "page-premium-products",
+        "items": [
+          {
+            "type": "html", 
+            "html": "<h3>Premium Selection</h3><p>With your budget over $2000, you have access to top-tier products.</p>",
+            "uuid": "premium-content"
+          },
+          {
+            "type": "checkbox",
+            "fieldName": "premiumFeatures",
+            "label": "Select premium features:",
+            "options": ["4K Display", "High-end GPU", "32GB+ RAM", "2TB+ Storage", "Premium Support"],
+            "uuid": "field-premium-features"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Gaming Specifications",
+        "uuid": "page-gaming-specs",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Gaming Setup Requirements</h3><p>Let's configure your gaming preferences.</p>",
+            "uuid": "gaming-content"
+          },
+          {
+            "type": "select",
+            "fieldName": "gamingLevel",
+            "label": "Gaming intensity:",
+            "options": ["Casual Gaming", "Competitive eSports", "AAA Titles", "VR Gaming"],
+            "uuid": "field-gaming-level"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Professional Specifications",
+        "uuid": "page-professional-specs",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Professional Workstation</h3><p>Configure your professional requirements.</p>",
+            "uuid": "pro-content"
+          },
+          {
+            "type": "checkbox",
+            "fieldName": "proTools",
+            "label": "Software you'll be using:",
+            "options": ["Adobe Creative Suite", "CAD/3D Modeling", "Video Editing", "Data Analysis", "Development"],
+            "uuid": "field-pro-tools",
+            "navigationRules": [
+              {
+                "condition": "proTools.containsAny([\"Video Editing\", \"3D Modeling\"])",
+                "target": "page-high-performance",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Mobile Specifications",
+        "uuid": "page-mobile-specs",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Ultra-Portable Options</h3><p>Lightweight devices with long battery life.</p>",
+            "uuid": "mobile-content"
+          },
+          {
+            "type": "range",
+            "fieldName": "weightPreference",
+            "label": "Maximum acceptable weight (lbs):",
+            "min": 2,
+            "max": 6,
+            "step": 0.5,
+            "defaultValue": 4,
+            "uuid": "field-weight"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "General Specifications",
+        "uuid": "page-general-specs",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Balanced Options</h3><p>Well-rounded devices for everyday use.</p>",
+            "uuid": "general-content"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Student Discount",
+        "uuid": "page-student-discount",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Student Discount Available!</h3><p>As a student, you're eligible for educational discounts up to 20% off.</p>",
+            "uuid": "student-content"
+          },
+          {
+            "type": "radio",
+            "fieldName": "studentVerify",
+            "label": "Verify student status?",
+            "options": ["Yes, verify now", "Skip for now"],
+            "uuid": "field-student-verify"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Business Account",
+        "uuid": "page-business-account",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Business Solutions</h3><p>Access volume pricing and business support options.</p>",
+            "uuid": "business-content"
+          },
+          {
+            "type": "number",
+            "fieldName": "quantity",
+            "label": "How many units do you need?",
+            "min": 1,
+            "defaultValue": 1,
+            "uuid": "field-quantity",
+            "navigationRules": [
+              {
+                "condition": "quantity >= 10",
+                "target": "page-volume-discount",
+                "isPage": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Volume Discount",
+        "uuid": "page-volume-discount",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Volume Discount Qualified!</h3><p>Ordering 10+ units qualifies you for volume pricing.</p>",
+            "uuid": "volume-content"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "No Email Provided",
+        "uuid": "page-no-email",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Contact Optional</h3><p>You can still get recommendations without providing email.</p>",
+            "uuid": "no-email-content"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Standard Recommendations",
+        "uuid": "page-standard-recommendations",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Your Personalized Recommendations</h3><p>Based on your preferences, here are our top picks.</p>",
+            "uuid": "standard-content"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "High Performance Required",
+        "uuid": "page-high-performance",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>High-Performance Workstation Required</h3><p>Your software choices require top-tier hardware.</p>",
+            "uuid": "high-perf-content"
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Standard Performance",
+        "uuid": "page-standard-performance",
+        "items": [
+          {
+            "type": "html",
+            "html": "<h3>Standard Performance Sufficient</h3><p>Mid-range hardware will handle your needs well.</p>",
+            "uuid": "standard-perf-content"
+          }
+        ]
+      }
+    ]
+  },
+  "localizations": {
+    "en": {}
+  },
+  "theme": {
+    "name": "modern"
+  }
+}

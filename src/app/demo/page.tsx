@@ -55,18 +55,7 @@ const sampleSurvey = {
               }
             ],
             "uuid": "dd060ccd-cab8-49a5-a007-5f5b638c5901",
-            "navigationRules": [
-              {
-                "condition": "experienceLevel == \"none\"",
-                "target": "1c14950b-1171-4a9b-b076-209d58b86f10",
-                "isPage": true
-              },
-              {
-                "condition": "experienceLevel != \"none\"",
-                "target": "1c14950b-1171-4a9b-b076-209d58b86f10",
-                "isPage": true
-              }
-            ]
+            "navigationRules": []
           }
         ]
       },
@@ -122,11 +111,6 @@ const sampleSurvey = {
               {
                 "condition": "educationBackground == \"high-school\"",
                 "target": "disq-education-1171-4a9b-b076-209d58b86f24",
-                "isPage": true
-              },
-              {
-                "condition": "educationBackground != \"high-school\"",
-                "target": "f6366314-ec4a-4af5-8843-5928b7d8b515",
                 "isPage": true
               }
             ]
@@ -201,11 +185,6 @@ const sampleSurvey = {
                 "condition": "primarySkill == \"none\"",
                 "target": "disq-interest-1171-4a9b-b076-209d58b86f25",
                 "isPage": true
-              },
-              {
-                "condition": "primarySkill != \"none\"",
-                "target": "c48c51cc-e478-4f6e-ba20-e66b9e6d67ad",
-                "isPage": true
               }
             ]
           }
@@ -249,18 +228,7 @@ const sampleSurvey = {
               }
             ],
             "uuid": "7a2c0bfc-a766-4e4e-9b75-1ff49597c990",
-            "navigationRules": [
-              {
-                "condition": "learningStyle == \"formal\"",
-                "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
-                "isPage": true
-              },
-              {
-                "condition": "learningStyle != \"formal\"",
-                "target": "1a250ac6-1959-43e2-9238-3e8adaac44f4",
-                "isPage": true
-              }
-            ]
+            "navigationRules": []
           }
         ]
       },
@@ -307,18 +275,7 @@ const sampleSurvey = {
               }
             ],
             "uuid": "j4197f31-8da6-450c-af52-5ec8f664f5c2",
-            "navigationRules": [
-              {
-                "condition": "problemSolving >= \"4\"",
-                "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
-                "isPage": true
-              },
-              {
-                "condition": "problemSolving < \"4\"",
-                "target": "e1c14950b-1171-4a9b-b076-209d58b86f11",
-                "isPage": true
-              }
-            ]
+            "navigationRules": []
           }
         ]
       },
@@ -360,18 +317,7 @@ const sampleSurvey = {
               }
             ],
             "uuid": "r4197f31-8da6-450c-af52-5ec8f664f5c6",
-            "navigationRules": [
-              {
-                "condition": "communicationPreference == \"love\"",
-                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
-                "isPage": true
-              },
-              {
-                "condition": "communicationPreference != \"love\"",
-                "target": "i1c14950b-1171-4a9b-b076-209d58b86f13",
-                "isPage": true
-              }
-            ]
+            "navigationRules": []
           }
         ]
       },
@@ -388,18 +334,7 @@ const sampleSurvey = {
             "description": "This helps us better understand your background",
             "defaultValue": "",
             "uuid": "d9a559b2-3add-485f-9b42-7963f1720ddb",
-            "navigationRules": [
-              {
-                "condition": "previousExperience != \"\"",
-                "target": "m1c14950b-1171-4a9b-b076-209d58b86f15",
-                "isPage": true
-              },
-              {
-                "condition": "previousExperience == \"\"",
-                "target": "m1c14950b-1171-4a9b-b076-209d58b86f15",
-                "isPage": true
-              }
-            ]
+            "navigationRules": []
           }
         ]
       },
@@ -448,22 +383,12 @@ const sampleSurvey = {
             "uuid": "v4197f31-8da6-450c-af52-5ec8f664f5c8",
             "navigationRules": [
               {
-                "condition": "primarySkill == \"programming\"",
+                "condition": "[\"programming\", \"mobile\"].includes(primarySkill)",
                 "target": "qualified-developer-1171-4a9b-b076-209d58b86f28",
                 "isPage": true
               },
               {
-                "condition": "primarySkill == \"mobile\"",
-                "target": "qualified-developer-1171-4a9b-b076-209d58b86f28",
-                "isPage": true
-              },
-              {
-                "condition": "primarySkill == \"data\"",
-                "target": "qualified-data-1171-4a9b-b076-209d58b86f29",
-                "isPage": true
-              },
-              {
-                "condition": "primarySkill == \"ai\"",
+                "condition": "[\"data\", \"ai\"].includes(primarySkill)",
                 "target": "qualified-data-1171-4a9b-b076-209d58b86f29",
                 "isPage": true
               },
@@ -478,12 +403,7 @@ const sampleSurvey = {
                 "isPage": true
               },
               {
-                "condition": "primarySkill == \"cybersecurity\"",
-                "target": "qualified-general-1171-4a9b-b076-209d58b86f32",
-                "isPage": true
-              },
-              {
-                "condition": "primarySkill == \"cloud\"",
+                "condition": "[\"cybersecurity\", \"cloud\"].includes(primarySkill)",
                 "target": "qualified-general-1171-4a9b-b076-209d58b86f32",
                 "isPage": true
               }
@@ -534,12 +454,7 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "primarySkill == \"programming\"",
-                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
-                "isPage": true
-              },
-              {
-                "condition": "primarySkill == \"mobile\"",
+                "condition": "[\"programming\",\"mobile\"].includes(primarySkill)",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -561,12 +476,7 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "primarySkill == \"data\"",
-                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
-                "isPage": true
-              },
-              {
-                "condition": "primarySkill == \"ai\"",
+                "condition": "[\"data\",\"ai\"].includes(primarySkill)",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -632,12 +542,7 @@ const sampleSurvey = {
             "showContinueButton": true,
             "navigationRules": [
               {
-                "condition": "primarySkill == \"cybersecurity\"",
-                "target": "40bf913e-76ac-432a-bac8-981acdad2712",
-                "isPage": true
-              },
-              {
-                "condition": "primarySkill == \"cloud\"",
+                "condition": "[\"cybersecurity\",\"cloud\"].includes(primarySkill)",
                 "target": "40bf913e-76ac-432a-bac8-981acdad2712",
                 "isPage": true
               }
@@ -657,7 +562,14 @@ const sampleSurvey = {
             "variableName": "",
             "className": "",
             "uuid": "career-plan-intro-html"
-          },
+          }
+        ]
+      },
+      {
+        "type": "set",
+        "name": "Last Step to go.",
+        "uuid": "40bf913e-76ac-432a-bac8-981acdad2710",
+        "items": [
           {
             "type": "checkout",
             "fieldName": "careerPlanCheckout",
@@ -673,7 +585,7 @@ const sampleSurvey = {
             "allowCompany": false,
             "defaultCountry": "US",
             "className": "",
-            "uuid": "a4d78c0b-4ac2-4196-a043-32f59c17e5a7",
+            "uuid": "a4d78c0b-4ac2-4196-a043-32f59c17e5a0",
             "navigationRules": []
           }
         ]
