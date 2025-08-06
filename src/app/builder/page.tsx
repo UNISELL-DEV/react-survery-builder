@@ -6,8 +6,9 @@ import Link from "next/link";
 
 
 import { CreditCard } from 'lucide-react';
-import { BlockDefinition, StandardBlocks, StandardNodes, SurveyBuilder } from "survey-form-package/src";
+import { BlockDefinition, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock } from "survey-form-package/src";
 import { useTheme } from "next-themes";
+import { useEffect } from "react";
 
 // Create a custom credit card input block
 const CreditCardBlock : BlockDefinition = {
@@ -51,6 +52,26 @@ const CreditCardBlock : BlockDefinition = {
       />
     </div>
   ),
+  renderBlock: ({ block, value, onChange, error, disabled }) => (
+    <div className="space-y-2">
+      {block.label && (
+        <label className="block text-sm font-medium text-gray-900 mb-1">
+          {block.label}
+        </label>
+      )}
+      <input
+        type="text"
+        value={value || ''}
+        onChange={(e) => onChange?.(e.target.value)}
+        placeholder={block.placeholder || 'XXXX XXXX XXXX XXXX'}
+        disabled={disabled}
+        className={`w-full p-2 border rounded-md ${error ? 'border-red-500' : 'border-gray-300'} ${disabled ? 'bg-gray-100' : ''}`}
+      />
+      {error && (
+        <div className="text-sm text-red-600">{error}</div>
+      )}
+    </div>
+  )
 };
 
 // Add your custom block to the SurveyBuilder
@@ -66,6 +87,14 @@ function App() {
 export default function Home() {
   const { theme, setTheme } = useTheme();
   const [surveyData, setSurveyData] = useState<any>(null);
+
+  // Register the custom block when component mounts
+  useEffect(() => {
+    registerBlock(CreditCardBlock);
+    
+    // Optional: return cleanup function if you want to unregister on unmount
+    // return () => unregisterBlock('credit-card');
+  }, []);
 
   return (
     <main className="min-h-screen p-4">
