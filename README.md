@@ -6,8 +6,9 @@ A comprehensive React-based survey builder and renderer ecosystem featuring a po
 
 ### **Visual Survey Builder**
 - **Drag-and-Drop Interface**: Intuitive visual editor with real-time preview
-- **18+ Block Types**: Text inputs, radio buttons, checkboxes, file uploads, matrices, date pickers, and more
-- **Custom Block Support**: Easily extend with your own custom block definitions
+- **18+ Unified Block Types**: Text inputs, radio buttons, checkboxes, file uploads, matrices, date pickers, and more
+- **Unified Block System**: Single-file block definitions combining builder and renderer components
+- **Custom Block Support**: Easily extend with your own unified block definitions using `registerBlock()`
 - **Node-Based Architecture**: Hierarchical survey structure with sections and pages
 - **Live Preview**: See your survey as you build it
 
@@ -43,7 +44,9 @@ A comprehensive React-based survey builder and renderer ecosystem featuring a po
 ### **Developer-Friendly**
 - **TypeScript Support**: Full type safety and IntelliSense
 - **Workspace Architecture**: Monorepo with separate builder and renderer packages
-- **Extensible Block System**: Easy to add custom block types
+- **Unified Block System**: Single-file block definitions with `renderBlock` for unified rendering
+- **Block Registry**: Global block registration with `registerBlock()` and `getBlockDefinition()`
+- **Extensible Architecture**: Easy to add custom block types with full builder/renderer support
 - **Theme System**: Comprehensive theming with CSS variables
 - **Modern Stack**: React 19, Next.js 15, Tailwind CSS 4
 
@@ -217,10 +220,15 @@ function MyApp() {
 }
 ```
 
-### **Custom Block Creation**
+### **Unified Block System**
+
+The survey package now uses a **unified block architecture** where each block contains both builder and renderer components in a single definition. This makes it easier to create, maintain, and extend blocks.
+
+#### **Creating Custom Blocks**
 
 ```typescript
-import { BlockDefinition } from 'survey-form-package';
+import React, { useEffect } from 'react';
+import { BlockDefinition, registerBlock } from 'survey-form-package';
 
 const CustomRatingBlock: BlockDefinition = {
   type: 'star-rating',
@@ -234,26 +242,137 @@ const CustomRatingBlock: BlockDefinition = {
     maxStars: 5,
     allowHalfStars: true
   },
-  renderItem: ({ data, value, onChange }) => (
-    <StarRatingComponent
-      value={value}
-      maxStars={data.maxStars}
-      onChange={onChange}
-      allowHalfStars={data.allowHalfStars}
-    />
+  
+  // BUILDER COMPONENTS
+  renderItem: ({ data }) => (
+    // How block appears in builder preview
+    <StarRatingComponent maxStars={data.maxStars} disabled />
   ),
   renderFormFields: ({ data, onUpdate }) => (
-    <div>
-      <label>Maximum Stars</label>
-      <input 
-        type="number" 
-        value={data.maxStars} 
-        onChange={(e) => onUpdate({...data, maxStars: parseInt(e.target.value)})}
-      />
+    // Configuration form in builder
+    <div className="space-y-4">
+      <div>
+        <label>Label</label>
+        <input 
+          value={data.label || ''}
+          onChange={(e) => onUpdate?.({ ...data, label: e.target.value })}
+        />
+      </div>
+      <div>
+        <label>Maximum Stars</label>
+        <input 
+          type="number"
+          value={data.maxStars || 5}
+          onChange={(e) => onUpdate?.({ ...data, maxStars: parseInt(e.target.value) })}
+        />
+      </div>
     </div>
-  )
+  ),
+  renderPreview: () => (
+    // Small preview in block library
+    <div className="flex justify-center">
+      <StarRatingComponent maxStars={5} value={3} disabled />
+    </div>
+  ),
+  
+  // RENDERER COMPONENT - NEW UNIFIED APPROACH
+  renderBlock: ({ block, value, onChange, error, disabled }) => (
+    // How block renders in actual surveys
+    <div className="space-y-2">
+      {block.label && (
+        <label className="block text-sm font-medium">
+          {block.label}
+        </label>
+      )}
+      <StarRatingComponent
+        value={value || 0}
+        maxStars={block.maxStars || 5}
+        allowHalfStars={block.allowHalfStars}
+        onChange={onChange}
+        disabled={disabled}
+      />
+      {error && <div className="text-red-500 text-sm">{error}</div>}
+    </div>
+  ),
+  
+  // VALIDATION
+  validate: (data) => {
+    if (!data.fieldName) return "Field name is required";
+    return null;
+  },
+  validateValue: (value, data) => {
+    if (data.required && !value) return "Rating is required";
+    return null;
+  },
 };
+
+// Register the custom block
+function MyApp() {
+  useEffect(() => {
+    registerBlock(CustomRatingBlock);
+  }, []);
+
+  return (
+    <SurveyBuilder
+      blockDefinitions={[...StandardBlocks, CustomRatingBlock]}
+      // ... other props
+    />
+  );
+}
 ```
+
+#### **Unified Block Benefits**
+
+- ✅ **Single Source of Truth**: One file defines both builder and renderer behavior
+- ✅ **Easier Maintenance**: Changes only need to be made in one place  
+- ✅ **Better Type Safety**: Shared interfaces ensure consistency
+- ✅ **Simplified Extension**: Custom blocks only need one implementation
+- ✅ **Validation Consolidation**: Both config and value validation in one place
+
+#### **Available Block Types (18 Built-in)**
+
+All blocks use the unified system and support both builder and renderer functionality:
+
+| Block Type | Description | Input Type |
+|------------|-------------|------------|
+| `textfield` | Single line text input | Text |
+| `textarea` | Multi-line text area | Text |
+| `radio` | Single choice selection | Option |
+| `checkbox` | Multiple choice selection | Array |
+| `select` | Dropdown selection | Option |
+| `range` | Slider/range input | Number |
+| `datepicker` | Date selection | Date |
+| `fileupload` | File upload | File |
+| `matrix` | Grid/table questions | Object |
+| `selectablebox` | Visual selection boxes | Option |
+| `markdown` | Rich text content | N/A |
+| `html` | Raw HTML content | N/A |
+| `script` | Custom JavaScript | N/A |
+| `auth` | Authentication forms | Object |
+| `bmiCalculator` | BMI calculation | Number |
+| `calculated` | Dynamic calculations | Number |
+| `conditional` | Conditional logic | Any |
+| `checkout` | Payment forms | Object |
+
+#### **Block Registration**
+
+```typescript
+import { registerBlock, unregisterBlock, getBlockDefinition } from 'survey-form-package';
+
+// Register a custom block
+registerBlock(MyCustomBlock);
+
+// Get a registered block
+const blockDef = getBlockDefinition('my-custom-type');
+
+// Unregister a block
+unregisterBlock('my-custom-type');
+```
+
+#### **Documentation**
+
+- 📖 [Custom Blocks Guide](./src/packages/survey-form-package/CUSTOM_BLOCKS_GUIDE.md) - Comprehensive guide for creating custom blocks
+- 📖 [Block Migration Guide](./src/packages/survey-form-package/BLOCK_MIGRATION_GUIDE.md) - Migration status and legacy block information
 
 ### **Advanced Conditional Logic**
 
