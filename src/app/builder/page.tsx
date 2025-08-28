@@ -6,9 +6,10 @@ import Link from "next/link";
 
 
 import { CreditCard } from 'lucide-react';
-import { BlockDefinition, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock } from "survey-form-package/src";
+import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder } from "survey-form-package/src";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
+import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
 
 // Create a custom credit card input block
 const CreditCardBlock : BlockDefinition = {
@@ -74,27 +75,55 @@ const CreditCardBlock : BlockDefinition = {
   )
 };
 
-// Add your custom block to the SurveyBuilder
-function App() {
-  return (
-    <SurveyBuilder
-      blockDefinitions={[...StandardBlocks, CreditCardBlock]}
-      nodeDefinitions={StandardNodes}
-    />
-  );
-}
-
 export default function Home() {
   const { theme, setTheme } = useTheme();
   const [surveyData, setSurveyData] = useState<any>(null);
 
-  // Register the custom block when component mounts
+    // Register the custom block when component mounts
   useEffect(() => {
     registerBlock(CreditCardBlock);
     
     // Optional: return cleanup function if you want to unregister on unmount
     // return () => unregisterBlock('credit-card');
   }, []);
+
+  // Define your global custom fields
+  const globalCustomFields: GlobalCustomField[] = [
+    {
+      key: "referenceQuestionKey",
+      label: "Reference Question Key",
+      description: "Unique identifier for this question used in data analysis",
+      component: ({ data, onUpdate, value }) => (
+        <DynamicKeyValueField
+          onUpdate={onUpdate} data={data}
+          label="Telegra Question Config"
+          keyPlaceholder="Telegra Key"
+          valuePlaceholder="Telegra Value"
+          description="Custom keys for storing telegra information."
+          keyName="telegraData"
+        />
+      ),
+      defaultValue: "",
+      showLabel: false
+    },
+    // You can add more custom fields here
+    {
+      key: "questionCategory",
+      label: "Question Category",
+      description: "Category for organizing questions in reports",
+      component: ({ data, onUpdate, value }) => (
+        <input
+          value={value || ""}
+          onChange={(e) => onUpdate({ ...data, questionCategory: e.target.value })}
+          placeholder="e.g. Demographics, Health, Preferences"
+          className="w-full p-2 border rounded-md"
+        />
+      ),
+      defaultValue: "",
+      showLabel: true
+    }
+  ];
+
 
   return (
     <main className="min-h-screen p-4">
@@ -116,6 +145,7 @@ export default function Home() {
           <SurveyBuilder
             blockDefinitions={[...StandardBlocks, CreditCardBlock]}
             nodeDefinitions={StandardNodes}
+            globalCustomFields={globalCustomFields} 
             onDataChange={setSurveyData}
           />
         </div>

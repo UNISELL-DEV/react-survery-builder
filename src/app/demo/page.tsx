@@ -840,7 +840,6 @@ export default function FormRendererExample() {
                       survey={currentSurvey as any}
                       onSubmit={handleSubmit}
                       onChange={handleChange}
-                      layout='fullpage'
                       theme={activeTheme as any}
                       enableDebug={false}
                       progressBar={{
