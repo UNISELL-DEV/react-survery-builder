@@ -848,7 +848,23 @@ export default function FormRendererExample() {
                           showStepInfo: true,
                           position: 'top',
                       }}
-                  />
+        analytics={{
+          enabled: true,
+          sessionId: "unique-session-123",  // Unique identifier for this session
+          userId: "user-456",               // Optional user ID
+          surveyId: "survey-abc",          // Survey identifier
+          googleAnalytics: {
+            measurementId: "G-NYWEMJ2852",
+            debug: true
+          },
+          googleTagManager: {
+            containerId: "GTM-K82WBC5D"
+          },
+          trackFieldInteractions: true,
+          trackValidationErrors: true,
+          trackTimings: true
+        }}
+/>
               </div>
           </div>
       </div>
