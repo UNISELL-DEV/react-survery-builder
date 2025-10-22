@@ -58,7 +58,7 @@ const saveThemeToStorage = (name: string, theme: ThemeDefinition): SavedTheme =>
     name,
     theme: {
       ...theme,
-      name: 'custom' // Ensure custom theme type
+      name: name as any // Use the user-provided name as the theme name
     },
     createdAt: now,
     updatedAt: now,

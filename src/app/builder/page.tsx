@@ -6,10 +6,39 @@ import Link from "next/link";
 
 
 import { CreditCard } from 'lucide-react';
-import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder } from "survey-form-package/src";
+import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "survey-form-package/src";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
+import { InteractiveBmiBlock } from "./components/InteractiveBmi";
+
+// LocalStorage key for themes
+const STORAGE_KEY = 'survey_custom_themes';
+
+// Saved theme interface
+interface SavedTheme {
+  id: string;
+  name: string;
+  theme: ThemeDefinition;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Get saved themes from localStorage
+const getSavedThemes = (): SavedTheme[] => {
+  if (typeof window === 'undefined') return [];
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return [];
+
+    const themes = JSON.parse(stored);
+    return Array.isArray(themes) ? themes : [];
+  } catch (error) {
+    console.error('Error loading saved themes:', error);
+    return [];
+  }
+};
 
 // Create a custom credit card input block
 const CreditCardBlock : BlockDefinition = {
@@ -78,13 +107,23 @@ const CreditCardBlock : BlockDefinition = {
 export default function Home() {
   const { theme, setTheme } = useTheme();
   const [surveyData, setSurveyData] = useState<any>(null);
+  const [customThemes, setCustomThemes] = useState<Record<string, ThemeDefinition>>({});
 
-    // Register the custom block when component mounts
+  // Register the custom block when component mounts
   useEffect(() => {
-    registerBlock(CreditCardBlock);
-    
+    registerBlock(InteractiveBmiBlock);
+
     // Optional: return cleanup function if you want to unregister on unmount
     // return () => unregisterBlock('credit-card');
+  }, []);
+
+  // Load saved themes from localStorage
+  useEffect(() => {
+    const savedThemes = getSavedThemes();
+    const themesRecord = Object.fromEntries(
+      savedThemes.map(saved => [saved.name, saved.theme])
+    );
+    setCustomThemes(themesRecord);
   }, []);
 
   // Define your global custom fields
@@ -143,9 +182,10 @@ export default function Home() {
 
         <div className="border rounded-lg shadow-sm h-[800px] overflow-hidden">
           <SurveyBuilder
-            blockDefinitions={[...StandardBlocks, CreditCardBlock]}
+            blockDefinitions={[...StandardBlocks, InteractiveBmiBlock]}
             nodeDefinitions={StandardNodes}
-            globalCustomFields={globalCustomFields} 
+            globalCustomFields={globalCustomFields}
+            customThemes={customThemes}
             onDataChange={setSurveyData}
           />
         </div>
