@@ -77,7 +77,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6 py-12">
+      <main className="flex-1 flex justify-center px-6 py-12">
         <div className="w-full max-w-xl">
           {isReady && (
             <AnimatePresence mode="wait">
@@ -86,10 +86,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{
-                  duration: 0.5,
-                  ease: [0.4, 0, 0.2, 1],
-                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
               >
                 {/* Question Content */}
                 <div className="mb-8">
@@ -106,7 +103,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
                     <button
                       type="submit"
                       disabled={disabled}
-                      className={`w-full py-4 rounded-full text-white font-semibold text-lg transition-all duration-200 ${
+                      className={`w-full py-4 rounded-xl px-4 text-white font-semibold text-lg transition-all duration-200 ${
                         disabled
                           ? 'bg-gray-400 cursor-not-allowed'
                           : 'bg-[#1F5156] hover:bg-[#2A6A71] active:scale-[0.98]'
@@ -117,12 +114,6 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
                   )}
                 />
 
-                {/* Optional: Additional Info or Links */}
-                <div className="mt-6 text-center">
-                  <p className="text-sm text-gray-600">
-                    Refills.com takes your privacy seriously with industry leading encryption.
-                  </p>
-                </div>
               </motion.div>
             </AnimatePresence>
           )}
