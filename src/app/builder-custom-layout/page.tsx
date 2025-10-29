@@ -9,10 +9,11 @@ import { CreditCard } from 'lucide-react';
 import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "survey-form-package/src";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
-import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
-import { InteractiveBmiBlock } from "./custom-blocks/InteractiveBmi";
-import { PatientDataMappingField } from "./components/Patientdatamappingfield";
-import { UniqueEffectsBlock } from "./custom-blocks/UniqueEffectsBlock";
+import { DynamicKeyValueField } from "../builder/components/DynamicKeyValueField";
+import { InteractiveBmiBlock } from "../builder/custom-blocks/InteractiveBmi";
+import { PatientDataMappingField } from "../builder/components/Patientdatamappingfield";
+import { UniqueEffectsBlock } from "../builder/custom-blocks/UniqueEffectsBlock";
+import { RefillsLayout } from "../demo-custom/RefillsLayout";
 
 // LocalStorage key for themes
 const STORAGE_KEY = 'survey_custom_themes';
@@ -204,6 +205,7 @@ export default function Home() {
             globalCustomFields={globalCustomFields}
             customThemes={customThemes}
             onDataChange={setSurveyData}
+            previewLayout={RefillsLayout}
           />
         </div>
 

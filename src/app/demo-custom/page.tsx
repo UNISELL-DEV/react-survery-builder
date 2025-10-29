@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Check, Upload, AlertCircle } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { sampleSurvey } from '../surveydata';
+import { CustomSimpleLayout } from './CustomSimpleLayout';
+import { RefillsLayout } from './RefillsLayout';
 
 export default function FormRendererExample() {
   const [submittedData, setSubmittedData] = useState<Record<string, any> | null>(null);
@@ -180,6 +182,7 @@ export default function FormRendererExample() {
                       logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
                       survey={currentSurvey as any}
                       onSubmit={handleSubmit}
+                      layout={RefillsLayout}
                       onChange={handleChange}
                       theme={activeTheme as any}
                       enableDebug={false}
