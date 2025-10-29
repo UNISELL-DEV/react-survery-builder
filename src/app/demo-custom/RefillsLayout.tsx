@@ -34,7 +34,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
     <div className="refills-layout min-h-screen w-full flex flex-col bg-[#F5F3ED]">
       {/* Header - Dark Teal */}
       <header className="bg-[#1F5156] text-white">
-        <div className="w-xl max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Back Button */}
           <button
             type="button"
@@ -77,8 +77,8 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex justify-center px-6 py-12">
-        <div className="w-xl max-w-xl px-6">
+      <main className="flex-1 flex justify-center py-12">
+        <div className="max-w-xl px-6">
           {isReady && (
             <AnimatePresence mode="wait">
               <motion.div
