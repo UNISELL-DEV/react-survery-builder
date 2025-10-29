@@ -10,7 +10,9 @@ import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, Surv
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
-import { InteractiveBmiBlock } from "./components/InteractiveBmi";
+import { InteractiveBmiBlock } from "./custom-blocks/InteractiveBmi";
+import { PatientDataMappingField } from "./components/Patientdatamappingfield";
+import { UniqueEffectsBlock } from "./custom-blocks/UniqueEffectsBlock";
 
 // LocalStorage key for themes
 const STORAGE_KEY = 'survey_custom_themes';
@@ -111,7 +113,7 @@ export default function Home() {
 
   // Register the custom block when component mounts
   useEffect(() => {
-    registerBlock(InteractiveBmiBlock);
+    registerBlock(UniqueEffectsBlock);
 
     // Optional: return cleanup function if you want to unregister on unmount
     // return () => unregisterBlock('credit-card');
@@ -160,7 +162,22 @@ export default function Home() {
       ),
       defaultValue: "",
       showLabel: true
-    }
+    },
+    {
+      key: "patientDataKey",
+      label: "Reference patient Key",
+      description: "Map to patient data.",
+      component: ({ data, onUpdate, value }) => (
+        <PatientDataMappingField
+          onUpdate={onUpdate} data={data}
+          label="Patient Data Mapping"
+          description="Custom data mapping for patient information."
+          keyName="patientMap"
+        />
+      ),
+      defaultValue: "",
+      showLabel: false
+    },
   ];
 
 
@@ -182,7 +199,7 @@ export default function Home() {
 
         <div className="border rounded-lg shadow-sm h-[800px] overflow-hidden">
           <SurveyBuilder
-            blockDefinitions={[...StandardBlocks, InteractiveBmiBlock]}
+            blockDefinitions={[...StandardBlocks, UniqueEffectsBlock]}
             nodeDefinitions={StandardNodes}
             globalCustomFields={globalCustomFields}
             customThemes={customThemes}
