@@ -34,7 +34,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
     <div className="refills-layout min-h-screen w-full flex flex-col bg-[#F5F3ED]">
       {/* Header - Dark Teal */}
       <header className="bg-[#1F5156] text-white">
-        <div className="w-full mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="w-xl max-w-xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Back Button */}
           <button
             type="button"
@@ -64,7 +64,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="max-w-4xl mx-auto px-6 pb-4">
+        <div className="max-w-xl mx-auto px-6 pb-4">
           <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
             <motion.div
               className="h-full bg-white rounded-full"
@@ -78,7 +78,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex justify-center px-6 py-12">
-        <div className="w-full max-w-xl">
+        <div className="w-xl max-w-xl px-6">
           {isReady && (
             <AnimatePresence mode="wait">
               <motion.div
