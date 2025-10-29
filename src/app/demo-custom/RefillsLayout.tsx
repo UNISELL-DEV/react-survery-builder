@@ -78,7 +78,7 @@ export const RefillsLayout: React.FC<LayoutProps> = () => {
 
       {/* Main Content */}
       <main className="flex-1 flex justify-center py-12">
-        <div className="max-w-xl px-6">
+        <div className="w-full max-w-xl px-6">
           {isReady && (
             <AnimatePresence mode="wait">
               <motion.div
