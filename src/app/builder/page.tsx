@@ -13,6 +13,7 @@ import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
 import { InteractiveBmiBlock } from "./custom-blocks/InteractiveBmi";
 import { PatientDataMappingField } from "./components/Patientdatamappingfield";
 import { UniqueEffectsBlock } from "./custom-blocks/UniqueEffectsBlock";
+import { RefillsLayout } from "../demo/RefillsLayout";
 
 // LocalStorage key for themes
 const STORAGE_KEY = 'survey_custom_themes';
@@ -204,6 +205,7 @@ export default function Home() {
             globalCustomFields={globalCustomFields}
             customThemes={customThemes}
             onDataChange={setSurveyData}
+            previewLayout={RefillsLayout}
           />
         </div>
 
