@@ -1,129 +1,177 @@
-import React from "react";
-import { Calculator } from "lucide-react";
+import React, { useState, useEffect } from "react"
+import { Calculator } from "lucide-react"
 
 import type {
   BlockDefinition,
   ContentBlockItemProps,
   BlockRendererProps,
   BlockData,
-} from "@/packages/survey-form-package/src/types";
+} from "@/packages/survey-form-package/src/types"
 
-import { Input } from "@/packages/survey-form-package/src/components/ui/input";
-import { Label } from "@/packages/survey-form-package/src/components/ui/label";
-import { Card } from "@/packages/survey-form-package/src/components/ui/card";
-import { cn } from "@/packages/survey-form-package/src/lib/utils";
-import { themes } from "@/packages/survey-form-package/src/themes";
-import { useSurveyForm } from "@/packages/survey-form-package/src/context/SurveyFormContext";
+import { Input } from "@/packages/survey-form-package/src/components/ui/input"
+import { Label } from "@/packages/survey-form-package/src/components/ui/label"
+import { Card } from "@/packages/survey-form-package/src/components/ui/card"
+import { cn } from "@/packages/survey-form-package/src/lib/utils"
+import { themes } from "@/packages/survey-form-package/src/themes"
+import { useSurveyForm } from "@/packages/survey-form-package/src/context/SurveyFormContext"
 
 // ============================================================================
 // HELPER UTILITIES
 // ============================================================================
 
-const bmiCategories = {
-  Underweight: {
-    description: "Your BMI is in the underweight range. This may indicate potential health risks. We recommend consulting with a healthcare provider.",
-  },
-  Healthy: {
-    description: "Your BMI is in the healthy range. Keep up the great work with your lifestyle habits!",
-  },
-  Overweight: {
-    description: "Your BMI is in the overweight range. This may increase the risk of certain health conditions. Our program can help you reach a healthier weight.",
-  },
-  Obese: {
-    description: "Your BMI is in the obese range, which can significantly increase health risks. Our medical team can create a personalized plan for you.",
-  },
-};
-
 const calculateBMI = (feet: number, inches: number, weight: number) => {
-  const totalInches = (feet * 12) + inches;
-  const heightMeters = totalInches * 0.0254;
-  const weightKg = weight * 0.453592;
-  
-  if (heightMeters === 0) return null;
+  const totalInches = feet * 12 + (inches || 0)
+  const heightMeters = totalInches * 0.0254
+  const weightKg = weight * 0.453592
 
-  const bmi = Number((weightKg / (heightMeters * heightMeters)).toFixed(1));
+  if (heightMeters === 0 || weightKg === 0) return null
 
-  let category: keyof typeof bmiCategories;
-  if (bmi < 18.5) category = "Underweight";
-  else if (bmi < 25) category = "Healthy";
-  else if (bmi < 30) category = "Overweight";
-  else category = "Obese";
+  const bmi = Number((weightKg / (heightMeters * heightMeters)).toFixed(1))
 
-  return { bmi, category, description: bmiCategories[category].description };
-};
+  return bmi
+}
 
-// Simple progress bar component (no SVG)
-const BMIProgressBars: React.FC<{ bmi: number, category: string }> = ({ bmi, category }) => {
-  const categories = ["Underweight", "Healthy", "Overweight", "Obese"];
-  
-  const getRange = (cat: string) => {
-    switch (cat) {
-      case "Underweight": return "< 18.5";
-      case "Healthy": return "18.5 - 24.9";
-      case "Overweight": return "25.0 - 29.9";
-      case "Obese": return "> 30.0";
-      default: return "";
-    }
-  };
+const R = 170 // Radius from the SVG path 'A 170 170...'
+const circumference = Math.PI * R // Half circle circumference
+const maxBMI = 50
+
+const BMIChart = ({
+  bmi,
+  primaryColor,
+  secondaryColor,
+}: {
+  bmi?: number
+  primaryColor: string
+  secondaryColor: string
+}) => {
+  // We only need one state: the final offset.
+  // Initialize it to the full circumference (which means 0% progress).
+  const [strokeDashoffset, setStrokeDashoffset] = useState(circumference)
+
+  // This single effect runs whenever 'bmi' changes.
+  useEffect(() => {
+    // 1. Calculate the progress percentage (0-100)
+    const progressPercent = Math.min((bmi || 0) / maxBMI, 1)
+
+    // 2. Calculate the new offset based on the progress
+    // We subtract the progress from the total circumference
+    const newOffset = circumference - circumference * progressPercent
+
+    // 3. Set the new offset. The CSS transition will handle the animation.
+    setStrokeDashoffset(newOffset)
+  }, [bmi]) // <-- The dependency is [bmi]
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-4 gap-1.5">
-        {categories.map((cat) => (
-          <div
-            key={cat}
-            className={cn(
-              "h-2 rounded-full",
-              category === cat ? "bg-white" : "bg-white/30"
-            )}
-          />
-        ))}
-      </div>
-      <div className="grid grid-cols-4 gap-1.5 text-xs">
-        {categories.map((cat) => (
-          <span key={cat} className={cn(
-            "text-center",
-             category === cat ? "font-bold text-white" : "text-white/70"
-          )}>
-            {getRange(cat)}
-          </span>
-        ))}
+    <div className="relative w-[200px] h-[100px] sm:w-[400px] sm:h-[200px] flex items-center justify-center">
+      <svg
+        width="100%"
+        height="100%"
+        viewBox="0 0 420 210"
+        fill="none"
+        className="block"
+      >
+        {/* Background Path */}
+        <path
+          d="M 30 190
+          A 170 170 0 0 1 370 190"
+          stroke="#FFFFFF"
+          strokeWidth={22}
+          strokeLinecap="round"
+          fill="none"
+          opacity={0.6}
+          style={{
+            WebkitFilter: "drop-shadow(0px 4px 15.7px rgba(28, 28, 28, 0.05))",
+            filter: "drop-shadow(0px 4px 15.7px rgba(28, 28, 28, 0.05))",
+          }}
+        />
+        <defs>
+          <linearGradient
+            id="bmi-gradient"
+            x1="30"
+            y1="190"
+            x2="370"
+            y2="190"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor={primaryColor} />
+            <stop offset="1" stopColor={secondaryColor} />
+          </linearGradient>
+        </defs>
+
+        {/* Foreground (Animated) Path */}
+        <path
+          d="M 30 190
+          A 170 170 0 0 1 370 190"
+          stroke="url(#bmi-gradient)"
+          strokeWidth={22}
+          strokeLinecap="round"
+          fill="none"
+          className="shadow-[0_4px_16px_rgba(28,28,28,0.05)]"
+          // strokeDasharray is constant, no need for state
+          strokeDasharray={circumference}
+          // strokeDashoffset is updated from our state
+          strokeDashoffset={strokeDashoffset}
+          style={{
+            // This transition will animate the change in strokeDashoffset
+            transition: "stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1)",
+            transformOrigin: "center",
+            WebkitFilter: "drop-shadow(0px 4px 15.7px rgba(28, 28, 28, 0.05))",
+            filter: "drop-shadow(0px 4px 15.7px rgba(28, 28, 28, 0.05))",
+          }}
+        />
+      </svg>
+
+      {/* Centered BMI Info */}
+      <div className="absolute left-0 bottom-0 w-full h-full flex flex-col items-center justify-end pointer-events-none">
+        <h4 className="title sm:mb-2 text-[1rem] sm:text-[1.5rem] leading-[28px] sm:leading-[32px] -tracking-[1%] text-center text-foreground font-normal">
+          Your BMI
+        </h4>
+        <div
+          className="text-3xl sm:text-5xl font-medium text-foreground"
+          style={{ fontFamily: '"DM Sans", "Manrope", sans-serif' }}
+        >
+          {bmi?.toFixed(1) || 0}
+        </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
+export default BMIChart
 
 // ============================================================================
 // BLOCK IMPLEMENTATION
 // ============================================================================
 
 // Builder Form Component
-const BMI2CalculatorBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpdate }) => {
-  const handle = (field: string, value: any) => onUpdate?.({ ...data, [field]: value });
+const BMI3CalculatorBlockForm: React.FC<ContentBlockItemProps> = ({
+  data,
+  onUpdate,
+}) => {
+  const handle = (field: string, value: any) =>
+    onUpdate?.({ ...data, [field]: value })
 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="fieldName">Field Name</Label>
-        <Input
-          id="fieldName"
-          value={data.fieldName || ""}
-          onChange={(e) => handle("fieldName", e.target.value)}
-          placeholder="BMI2Calculator"
-        />
-        <p className="text-xs text-muted-foreground">Unique identifier for this block.</p>
-      </div>
-       <div className="space-y-2">
         <Label htmlFor="title">Title (h2)</Label>
         <Input
           id="title"
           value={data.title || ""}
           onChange={(e) => handle("title", e.target.value)}
-          placeholder="Let's calculate your BMI."
+          placeholder="Let's calculate"
         />
       </div>
-       <div className="space-y-2">
+      <div className="space-y-2">
+        <Label htmlFor="title">Title Highlight (h2)</Label>
+        <Input
+          id="title"
+          value={data.titleHighlight || ""}
+          onChange={(e) => handle("titleHighlight", e.target.value)}
+          placeholder="your BMI."
+        />
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="description">Description (p)</Label>
         <Input
           id="description"
@@ -132,216 +180,246 @@ const BMI2CalculatorBlockForm: React.FC<ContentBlockItemProps> = ({ data, onUpda
           placeholder="Body Mass Index (BMI) helps determine..."
         />
       </div>
-       <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="feetLabel">Feet Label</Label>
-            <Input id="feetLabel" value={data.feetLabel || ""} onChange={(e) => handle("feetLabel", e.target.value)} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="inchesLabel">Inches Label</Label>
-            <Input id="inchesLabel" value={data.inchesLabel || ""} onChange={(e) => handle("inchesLabel", e.target.value)} />
-          </div>
-       </div>
-       <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="feetLabel">Feet Label</Label>
+          <Input
+            id="feetLabel"
+            value={data.feetLabel || ""}
+            onChange={(e) => handle("feetLabel", e.target.value)}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="inchesLabel">Inches Label</Label>
+          <Input
+            id="inchesLabel"
+            value={data.inchesLabel || ""}
+            onChange={(e) => handle("inchesLabel", e.target.value)}
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
         <Label htmlFor="weightLabel">Weight Label</Label>
-        <Input id="weightLabel" value={data.weightLabel || ""} onChange={(e) => handle("weightLabel", e.target.value)} />
+        <Input
+          id="weightLabel"
+          value={data.weightLabel || ""}
+          onChange={(e) => handle("weightLabel", e.target.value)}
+        />
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Builder Item Preview
-const BMI2CalculatorBlockItem: React.FC<ContentBlockItemProps> = ({ data }) => {
+const BMI3CalculatorBlockItem: React.FC<ContentBlockItemProps> = ({ data }) => {
   return (
     <Card className="p-4 space-y-3">
-      <h2 className="text-center text-lg font-semibold">{data.title || "Let's calculate your BMI."}</h2>
-      <p className="text-center text-sm text-muted-foreground">{data.description || "Body Mass Index (BMI) helps determine..."}</p>
+      <h2 className="text-center text-lg font-semibold">
+        {data.title || "Let's calculate your BMI."}
+      </h2>
+      <p className="text-center text-sm text-muted-foreground">
+        {data.description || "Body Mass Index (BMI) helps determine..."}
+      </p>
       <div className="grid grid-cols-2 gap-x-4 gap-y-6">
         <div className="space-y-1">
-            <Label>{data.feetLabel || "Height (feet)"}</Label>
-            <Input disabled placeholder="5" />
+          <Label>{data.feetLabel || "Feet"}</Label>
+          <Input disabled placeholder="5" />
         </div>
         <div className="space-y-1">
-            <Label>{data.inchesLabel || "Height (inches)"}</Label>
-            <Input disabled placeholder="4" />
+          <Label>{data.inchesLabel || "Inches"}</Label>
+          <Input disabled placeholder="4" />
         </div>
         <div className="space-y-1 col-span-2">
-            <Label>{data.weightLabel || "Weight (lbs)"}</Label>
-            <Input disabled placeholder="200" />
+          <Label>{data.weightLabel || "Weight (lbs)"}</Label>
+          <Input disabled placeholder="200" />
         </div>
       </div>
       <div className="p-4 bg-primary/10 rounded-lg">
-        <p className="text-sm text-center text-primary">BMI Result will be shown here</p>
+        <p className="text-sm text-center text-primary">
+          BMI Result will be shown here
+        </p>
       </div>
     </Card>
-  );
-};
+  )
+}
 
 // Builder Palette Preview
-const BMI2CalculatorBlockPreview: React.FC = () => {
+const BMI3CalculatorBlockPreview: React.FC = () => {
   return (
     <div className="w-full flex items-center justify-center py-1">
       <div className="w-4/5 border rounded-md p-2 text-xs text-muted-foreground bg-muted/30">
-        BMI Calculator
+        BMI Calculator (Speedometer style)
       </div>
     </div>
-  );
-};
+  )
+}
 
 // Renderer Component
-const BMI2CalculatorRenderer = React.forwardRef<HTMLDivElement, BlockRendererProps>(
-  ({ block, theme, error }, ref) => {
-  
-  const themeConfig = theme ?? themes.default;
-  const { values, setValue } = useSurveyForm();
+const BMI3CalculatorRenderer = React.forwardRef<
+  HTMLDivElement,
+  BlockRendererProps
+>(({ block, theme, onChange, error }, ref) => {
+  const themeConfig = theme ?? themes.default
+  const { values } = useSurveyForm()
 
-  const feet = values.feet;
-  const inches = values.inches;
-  const weight = values.weight;
+  const [hasInteracted, setHasInteracted] = useState(false)
+
+  const [bmiValues, setBMIValues] = useState({
+    feet: values?.bmi?.feet ? values?.bmi?.feet : 5,
+    inches: values?.bmi?.inches ? values?.bmi?.inches : null,
+    weight: values?.bmi?.weight ? values?.bmi?.weight : null,
+    bmi: values?.bmi?.bmi ? values?.bmi?.bmi : null,
+  })
 
   const bmiResult = React.useMemo(() => {
-    const hf = Number(feet);
-    const hi = Number(inches);
-    const w = Number(weight);
-    return hf > 0 && w > 0 ? calculateBMI(hf, hi, w) : null;
-  }, [feet, inches, weight]);
-  
-  // Helper to handle input changes
-  const handleInputChange = (field: 'feet' | 'inches' | 'weight', value: string) => {
-    // Only allow numbers
-    const numericValue = value.replace(/[^0-9]/g, '');
-    setValue(field, numericValue);
-  };
+    const hf = Number(bmiValues.feet) || 0
+    const hi = Number(bmiValues.inches) || 0
+    const w = Number(bmiValues.weight) || 0
+    return hf > 0 && w > 0 ? calculateBMI(hf, hi, w) : null
+  }, [bmiValues])
 
-    return (
-      <div className="w-full min-w-0 max-w-2xl mx-auto" ref={ref}>
-        <h2 className="mb-2 text-center text-[2rem] -tracking-[4%] leading-[32px]">
-            {block.title}
+  const updateBMIValues = (key: any, value: any) => {
+    setHasInteracted(true)
+
+    let data = { ...bmiValues, [key]: value }
+
+    setBMIValues(data)
+    onChange(data)
+  }
+
+  // Update BMI result when BMI change
+  useEffect(() => {
+    if (bmiResult) {
+      let data = { ...bmiValues, bmi: bmiResult }
+      onChange(data)
+    }
+  }, [bmiResult])
+
+  return (
+    <div
+      className="relative w-full max-w-2xl flex flex-col gap-8 sm:gap-10 items-center min-h-[70svh] mx-auto"
+      ref={ref}
+    >
+      <div>
+        <h2 className={cn("mb-2", themeConfig.title)}>
+          {block.title}{" "}
+          <span
+            style={{
+              background: `linear-gradient(to right, ${themeConfig.colors.secondary}, ${themeConfig.colors.primary})`,
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            {block.titleHighlight}
+          </span>
         </h2>
-        <p className={cn("mb-4 sm:mb-8 text-center", themeConfig.field.description)}>
-            {block.description}
-        </p>
+        <p className={cn(themeConfig.description)}>{block.description}</p>
+      </div>
 
-        <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-y-8">
-            <div className="space-y-1.5">
-                <Label htmlFor="feet" className={cn(themeConfig.field.label)}>
-                    {block.feetLabel}
-                </Label>
-                <Input
-                  id="feet"
-                  name="feet"
-                  placeholder="5"
-                  type="number"
-                  value={values.feet || ""}
-                  onChange={(e) => handleInputChange('feet', e.target.value)}
-                  className={cn(themeConfig.field.input)}
-                />
-            </div>
+      <BMIChart
+        bmi={bmiResult}
+        primaryColor={themeConfig.colors.primary}
+        secondaryColor={themeConfig.colors.secondary}
+      />
 
-            <div className="space-y-1.5">
-                 <Label htmlFor="inches" className={cn(themeConfig.field.label)}>
-                    {block.inchesLabel}
-                </Label>
-                <Input
-                  id="inches"
-                  name="inches"
-                  placeholder="4"
-                  type="number"
-                  value={values.inches || ""}
-                  onChange={(e) => handleInputChange('inches', e.target.value)}
-                  className={cn(themeConfig.field.input)}
-                />
-            </div>
-
-            <div className="space-y-1.5 col-span-2">
-                 <Label htmlFor="weight" className={cn(themeConfig.field.label)}>
-                    {block.weightLabel}
-                </Label>
-                <Input
-                  id="weight"
-                  name="weight"
-                  placeholder="200"
-                  type="number"
-                  value={values.weight || ""}
-                  onChange={(e) => handleInputChange('weight', e.target.value)}
-                  className={cn(themeConfig.field.input)}
-                />
-            </div>
+      <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor={`bmi.feet`} className={cn(themeConfig.field.label)}>
+            {block.feetLabel}
+          </Label>
+          <Input
+            id="bmi.feet"
+            name="bmi.feet"
+            placeholder="5"
+            type="number"
+            value={bmiValues.feet}
+            onChange={(e) => updateBMIValues("feet", e.target.value)}
+            className={cn(themeConfig.field.input)}
+            required={true}
+          />
         </div>
 
-        {/* Display Error from validation */}
-        {error && (
-            <div className={cn("text-sm font-medium mt-2 text-center", themeConfig.field.error)}>
-                {error}
-            </div>
-        )}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor={`bmi.inches`} className={cn(themeConfig.field.label)}>
+            {block.inchesLabel}
+          </Label>
+          <Input
+            id="bmi.inches"
+            name="bmi.inches"
+            placeholder="4"
+            type="number"
+            value={bmiValues.inches}
+            onChange={(e) => updateBMIValues("inches", e.target.value)}
+            className={cn(themeConfig.field.input)}
+          />
+        </div>
 
-        {/* Display BMI Result */}
-        {bmiResult && (
-            <div className="mt-8 bg-white rounded-lg w-full border border-gray-200 shadow-sm">
-                <div className="flex flex-col gap-4 p-5 rounded-t-lg text-white" style={{backgroundColor: themeConfig.colors.primary}}>
-                    <div className="flex items-center justify-between">
-                    <span className="font-medium">Your BMI</span>
-                    <span className="text-xl font-bold">{bmiResult.bmi}</span>
-                    </div>
-                    <BMIProgressBars
-                        bmi={bmiResult.bmi}
-                        category={bmiResult.category}
-                    />
-                </div>
-
-                <div className="p-5 flex flex-col gap-2.5">
-                    <div className="flex justify-between items-center">
-                    <span className="font-semibold">{bmiResult.category}</span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                    {bmiResult.description}
-                    </p>
-                </div>
-            </div>
-        )}
+        <div className="flex flex-col gap-2 col-span-2 mt-4">
+          <Label htmlFor={`bmi.weight`} className={cn(themeConfig.field.label)}>
+            {block.weightLabel}
+          </Label>
+          <Input
+            id="bmi.weight"
+            name="bmi.weight"
+            placeholder="200"
+            type="number"
+            value={bmiValues.weight}
+            onChange={(e) => updateBMIValues("weight", e.target.value)}
+            className={cn(themeConfig.field.input)}
+            required={true}
+          />
+        </div>
       </div>
-    );
-  }
-);
 
-BMI2CalculatorRenderer.displayName = "BMI2CalculatorRenderer";
+      {/* Display Error from validation - only show after user interaction */}
+      {error && hasInteracted && (
+        <div
+          className={cn(
+            "text-sm font-medium mt-2 text-center",
+            themeConfig.field.error
+          )}
+        >
+          {error}
+        </div>
+      )}
+    </div>
+  )
+})
+
+BMI3CalculatorRenderer.displayName = "BMI3CalculatorRenderer"
 
 // Export the Block Definition
-export const BMI2CalculatorBlock: BlockDefinition = {
-  type: "BMI2Calculator",
-  name: "BMI2 Calculator",
+export const BMI3CalculatorBlock: BlockDefinition = {
+  type: "BMI3Calculator",
+  name: "BMI3 Calculator (Speedometer Style)",
   description: "Calculates BMI from height and weight inputs.",
   icon: <Calculator className="w-4 h-4" />,
   defaultData: {
-    type: "BMI2Calculator",
-    fieldName: "BMI2Calculator",
-    title: "Let's calculate your BMI.",
-    description: "Body Mass Index (BMI) helps determine eligibility for weight loss medication and assess weight-related health risks.",
-    feetLabel: "Height (feet)",
-    inchesLabel: "Height (inches)",
+    type: "BMI3Calculator",
+    title: "Let's calculate",
+    titleHighlight: "your BMI.",
+    fieldName: "bmi",
+    description:
+      "Body Mass Index (BMI) helps determine eligibility for weight loss medication and assess weight-related health risks.",
+    feetLabel: "Feet",
+    inchesLabel: "Inches",
     weightLabel: "Weight (lbs)",
-    required: true,
   },
-  renderItem: (props) => <BMI2CalculatorBlockItem {...props} />,
-  renderFormFields: (props) => <BMI2CalculatorBlockForm {...props} />,
-  renderPreview: () => <BMI2CalculatorBlockPreview />,
-  renderBlock: (props) => <BMI2CalculatorRenderer {...props} />,
-  validate: (data: BlockData) => {
-    if (!data.fieldName) return "Field name is required";
-    return null;
-  },
+  isCustom: true,
+  renderItem: (props) => <BMI3CalculatorBlockItem {...props} />,
+  renderFormFields: (props) => <BMI3CalculatorBlockForm {...props} />,
+  renderPreview: () => <BMI3CalculatorBlockPreview />,
+  renderBlock: (props) => <BMI3CalculatorRenderer {...props} />,
   validateValue: (value: any, data: BlockData) => {
-    // This block's value is composite, so we validate the dependent fields
-    if (data.required) {
-        if (!data.feet) return `${data.feetLabel || 'Feet'} is required.`;
-        if (!data.weight) return `${data.weightLabel || 'Weight'} is required.`;
-        
-        const hf = Number(data.feet);
-        const w = Number(data.weight);
-        if (hf <= 0) return `Please enter a valid height.`;
-        if (w <= 0) return `Please enter a valid weight.`;
-    }
-    return null;
+    // FIX: Validate the 'value' object, not 'data'
+    if (!value?.feet) return `${data.feetLabel || "Feet"} is required.`
+    if (!value?.weight) return `${data.weightLabel || "Weight"} is required.`
+
+    const hf = Number(value?.feet)
+    const w = Number(value?.weight)
+    if (hf <= 0) return `Please enter a valid height.`
+    if (w <= 0) return `Please enter a valid weight.`
+    return null
   },
-};
+}
