@@ -6,13 +6,15 @@ import Link from "next/link";
 
 
 import { CreditCard } from 'lucide-react';
-import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "survey-form-package/src";
+import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "@/packages/survey-form-package/src";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
 import { InteractiveBmiBlock } from "./custom-blocks/InteractiveBmi";
 import { PatientDataMappingField } from "./components/Patientdatamappingfield";
 import { UniqueEffectsBlock } from "./custom-blocks/UniqueEffectsBlock";
+import { BMI3CalculatorBlock } from "./custom-blocks/BmiCalculator";
+import { GoalWeightBlock } from "./custom-blocks/Bmigoal";
 
 // LocalStorage key for themes
 const STORAGE_KEY = 'survey_custom_themes';
@@ -114,6 +116,8 @@ export default function Home() {
   // Register the custom block when component mounts
   useEffect(() => {
     registerBlock(UniqueEffectsBlock);
+    registerBlock(BMI3CalculatorBlock);
+    registerBlock(GoalWeightBlock);
 
     // Optional: return cleanup function if you want to unregister on unmount
     // return () => unregisterBlock('credit-card');
@@ -199,7 +203,7 @@ export default function Home() {
 
         <div className="border rounded-lg shadow-sm h-[800px] overflow-hidden">
           <SurveyBuilder
-            blockDefinitions={[...StandardBlocks, UniqueEffectsBlock]}
+            blockDefinitions={[...StandardBlocks, UniqueEffectsBlock, BMI3CalculatorBlock, GoalWeightBlock]}
             nodeDefinitions={StandardNodes}
             globalCustomFields={globalCustomFields}
             customThemes={customThemes}

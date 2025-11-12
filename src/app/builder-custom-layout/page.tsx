@@ -6,7 +6,7 @@ import Link from "next/link";
 
 
 import { CreditCard } from 'lucide-react';
-import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "survey-form-package/src";
+import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "@/packages/survey-form-package/src";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { DynamicKeyValueField } from "../builder/components/DynamicKeyValueField";
