@@ -294,6 +294,7 @@ export const UniqueEffectsBlock: BlockDefinition = {
   defaultData: {
     type: "uniqueEffects",
     fieldName: "uniqueEffects",
+    isCustom: true,
   },
   renderItem: (props) => <UniqueEffects__BlockItem {...props} />,
   renderFormFields: (props) => <UniqueEffects__BlockForm {...props} />,

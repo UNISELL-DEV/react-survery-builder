@@ -119,7 +119,9 @@ const GoalWeightBlockPreview: React.FC = () => {
 const GoalWeightRenderer = forwardRef<HTMLInputElement, BlockRendererProps>(
   ({ block, value, onChange, onBlur, error, disabled, theme }, ref) => {
     const themeConfig = theme ?? themes.default
-    const { values } = useSurveyForm()
+    const { values, customData } = useSurveyForm()
+
+    console.log(customData)
 
     // Use the configured BMI key or default to "bmi.bmi"
     const bmiKey = block.bmiKey || "bmi.bmi"
@@ -223,6 +225,7 @@ export const GoalWeightBlock: BlockDefinition = {
     label: "Your goal weight (lbs)",
     placeholder: "150",
     required: true,
+    isCustom: true,
   },
   renderItem: (props) => <GoalWeightBlockItem {...props} />,
   renderFormFields: (props) => <GoalWeightBlockForm {...props} />,

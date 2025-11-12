@@ -750,7 +750,8 @@ export const InteractiveBmiBlock: BlockDefinition = {
     primaryColor: "#3B82F6",
     showHealthyPace: true,
     animateChart: true,
-    required: false
+    required: false,
+    isCustom: true,
   },
   renderItem: (props) => <InteractiveBmiBlockItem {...props} />,
   renderFormFields: (props) => <InteractiveBmiBlockForm {...props} />,
