@@ -184,6 +184,11 @@ export default function Home() {
     },
   ];
 
+  const customData = {
+    apiEndpoint: 'https://api.example.com',
+    userId: '12345',
+    // any other custom data
+  };
 
   return (
     <main className="min-h-screen p-4">
@@ -208,6 +213,7 @@ export default function Home() {
             globalCustomFields={globalCustomFields}
             customThemes={customThemes}
             onDataChange={setSurveyData}
+            customData={customData}
           />
         </div>
 
