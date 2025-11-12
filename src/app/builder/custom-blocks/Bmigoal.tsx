@@ -14,6 +14,8 @@ import { Input } from "@/packages/survey-form-package/src/components/ui/input"
 import { Label } from "@/packages/survey-form-package/src/components/ui/label"
 import { Card } from "@/packages/survey-form-package/src/components/ui/card"
 import { cn } from "@/packages/survey-form-package/src/lib/utils"
+import { useSurveyBuilder } from "@/packages/survey-form-package/src/context/SurveyBuilderContext"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/survey-form-package/src/components/ui/select"
 
 // ============================================================================
 // BLOCK IMPLEMENTATION
@@ -31,6 +33,13 @@ const GoalWeightBlockForm: React.FC<ContentBlockItemProps> = ({
 }) => {
   const handle = (field: string, value: any) =>
     onUpdate?.({ ...data, [field]: value })
+  
+  const { getAvailableFieldsBefore} = useSurveyBuilder();
+
+  const intakeFields = React.useMemo(() => {
+    const currentBlockId = data.uuid || data.fieldName;
+    return getAvailableFieldsBefore(currentBlockId)
+  }, [data.uuid, data.fieldName, getAvailableFieldsBefore]);
 
   return (
     <div className="space-y-4">
@@ -48,12 +57,21 @@ const GoalWeightBlockForm: React.FC<ContentBlockItemProps> = ({
       </div>
       <div className="space-y-2">
         <Label htmlFor="bmiKey">BMI Value Key</Label>
-        <Input
-          id="bmiKey"
-          value={data.bmiKey || ""}
-          onChange={(e) => handle("bmiKey", e.target.value)}
-          placeholder="bmi.bmi"
-        />
+          <Select
+            value={data.bmiKey || ""}
+            onValueChange={(val) => handle("bmiKey", val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="BMI Key" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[300px] overflow-y-auto z-50" side="bottom" align="start" sideOffset={5}>
+              {intakeFields.map((name) => (
+                <SelectItem key={name} value={name} className="pl-2">
+                  <span className="text-sm">{name}</span>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         <p className="text-xs text-muted-foreground">
           Path to BMI value in survey context (e.g., "bmi.bmi")
         </p>
@@ -244,5 +262,9 @@ export const GoalWeightBlock: BlockDefinition = {
     //   }
     // }
     return null
+  },
+  // Output schema - this block returns a simple number value
+  outputSchema: {
+    type: 'number'
   },
 }

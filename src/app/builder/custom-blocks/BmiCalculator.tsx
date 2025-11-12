@@ -422,4 +422,13 @@ export const BMI3CalculatorBlock: BlockDefinition = {
     if (w <= 0) return `Please enter a valid weight.`
     return null
   },
+  outputSchema: {
+    type: 'object',
+    properties: {
+      feet: { type: 'number', optional: true, description: 'Feet of the user' },
+      inches: { type: 'number', optional: true, description: 'Inches of the user' },
+      weight: { type: 'number', optional: true, description: 'weight of the user' },
+      bmi: { type: 'number', optional: true, description: 'bmi of the user' }
+    }
+  },
 }
