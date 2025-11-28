@@ -177,7 +177,6 @@ export default function FormRendererExample() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
               <div className="lg:col-span-12">
                   <SurveyForm
-                      logo={<Logo className="h-5 sm:h-6 w-auto text-primary mx-auto" />}
                       survey={currentSurvey as any}
                       onSubmit={handleSubmit}
                       onChange={handleChange}

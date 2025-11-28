@@ -214,7 +214,7 @@ export default function Home() {
             customThemes={customThemes}
             onDataChange={setSurveyData}
             customData={customData}
-            mode="pageless"
+            mode="paged"
           />
         </div>
 
