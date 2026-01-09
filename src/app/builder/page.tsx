@@ -5,8 +5,8 @@ import { useState } from "react";
 import Link from "next/link";
 
 
-import { CreditCard } from 'lucide-react';
-import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, SurveyBuilder, registerBlock, useSurveyBuilder, ThemeDefinition } from "@/packages/survey-form-package/src";
+import { CreditCard, Loader2 } from 'lucide-react';
+import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, registerBlock, useSurveyBuilder, ThemeDefinition } from "@/packages/survey-form-package/src";
 import { useTheme } from "next-themes";
 import { useEffect } from "react";
 import { DynamicKeyValueField } from "./components/DynamicKeyValueField";
@@ -15,7 +15,20 @@ import { PatientDataMappingField } from "./components/Patientdatamappingfield";
 import { UniqueEffectsBlock } from "./custom-blocks/UniqueEffectsBlock";
 import { BMI3CalculatorBlock } from "./custom-blocks/BmiCalculator";
 import { GoalWeightBlock } from "./custom-blocks/Bmigoal";
+import dynamic from "next/dynamic";
 
+// Dynamic import directly from SurveyForm file to avoid dagre dependency chain
+const SurveyBuilder = dynamic(
+  () => import("@/packages/survey-form-package/src/builder/survey/SurveyBuilder").then(mod => mod.SurveyBuilder),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    )
+  }
+);
 
 // LocalStorage key for themes
 const STORAGE_KEY = 'survey_custom_themes';

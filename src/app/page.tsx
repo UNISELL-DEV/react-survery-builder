@@ -1,16 +1,29 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { SurveyForm } from "@/packages/survey-form-package/src";
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Check, Upload, AlertCircle } from 'lucide-react';
+import { Check, Upload, AlertCircle, Loader2 } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { useTheme } from 'next-themes';
 import { sampleSurvey } from './surveydata'
+import dynamic from 'next/dynamic';
+
+// Dynamic import directly from SurveyForm file to avoid dagre dependency chain
+const SurveyForm = dynamic(
+  () => import("@/packages/survey-form-package/src/renderer/SurveyForm").then(mod => mod.SurveyForm),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    )
+  }
+);
 
 export default function FormRendererExample() {
   const { theme, setTheme } = useTheme();
@@ -208,7 +221,6 @@ export default function FormRendererExample() {
       </div>
 
       {resumeState.canShow && <SurveyForm
-        logo={logoElement}
         survey={currentSurvey as any}
         onSubmit={handleSubmit}
         onChange={handleChange}

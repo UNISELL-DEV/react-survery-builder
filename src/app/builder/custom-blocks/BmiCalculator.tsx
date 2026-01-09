@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react"
-import { Calculator } from "lucide-react"
+import { Activity, Calculator, Ruler, Weight } from "lucide-react"
 
 import type {
   BlockDefinition,
   ContentBlockItemProps,
   BlockRendererProps,
   BlockData,
+  ChatRendererProps,
 } from "@/packages/survey-form-package/src/types"
 
 import { Input } from "@/packages/survey-form-package/src/components/ui/input"
@@ -14,6 +15,9 @@ import { Card } from "@/packages/survey-form-package/src/components/ui/card"
 import { cn } from "@/packages/survey-form-package/src/lib/utils"
 import { themes } from "@/packages/survey-form-package/src/themes"
 import { useSurveyForm } from "@/packages/survey-form-package/src/context/SurveyFormContext"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/packages/survey-form-package/src/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/packages/survey-form-package/src/components/ui/select"
 
 // ============================================================================
 // HELPER UTILITIES
@@ -389,6 +393,211 @@ const BMI3CalculatorRenderer = React.forwardRef<
 
 BMI3CalculatorRenderer.displayName = "BMI3CalculatorRenderer"
 
+/**
+ * Chat renderer for BMI Calculator - streamlined chat experience
+ * Imperial-only (ft/in + lbs)
+ */
+const BMIChatRenderer: React.FC<ChatRendererProps> = ({
+  block,
+  value,
+  onChange,
+  onSubmit,
+  theme,
+  disabled = false,
+  error,
+}) => {
+  // Imperial-only flow
+  const [step, setStep] = useState<'height' | 'weight' | 'result'>('height');
+  const unitSystem: 'imperial' = 'imperial';
+
+  // If a previous value exists, assume height is stored as TOTAL INCHES (to match your prior "finalHeight")
+  const initialTotalInches =
+    typeof value?.height === 'number' && !Number.isNaN(value.height) ? value.height : 70; // 5'10"
+
+  const [heightFeet, setHeightFeet] = useState<number>(Math.floor(initialTotalInches / 12) || 5);
+  const [heightInches, setHeightInches] = useState<number>(initialTotalInches % 12 || 10);
+
+  const [weight, setWeight] = useState<number>(typeof value?.weight === 'number' ? value.weight : 150);
+
+  // Calculate BMI (imperial formula)
+  const calculateBMIValue = () => {
+    const totalInches = heightFeet * 12 + heightInches;
+    if (!totalInches || totalInches <= 0) return 0;
+    // BMI = 703 * weight(lbs) / height(in)^2
+    return (703 * weight) / (totalInches * totalInches);
+  };
+
+  const getBMICategory = (bmi: number) => {
+    if (bmi < 18.5) return { category: 'Underweight', color: 'text-blue-600', bgColor: 'bg-blue-100' };
+    if (bmi < 25) return { category: 'Normal Weight', color: 'text-green-600', bgColor: 'bg-green-100' };
+    if (bmi < 30) return { category: 'Overweight', color: 'text-orange-600', bgColor: 'bg-orange-100' };
+    return { category: 'Obese', color: 'text-red-600', bgColor: 'bg-red-100' };
+  };
+
+  const handleHeightSubmit = () => {
+    setStep('weight');
+  };
+
+  const handleWeightSubmit = () => {
+    setStep('result');
+  };
+
+  const handleFinalSubmit = () => {
+    const bmi = calculateBMIValue();
+    const bmiData = getBMICategory(bmi);
+    const finalHeight = heightFeet * 12 + heightInches; // store as total inches for consistency
+
+    const result = {
+      bmi: parseFloat(bmi.toFixed(1)),
+      category: bmiData.category,
+      height: finalHeight, // total inches
+      weight, // lbs
+      unitSystem, // always 'imperial'
+    };
+
+    onChange(result);
+    onSubmit(result);
+  };
+
+  // Height input step (imperial only)
+  if (step === 'height') {
+    return (
+      <div className="flex flex-col gap-4 w-full">
+        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+          <Ruler className="w-4 h-4" />
+          <span className="text-sm">Enter your height</span>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <Select value={heightFeet.toString()} onValueChange={(v) => setHeightFeet(parseInt(v))}>
+            <SelectTrigger className="w-20 h-14 text-center text-lg font-semibold rounded-xl">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[3, 4, 5, 6, 7, 8].map((ft) => (
+                <SelectItem key={ft} value={ft.toString()}>
+                  {ft}'
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={heightInches.toString()} onValueChange={(v) => setHeightInches(parseInt(v))}>
+            <SelectTrigger className="w-20 h-14 text-center text-lg font-semibold rounded-xl">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 12 }, (_, i) => (
+                <SelectItem key={i} value={i.toString()}>
+                  {i}"
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Button
+            type="button"
+            onClick={handleHeightSubmit}
+            disabled={disabled}
+            className="h-14 px-6 rounded-xl flex-1"
+            style={theme?.colors?.primary ? { backgroundColor: theme.colors.primary } : undefined}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Weight input step (lbs only)
+  if (step === 'weight') {
+    return (
+      <div className="flex flex-col gap-4 w-full">
+        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+          <Weight className="w-4 h-4" />
+          <span className="text-sm">Enter your weight</span>
+        </div>
+
+        <div className="flex gap-2 items-center">
+          <div className="relative flex-1">
+            <Input
+              type="number"
+              value={weight}
+              onChange={(e) => setWeight(parseInt(e.target.value) || 150)}
+              disabled={disabled}
+              min={70}
+              max={660}
+              className="text-center text-xl font-semibold h-14 pr-12 rounded-xl"
+              placeholder="150"
+              autoFocus
+            />
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              lbs
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleWeightSubmit}
+            disabled={disabled || !weight}
+            className="h-14 px-6 rounded-xl"
+            style={theme?.colors?.primary ? { backgroundColor: theme.colors.primary } : undefined}
+          >
+            Calculate
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Result step
+  if (step === 'result') {
+    const bmi = calculateBMIValue();
+    const bmiData = getBMICategory(bmi);
+
+    return (
+      <div className="flex flex-col gap-4 w-full">
+        <div
+          className={cn("p-6 rounded-2xl text-center", bmiData.bgColor, "dark:bg-opacity-20")}
+        >
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <Activity className="w-5 h-5 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+              Your BMI
+            </span>
+          </div>
+
+          <div className={cn("text-5xl font-bold mb-2", bmiData.color)}>{bmi.toFixed(1)}</div>
+
+          <Badge variant="secondary" className={cn("text-sm px-4 py-1", bmiData.color)}>
+            {bmiData.category}
+          </Badge>
+
+          <div className="mt-4 pt-4 border-t border-current/10">
+            <div className="flex justify-center gap-6 text-sm text-muted-foreground">
+              <span>Height: {heightFeet}'{heightInches}"</span>
+              <span>Weight: {weight} lbs</span>
+            </div>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          onClick={handleFinalSubmit}
+          disabled={disabled}
+          className="h-12 rounded-xl w-full"
+          style={theme?.colors?.primary ? { backgroundColor: theme.colors.primary } : undefined}
+        >
+          Continue
+        </Button>
+      </div>
+    );
+  }
+
+  return null;
+};
+
+
 // Export the Block Definition
 export const BMI3CalculatorBlock: BlockDefinition = {
   type: "BMI3Calculator",
@@ -411,6 +620,7 @@ export const BMI3CalculatorBlock: BlockDefinition = {
   renderFormFields: (props) => <BMI3CalculatorBlockForm {...props} />,
   renderPreview: () => <BMI3CalculatorBlockPreview />,
   renderBlock: (props) => <BMI3CalculatorRenderer {...props} />,
+  chatRenderer: (props) => <BMIChatRenderer {...props} />,
   validateValue: (value: any, data: BlockData) => {
     // FIX: Validate the 'value' object, not 'data'
     if (!value?.feet) return `${data.feetLabel || "Feet"} is required.`
