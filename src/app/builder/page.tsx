@@ -16,6 +16,7 @@ import { UniqueEffectsBlock } from "./custom-blocks/UniqueEffectsBlock";
 import { BMI3CalculatorBlock } from "./custom-blocks/BmiCalculator";
 import { GoalWeightBlock } from "./custom-blocks/Bmigoal";
 
+
 // LocalStorage key for themes
 const STORAGE_KEY = 'survey_custom_themes';
 
