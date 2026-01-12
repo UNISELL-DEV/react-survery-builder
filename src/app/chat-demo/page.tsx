@@ -2,24 +2,29 @@
 
 import React, { useState } from 'react';
 import dynamic from 'next/dynamic';
-import type { AIHandlerContext, AIHandlerResponse } from "@/packages/survey-form-package/src/renderer/layouts/ChatLayout";
+import type {
+  AIHandlerContext,
+  AIHandlerResponse,
+} from '@/packages/survey-form-package/src/renderer/layouts/ChatLayout';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Check, MessageCircle, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { sampleSurvey } from '../surveydata';
 
-
 // Dynamic import directly from SurveyForm file to avoid dagre dependency chain
 const SurveyForm = dynamic(
-  () => import("@/packages/survey-form-package/src/renderer/SurveyForm").then(mod => mod.SurveyForm),
+  () =>
+    import('@/packages/survey-form-package/src/renderer/SurveyForm').then(
+      (mod) => mod.SurveyForm
+    ),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
-    )
+    ),
   }
 );
 
@@ -101,12 +106,14 @@ function getBlockOptions(block: any): Array<{ label: string; value: any }> {
 }
 
 // AI Handler that calls our API route
-const aiHandler = async (context: AIHandlerContext): Promise<AIHandlerResponse> => {
+const aiHandler = async (
+  context: AIHandlerContext
+): Promise<AIHandlerResponse> => {
   try {
     // Build conversation history for AI context
     const conversationHistory = context.conversationHistory
-      .filter(msg => !msg.isLoading)
-      .map(msg => ({
+      .filter((msg) => !msg.isLoading)
+      .map((msg) => ({
         role: msg.role,
         content: msg.content,
       }));
@@ -152,7 +159,7 @@ const aiHandler = async (context: AIHandlerContext): Promise<AIHandlerResponse> 
     // Fallback to original question or field name
     const fallback = context.currentField
       ? `What is your ${context.currentField}?`
-      : (context.block.label || 'Please answer this question:');
+      : context.block.label || 'Please answer this question:';
     return {
       conversationalQuestion: fallback,
     };
@@ -160,7 +167,10 @@ const aiHandler = async (context: AIHandlerContext): Promise<AIHandlerResponse> 
 };
 
 export default function ChatDemoPage() {
-  const [submittedData, setSubmittedData] = useState<Record<string, any> | null>(null);
+  const [submittedData, setSubmittedData] = useState<Record<
+    string,
+    any
+  > | null>(null);
   const [showAlert, setShowAlert] = useState(false);
 
   const handleSubmit = (data: Record<string, any>) => {
@@ -172,17 +182,17 @@ export default function ChatDemoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="h-svh bg-gray-50 dark:bg-gray-900 flex flex-col">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-50">
+        <div className="container mx-auto flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
             <MessageCircle className="w-6 h-6 text-blue-600" />
             <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
               Chat Survey Demo
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-col sm:flex-row items-end sm:items-start">
             <Link href="/demo">
               <Button variant="outline" size="sm">
                 Standard Demo
@@ -211,25 +221,24 @@ export default function ChatDemoPage() {
       )}
 
       {/* Chat Survey */}
-      <div className="h-[calc(100vh-60px)]">
-        <SurveyForm
-          survey={chatSurvey as any}
-          layout="chat"
-          onSubmit={handleSubmit}
-          onChange={(data) => console.log('Survey data:', data)}
-          customData={{
-            aiHandler,
-            welcomeMessage: "Hey there! I'm going to ask you a few questions about your health and fitness goals. Ready to get started?",
-            typingDelay: 800,
-          }}
-          progressBar={{
-            type: 'bar',
-            position: 'top',
-            showPercentage: true,
-          }}
-          mode="pageless"
-        />
-      </div>
+      <SurveyForm
+        survey={chatSurvey as any}
+        layout="chat"
+        onSubmit={handleSubmit}
+        onChange={(data) => console.log('Survey data:', data)}
+        customData={{
+          aiHandler,
+          welcomeMessage:
+            "Hey there! I'm going to ask you a few questions about your health and fitness goals. Ready to get started?",
+          typingDelay: 800,
+        }}
+        progressBar={{
+          type: 'bar',
+          position: 'top',
+          showPercentage: true,
+        }}
+        mode="pageless"
+      />
 
       {/* Submitted Data Preview */}
       {submittedData && (
