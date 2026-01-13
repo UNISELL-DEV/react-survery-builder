@@ -182,9 +182,9 @@ export default function ChatDemoPage() {
   };
 
   return (
-    <div className="h-svh bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <div className="h-svh bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 z-50">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 sticky top-0 left-0 right-0 z-50">
         <div className="container mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <MessageCircle className="w-6 h-6 text-blue-600" />
@@ -192,7 +192,7 @@ export default function ChatDemoPage() {
               Chat Survey Demo
             </h1>
           </div>
-          <div className="flex gap-2 flex-col sm:flex-row items-end sm:items-start">
+          <div className="flex gap-2 flex-wrap justify-end">
             <Link href="/demo">
               <Button variant="outline" size="sm">
                 Standard Demo
@@ -221,24 +221,26 @@ export default function ChatDemoPage() {
       )}
 
       {/* Chat Survey */}
-      <SurveyForm
-        survey={chatSurvey as any}
-        layout="chat"
-        onSubmit={handleSubmit}
-        onChange={(data) => console.log('Survey data:', data)}
-        customData={{
-          aiHandler,
-          welcomeMessage:
-            "Hey there! I'm going to ask you a few questions about your health and fitness goals. Ready to get started?",
-          typingDelay: 800,
-        }}
-        progressBar={{
-          type: 'bar',
-          position: 'top',
-          showPercentage: true,
-        }}
-        mode="pageless"
-      />
+      <div className="flex-1 min-h-0 overflow-auto">
+        <SurveyForm
+          survey={chatSurvey as any}
+          layout="chat"
+          onSubmit={handleSubmit}
+          onChange={(data) => console.log('Survey data:', data)}
+          customData={{
+            aiHandler,
+            welcomeMessage:
+              "Hey there! I'm going to ask you a few questions about your health and fitness goals. Ready to get started?",
+            typingDelay: 800,
+          }}
+          progressBar={{
+            type: 'bar',
+            position: 'top',
+            showPercentage: true,
+          }}
+          mode="pageless"
+        />
+      </div>
 
       {/* Submitted Data Preview */}
       {submittedData && (
