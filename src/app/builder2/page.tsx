@@ -222,6 +222,7 @@ export default function Home() {
 
         <div className="border rounded-lg shadow-sm h-[800px] overflow-hidden">
           <SurveyBuilder
+            previewLayout={"chat"}
             blockDefinitions={[...StandardBlocks, UniqueEffectsBlock, BMI3CalculatorBlock, GoalWeightBlock]}
             nodeDefinitions={StandardNodes}
             globalCustomFields={globalCustomFields}
