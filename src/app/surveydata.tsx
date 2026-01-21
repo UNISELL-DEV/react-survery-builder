@@ -5,16 +5,16 @@ export const sampleSurvey = {
     type: 'section',
     uuid: 'ee8c7a71-2916-428a-9ada-29bd783e595c',
     items: [
-      {
-        type: 'bmiCalculator',
-        label: 'BMI Calculator',
-        description: 'Calculate your Body Mass Index',
-        fieldName: 'bmiResult',
-        defaultUnit: 'metric',
-        showResults: false,
-        theme: 'default',
-        className: '',
-      },
+      // {
+      //   type: 'bmiCalculator',
+      //   label: 'BMI Calculator',
+      //   description: 'Calculate your Body Mass Index',
+      //   fieldName: 'bmiResult',
+      //   defaultUnit: 'metric',
+      //   showResults: false,
+      //   theme: 'default',
+      //   className: '',
+      // },
       {
         type: 'selectablebox',
         uuid: '8c88c661-f4a7-4f4a-89ea-f01aff367163',
