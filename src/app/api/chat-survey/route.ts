@@ -1,4 +1,82 @@
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  PollyClient,
+  SynthesizeSpeechCommand,
+  Engine,
+  OutputFormat,
+  VoiceId,
+} from '@aws-sdk/client-polly';
+
+// Create Polly client for TTS
+const pollyClient = new PollyClient({
+  region: process.env.AWS_REGION || 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.AWS_LOCAL_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.AWS_LOCAL_SECRET_ACCESS_KEY || '',
+  },
+});
+
+/**
+ * Generate TTS audio using AWS Polly
+ */
+async function generateTTSAudio(
+  text: string,
+  voice: VoiceId = 'Joanna',
+): Promise<{ audio: string; format: string; sampleRate: number } | null> {
+  try {
+    // Check for AWS credentials
+    if (
+      !process.env.AWS_LOCAL_ACCESS_KEY_ID ||
+      !process.env.AWS_LOCAL_SECRET_ACCESS_KEY
+    ) {
+      return null;
+    }
+
+    const command = new SynthesizeSpeechCommand({
+      Text: text,
+      TextType: 'text',
+      OutputFormat: OutputFormat.MP3,
+      VoiceId: voice,
+      Engine: Engine.NEURAL,
+      SampleRate: '24000',
+    });
+
+    const response = await pollyClient.send(command);
+
+    if (!response.AudioStream) {
+      return null;
+    }
+
+    // Convert stream to base64
+    const audioBuffer = await streamToBuffer(response.AudioStream);
+    const audioBase64 = audioBuffer.toString('base64');
+
+    return {
+      audio: audioBase64,
+      format: 'mp3',
+      sampleRate: 24000,
+    };
+  } catch (error) {
+    console.error('TTS generation error:', error);
+    return null;
+  }
+}
+
+/**
+ * Convert a readable stream to a Buffer
+ */
+async function streamToBuffer(stream: any): Promise<Buffer> {
+  if (stream.transformToByteArray) {
+    const bytes = await stream.transformToByteArray();
+    return Buffer.from(bytes);
+  }
+
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of stream) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
 
 interface OptionItem {
   label?: string;
@@ -12,7 +90,10 @@ interface ConversationMessage {
 
 interface OutputSchema {
   type: string;
-  properties?: Record<string, { type: string; optional?: boolean; description?: string }>;
+  properties?: Record<
+    string,
+    { type: string; optional?: boolean; description?: string }
+  >;
   items?: { type: string };
 }
 
@@ -41,6 +122,10 @@ interface RequestBody {
   currentField?: string;
   collectedFields?: Record<string, unknown>;
   remainingFields?: string[];
+  // TTS options
+  includeTTS?: boolean;
+  ttsVoice?: string;
+  language?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -60,16 +145,33 @@ export async function POST(request: NextRequest) {
       currentField,
       collectedFields,
       remainingFields,
+      // TTS options - disabled, using separate streaming TTS for better perceived performance
+      includeTTS = false,
+      ttsVoice = 'Joanna',
+      language,
     } = body;
+
+    // const includeTTS = false;
 
     // Check if ANTHROPIC_API_KEY is set
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       // Return original question if no API key
+      // Still try to generate TTS audio if requested
+      let ttsData = null;
+      if (includeTTS) {
+        ttsData = await generateTTSAudio(originalQuestion, ttsVoice as VoiceId);
+      }
+
       return NextResponse.json({
         question: originalQuestion,
         success: true,
         fallback: true,
+        ...(ttsData && {
+          audio: ttsData.audio,
+          audioFormat: ttsData.format,
+          audioSampleRate: ttsData.sampleRate,
+        }),
       });
     }
 
@@ -84,7 +186,10 @@ export async function POST(request: NextRequest) {
     if (outputSchema) {
       if (outputSchema.type === 'object' && outputSchema.properties) {
         const fields = Object.entries(outputSchema.properties)
-          .map(([key, val]) => `${key} (${val.type}${val.optional ? ', optional' : ''})`)
+          .map(
+            ([key, val]) =>
+              `${key} (${val.type}${val.optional ? ', optional' : ''})`,
+          )
           .join(', ');
         schemaContext = `\nThis question collects: ${fields}`;
       } else if (outputSchema.type === 'array') {
@@ -120,9 +225,14 @@ export async function POST(request: NextRequest) {
     let conversationContext = '';
     if (conversationHistory && conversationHistory.length > 0) {
       const recentMessages = conversationHistory.slice(-6); // Last 6 messages (3 Q&A pairs)
-      conversationContext = '\n\nRecent conversation:\n' + recentMessages
-        .map(msg => `${msg.role === 'assistant' ? 'You' : 'User'}: ${msg.content}`)
-        .join('\n');
+      conversationContext =
+        '\n\nRecent conversation:\n' +
+        recentMessages
+          .map(
+            (msg) =>
+              `${msg.role === 'assistant' ? 'You' : 'User'}: ${msg.content}`,
+          )
+          .join('\n');
     }
 
     // Determine if this is a multi-field question
@@ -177,7 +287,7 @@ Respond with just the conversational question (and optionally a brief acknowledg
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 200,
         system: systemPrompt,
         messages: [
@@ -196,22 +306,62 @@ Respond with just the conversational question (and optionally a brief acknowledg
     const data = await response.json();
 
     // Extract the text content
-    const textContent = data.content?.find((c: { type: string }) => c.type === 'text');
+    const textContent = data.content?.find(
+      (c: { type: string }) => c.type === 'text',
+    );
     const conversationalQuestion = textContent?.text || originalQuestion;
+
+    // Generate TTS audio if requested (in parallel would be ideal but sequential is simpler)
+    let ttsData = null;
+    if (includeTTS) {
+      ttsData = await generateTTSAudio(
+        conversationalQuestion,
+        ttsVoice as VoiceId,
+      );
+    }
 
     return NextResponse.json({
       question: conversationalQuestion,
       success: true,
+      ...(ttsData && {
+        audio: ttsData.audio,
+        audioFormat: ttsData.format,
+        audioSampleRate: ttsData.sampleRate,
+      }),
     });
   } catch (error) {
     console.error('Error calling Claude API:', error);
 
     // Return the original question as fallback
-    const body = await request.clone().json().catch(() => ({ originalQuestion: 'Please answer this question:' }));
+    const body = await request
+      .clone()
+      .json()
+      .catch(() => ({
+        originalQuestion: 'Please answer this question:',
+        includeTTS: true,
+        ttsVoice: 'Joanna',
+      }));
+    const fallbackQuestion =
+      body.originalQuestion || 'Please answer this question:';
+
+    // Still try to generate TTS for the fallback
+    let ttsData = null;
+    if (body.includeTTS !== false) {
+      ttsData = await generateTTSAudio(
+        fallbackQuestion,
+        (body.ttsVoice || 'Joanna') as VoiceId,
+      );
+    }
+
     return NextResponse.json({
-      question: body.originalQuestion || 'Please answer this question:',
+      question: fallbackQuestion,
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
+      ...(ttsData && {
+        audio: ttsData.audio,
+        audioFormat: ttsData.format,
+        audioSampleRate: ttsData.sampleRate,
+      }),
     });
   }
 }

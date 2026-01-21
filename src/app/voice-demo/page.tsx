@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +16,20 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { sampleSurvey } from '../surveydata';
+import type {
+  VoiceCustomData,
+  VoiceValidationRequest,
+  VoiceValidationResponse,
+  VoiceSessionInitRequest,
+  VoiceSessionInitResponse,
+  VoiceSessionEndRequest,
+  TTSRequest,
+  TTSResponse,
+} from '@/packages/survey-form-package/src/renderer/layouts/VoiceLayout';
+import type {
+  AIHandlerContext,
+  AIHandlerResponse,
+} from '@/packages/survey-form-package/src/renderer/layouts/ChatLayout/types';
 
 // Dynamic import of SurveyForm to avoid SSR issues with audio APIs
 const SurveyForm = dynamic(
@@ -35,6 +49,170 @@ const SurveyForm = dynamic(
 
 // Voice survey configuration
 const voiceSurvey = sampleSurvey;
+
+/**
+ * Helper to extract options from block for AI handler
+ */
+function getBlockOptions(block: any): Array<{ label: string; value: any }> {
+  if (block.options && Array.isArray(block.options)) {
+    return block.options.map((opt: any) => ({
+      label: opt.label || String(opt.value || opt),
+      value: opt.value ?? opt,
+    }));
+  }
+  if (block.items && Array.isArray(block.items)) {
+    return (block.items as any[]).map((item) => ({
+      label: item.label || String(item.value || item),
+      value: item.value ?? item,
+    }));
+  }
+  return [];
+}
+
+/**
+ * AI Handler - calls the chat-survey API for conversational question rephrasing
+ * This is now explicitly provided rather than being hardcoded in VoiceLayout.
+ * The API also returns TTS audio to avoid a separate TTS call.
+ */
+const aiHandler = async (
+  context: AIHandlerContext,
+): Promise<AIHandlerResponse> => {
+  try {
+    const response = await fetch('/api/chat-survey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        originalQuestion: context.block.label || context.block.name,
+        blockType: context.block.type,
+        options: getBlockOptions(context.block),
+        questionNumber: context.currentQuestionIndex + 1,
+        totalQuestions: context.totalQuestions,
+        previousResponses: context.previousResponses,
+        conversationHistory: context.conversationHistory
+          .filter((m) => !m.isLoading)
+          .map((m) => ({ role: m.role, content: m.content })),
+        // Include TTS options - audio will be generated alongside the question
+        includeTTS: false,
+        ttsVoice: 'Joanna', // AWS Polly neural voice
+      }),
+    });
+
+    const data = await response.json();
+    return {
+      conversationalQuestion:
+        data.question || context.block.label || 'Please answer this question',
+      // Include audio from the combined response if available
+      audio: data.audio,
+      audioFormat: data.audioFormat,
+      audioSampleRate: data.audioSampleRate,
+    };
+  } catch (error) {
+    console.error('AI handler error:', error);
+    return {
+      conversationalQuestion:
+        context.block.label ||
+        context.block.name ||
+        'Please answer this question',
+    };
+  }
+};
+
+/**
+ * Validation Handler - calls the voice-survey/validate API for AI-powered answer matching
+ */
+const validationHandler = async (
+  request: VoiceValidationRequest,
+): Promise<VoiceValidationResponse> => {
+  try {
+    const response = await fetch('/api/voice-survey/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      throw new Error('Validation request failed');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Validation error:', error);
+    // Return a reask response on error
+    return {
+      success: false,
+      isValid: false,
+      matchedOptions: [],
+      matchedValues: [],
+      confidence: 'low',
+      needsConfirmation: false,
+      invalidReason: 'Failed to validate your answer. Please try again.',
+      suggestedAction: 'reask',
+    };
+  }
+};
+
+/**
+ * Session Init Handler - calls the voice-survey API for session initialization
+ */
+const sessionInitHandler = async (
+  request: VoiceSessionInitRequest,
+): Promise<VoiceSessionInitResponse> => {
+  try {
+    const response = await fetch('/api/voice-survey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'init',
+        ...request,
+      }),
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error('Session init error:', error);
+    return { success: false, error: 'Failed to initialize session' };
+  }
+};
+
+/**
+ * Session End Handler - calls the voice-survey API for session cleanup
+ */
+const sessionEndHandler = async (
+  request: VoiceSessionEndRequest,
+): Promise<void> => {
+  try {
+    await fetch('/api/voice-survey', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'end',
+        sessionId: request.sessionId,
+      }),
+    });
+  } catch (error) {
+    console.error('Session end error:', error);
+  }
+};
+
+/**
+ * AWS Polly TTS Handler - Streaming version
+ * Returns a streaming URL that allows audio to start playing before fully downloaded.
+ * This provides much better perceived performance than waiting for the full audio.
+ */
+const ttsHandler = async (request: TTSRequest): Promise<TTSResponse> => {
+  // Build streaming URL with query parameters
+  const params = new URLSearchParams({
+    text: request.text,
+    voice: request.voice || 'Joanna',
+    language: request.language || 'en-US',
+    engine: 'neural',
+  });
+
+  // Return streaming URL - audio will start playing as soon as data arrives
+  return {
+    streamUrl: `/api/voice-survey/tts?${params.toString()}`,
+  };
+};
 
 export default function VoiceDemoPage() {
   const [submittedData, setSubmittedData] = useState<Record<
@@ -313,20 +491,43 @@ export default function VoiceDemoPage() {
           layout="voice"
           onSubmit={handleSubmit}
           onChange={(data) => console.log('Survey data:', data)}
-          customData={{
-            welcomeMessage: 'Hey there, welcome to our survey!',
-            completionMessage:
-              'Thank you for completing the survey! Your responses have been recorded.',
-            autoListen,
-            silenceTimeout: 2500,
-            maxListenTime: 20000,
-            orbStyle,
-            sessionConfig: {
-              surveyId: 'voice-demo-survey',
-              useBrowserTTS: true,
-              useBrowserSTT: true,
-            },
-          }}
+          customData={
+            {
+              // Messages
+              welcomeMessage: 'Hey there, welcome to our survey!',
+              completionMessage:
+                'Thank you for completing the survey! Your responses have been recorded.',
+
+              // Behavior options
+              autoListen,
+              silenceTimeout: 2500,
+              maxListenTime: 20000,
+              orbStyle,
+
+              // Session configuration
+              sessionConfig: {
+                surveyId: 'voice-demo-survey',
+                useBrowserTTS: true,
+                useBrowserSTT: true,
+              },
+
+              // Injectable handlers - these replace the hardcoded API calls
+              // Remove these to use the default local-only behavior (no AI)
+              aiHandler, // AI handler now includes TTS audio in response (no separate TTS call)
+              validationHandler,
+              sessionInitHandler,
+              sessionEndHandler,
+
+              // TTS is now included in the aiHandler response from chat-survey API
+              // The ttsHandler below is only used as fallback for non-AI speech (e.g., error messages)
+              ttsHandler,
+              ttsVoice: 'Joanna',
+              language: 'en-US',
+
+              // Note: STT still uses browser's SpeechRecognition for real-time streaming
+              // AWS Transcribe Streaming requires WebSocket which is not supported in API routes
+            } satisfies VoiceCustomData
+          }
           mode="pageless"
         />
       )}
