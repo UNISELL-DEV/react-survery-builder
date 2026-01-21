@@ -1,0 +1,541 @@
+import { NextRequest, NextResponse } from 'next/server';
+
+/**
+ * Voice Answer Validation API
+ *
+ * Uses AI to validate and match voice transcripts to available options.
+ * This handles cases where speech recognition may not capture exact words.
+ */
+
+interface Option {
+  id?: string;
+  label: string;
+  value: string;
+}
+
+interface ValidationRequest {
+  transcript: string;
+  options: Option[];
+  multiSelect: boolean;
+  questionLabel?: string;
+  blockType?: string;
+  previousSelections?: string[]; // For multi-select, track what's already selected
+  isConfirmation?: boolean; // Whether this is a confirmation of selections
+}
+
+interface ValidationResponse {
+  success: boolean;
+  isValid: boolean;
+  matchedOptions: Option[];
+  matchedValues: string[];
+  confidence: 'high' | 'medium' | 'low';
+  needsConfirmation: boolean;
+  confirmationMessage?: string;
+  invalidReason?: string;
+  suggestedAction?: 'confirm' | 'reask' | 'add_more' | 'submit' | 'finish_multiselect';
+}
+
+// Patterns for "none of the above" type options that don't need confirmation
+const EXCLUSIVE_OPTION_PATTERNS = [
+  /^none\s*(of\s*(the\s*)?(above|these|them))?$/i,
+  /^neither$/i,
+  /^not\s*(any|applicable)$/i,
+  /^n\/?a$/i,
+  /^prefer\s*not\s*to\s*(say|answer)$/i,
+  /^skip$/i,
+  /^no\s*(preference|opinion)$/i,
+  /^don'?t\s*know$/i,
+  /^unsure$/i,
+  /^other$/i,
+];
+
+// Check if an option is an "exclusive" type that shouldn't need confirmation
+function isExclusiveOption(label: string): boolean {
+  const normalizedLabel = label.toLowerCase().trim();
+  return EXCLUSIVE_OPTION_PATTERNS.some(pattern => pattern.test(normalizedLabel));
+}
+
+// Patterns for "done" / "finished" responses
+const DONE_PATTERNS = [
+  /^(that'?s?\s*)?(all|it|everything|done|enough)$/i,
+  /^(i'?m\s*)?(done|finished|good)$/i,
+  /^no\s*(more|thanks)$/i,
+  /^continue$/i,
+  /^next(\s*question)?$/i,
+  /^move\s*on$/i,
+  /^let'?s?\s*(continue|move\s*on|go)$/i,
+];
+
+// Check if the response means "I'm done selecting"
+function isDoneResponse(transcript: string): boolean {
+  const normalized = transcript.toLowerCase().trim();
+  return DONE_PATTERNS.some(pattern => pattern.test(normalized));
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body: ValidationRequest = await request.json();
+    const {
+      transcript,
+      options,
+      multiSelect,
+      questionLabel,
+      blockType,
+      previousSelections = [],
+      isConfirmation = false,
+    } = body;
+
+    // Check if ANTHROPIC_API_KEY is set
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      // Fallback to basic matching without AI
+      return NextResponse.json(fallbackValidation(transcript, options, multiSelect, previousSelections));
+    }
+
+    // Check for "done" response when user has previous selections (multi-select)
+    if (previousSelections.length > 0 && isDoneResponse(transcript)) {
+      const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+      return NextResponse.json({
+        success: true,
+        isValid: true,
+        matchedOptions: selectedOptions,
+        matchedValues: previousSelections,
+        confidence: 'high',
+        needsConfirmation: false,
+        suggestedAction: 'finish_multiselect',
+      } as ValidationResponse);
+    }
+
+    // Build options context for the AI
+    const optionsText = options
+      .map((opt, i) => `${i + 1}. Label: "${opt.label}" → Value: "${opt.value}"`)
+      .join('\n');
+
+    // Handle confirmation flow
+    if (isConfirmation) {
+      return handleConfirmation(transcript, previousSelections, options, apiKey);
+    }
+
+    const systemPrompt = `You are a voice survey answer validator. Your job is to analyze a user's spoken response and determine which option(s) they selected from a list of available options.
+
+IMPORTANT RULES:
+1. Match by semantic meaning, not just exact words. E.g., "I want to lose weight" matches "Specific weight loss target"
+2. Handle speech recognition errors. E.g., "health improvement" should match "Overall health improvement"
+3. Numbers can be spoken as words. E.g., "option one", "first", "1" all mean option 1
+4. For multiSelect: user might say multiple options or add to previous selections
+5. Common affirmative words like "yes", "yeah", "sure" mean confirmation
+6. Common negative words like "no", "nope", "not that one" mean rejection
+
+Return a JSON object with these exact fields:
+{
+  "isValid": boolean,
+  "matchedOptionIndices": number[], // 0-based indices of matched options
+  "confidence": "high" | "medium" | "low",
+  "needsConfirmation": boolean,
+  "reason": string // Brief explanation of the match or why it's invalid
+}`;
+
+    const userPrompt = `Question: "${questionLabel || 'Please select an option'}"
+Block type: ${blockType || 'select'}
+Multi-select: ${multiSelect}
+${previousSelections.length > 0 ? `Previously selected: ${previousSelections.join(', ')}` : ''}
+
+Available options:
+${optionsText}
+
+User's spoken response: "${transcript}"
+
+Analyze this response and determine which option(s) the user is selecting. Consider partial matches, paraphrases, and common speech patterns.`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: systemPrompt,
+        messages: [
+          {
+            role: 'user',
+            content: userPrompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('API request failed:', response.status);
+      return NextResponse.json(fallbackValidation(transcript, options, multiSelect));
+    }
+
+    const data = await response.json();
+    const textContent = data.content?.find((c: { type: string }) => c.type === 'text');
+    const responseText = textContent?.text || '';
+
+    // Parse the JSON from the response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return NextResponse.json(fallbackValidation(transcript, options, multiSelect));
+    }
+
+    const aiResult = JSON.parse(jsonMatch[0]);
+
+    // Build the response
+    const matchedOptions = (aiResult.matchedOptionIndices || [])
+      .filter((i: number) => i >= 0 && i < options.length)
+      .map((i: number) => options[i]);
+
+    const matchedValues = matchedOptions.map((opt: Option) => opt.value);
+
+    // Determine if we need confirmation
+    let needsConfirmation = aiResult.needsConfirmation;
+    let confirmationMessage = '';
+    let suggestedAction: 'confirm' | 'reask' | 'add_more' | 'submit' | 'finish_multiselect' = 'submit';
+
+    // Check if any matched option is an exclusive option (like "none of the above")
+    const hasExclusiveOption = matchedOptions.some((opt: Option) => isExclusiveOption(opt.label));
+
+    if (aiResult.isValid && matchedOptions.length > 0 && hasExclusiveOption) {
+      // Exclusive options like "none of the above" don't need confirmation
+      needsConfirmation = false;
+      suggestedAction = 'submit';
+    } else if (aiResult.isValid && multiSelect && matchedOptions.length > 0) {
+      // For multi-select, confirm what was selected
+      needsConfirmation = true;
+      const selectedLabels = matchedOptions.map((opt: Option) => opt.label).join(', ');
+      confirmationMessage = `I heard you say ${selectedLabels}. Would you like to add more options, or say "done" to continue?`;
+      suggestedAction = 'confirm';
+    } else if (aiResult.isValid && matchedOptions.length > 0 && aiResult.confidence === 'medium') {
+      // For single select with medium confidence, ask for confirmation
+      needsConfirmation = true;
+      confirmationMessage = `Just to confirm, you selected "${matchedOptions[0].label}". Is that correct?`;
+      suggestedAction = 'confirm';
+    } else if (!aiResult.isValid) {
+      suggestedAction = 'reask';
+    }
+
+    const result: ValidationResponse = {
+      success: true,
+      isValid: aiResult.isValid,
+      matchedOptions,
+      matchedValues,
+      confidence: aiResult.confidence || 'medium',
+      needsConfirmation,
+      confirmationMessage,
+      invalidReason: !aiResult.isValid ? aiResult.reason : undefined,
+      suggestedAction,
+    };
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('Voice validation API error:', error);
+    return NextResponse.json({
+      success: false,
+      isValid: false,
+      matchedOptions: [],
+      matchedValues: [],
+      confidence: 'low',
+      needsConfirmation: false,
+      invalidReason: 'Failed to validate answer',
+      suggestedAction: 'reask',
+    } as ValidationResponse);
+  }
+}
+
+/**
+ * Handle confirmation responses (yes/no/add more/done)
+ */
+async function handleConfirmation(
+  transcript: string,
+  previousSelections: string[],
+  options: Option[],
+  apiKey: string
+): Promise<NextResponse> {
+  // First check for "done" pattern locally (faster than AI call)
+  if (isDoneResponse(transcript)) {
+    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    return NextResponse.json({
+      success: true,
+      isValid: true,
+      matchedOptions: selectedOptions,
+      matchedValues: previousSelections,
+      confidence: 'high',
+      needsConfirmation: false,
+      suggestedAction: 'finish_multiselect',
+    } as ValidationResponse);
+  }
+
+  // Check for simple "yes" / affirmative responses - in multi-select context, this means add more
+  const simpleYesPattern = /^(yes|yeah|yep|sure|yup|ok|okay|uh-huh)\.?$/i;
+  if (simpleYesPattern.test(transcript.trim())) {
+    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    return NextResponse.json({
+      success: true,
+      isValid: true,
+      matchedOptions: selectedOptions,
+      matchedValues: previousSelections,
+      confidence: 'high',
+      needsConfirmation: true,
+      confirmationMessage: 'Which additional option would you like to add?',
+      suggestedAction: 'add_more',
+    } as ValidationResponse);
+  }
+
+  const systemPrompt = `You are analyzing a user's response in a voice survey.
+The user was asked: "Would you like to add more options, or say 'done' to continue?"
+
+IMPORTANT CONTEXT: The user has already made selection(s). They are being asked if they want to ADD MORE options.
+- If they say "yes", "sure", "I'd like to add more" = they want to ADD MORE (not confirm)
+- If they say "no", "no more", "done", "that's all", "continue" = they are DONE and want to submit
+- If they say an option name or description = they are selecting that option to add
+- If they say "no, that's wrong" or "not that one" = they want to REJECT and start over
+
+Analyze their response and return a JSON object:
+{
+  "intent": "add_more" | "done" | "reject" | "select_option" | "unclear",
+  "matchedOptionIndex": number | null,
+  "reason": string
+}
+
+- "add_more" = they want to add more options (said yes, sure, etc.)
+- "done" = they don't want more, ready to submit (said no, done, continue, that's all)
+- "reject" = they want to reject the selection and start over
+- "select_option" = they named or described a specific option to add
+- "unclear" = can't determine their intent`;
+
+  const optionsText = options
+    .map((opt, i) => `${i}. "${opt.label}"`)
+    .join('\n');
+
+  const userPrompt = `Previously selected: ${previousSelections.join(', ')}
+Available options:
+${optionsText}
+
+User's response: "${transcript}"
+
+What is the user's intent?`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('API failed');
+    }
+
+    const data = await response.json();
+    const textContent = data.content?.find((c: { type: string }) => c.type === 'text');
+    const responseText = textContent?.text || '';
+
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON in response');
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+
+    // Map previousSelections values back to options
+    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+
+    switch (result.intent) {
+      case 'done':
+        // User is done selecting, submit the current selections
+        return NextResponse.json({
+          success: true,
+          isValid: true,
+          matchedOptions: selectedOptions,
+          matchedValues: previousSelections,
+          confidence: 'high',
+          needsConfirmation: false,
+          suggestedAction: 'finish_multiselect',
+        } as ValidationResponse);
+
+      case 'reject':
+        return NextResponse.json({
+          success: true,
+          isValid: false,
+          matchedOptions: [],
+          matchedValues: [],
+          confidence: 'high',
+          needsConfirmation: false,
+          invalidReason: 'User rejected the selection. Please select again.',
+          suggestedAction: 'reask',
+        } as ValidationResponse);
+
+      case 'add_more':
+        return NextResponse.json({
+          success: true,
+          isValid: true,
+          matchedOptions: selectedOptions,
+          matchedValues: previousSelections,
+          confidence: 'high',
+          needsConfirmation: true,
+          confirmationMessage: 'Which additional option would you like to add?',
+          suggestedAction: 'add_more',
+        } as ValidationResponse);
+
+      case 'select_option':
+        // User named a specific option - add it to the selection
+        if (result.matchedOptionIndex !== null && result.matchedOptionIndex >= 0 && result.matchedOptionIndex < options.length) {
+          const newOption = options[result.matchedOptionIndex];
+          const newValues = [...new Set([...previousSelections, newOption.value])];
+          const newOptions = options.filter((opt) => newValues.includes(opt.value));
+
+          return NextResponse.json({
+            success: true,
+            isValid: true,
+            matchedOptions: newOptions,
+            matchedValues: newValues,
+            confidence: 'high',
+            needsConfirmation: true,
+            confirmationMessage: `Added "${newOption.label}". Would you like to add more, or say "done" to continue?`,
+            suggestedAction: 'confirm',
+          } as ValidationResponse);
+        }
+        // Couldn't match the option, ask again
+        return NextResponse.json({
+          success: true,
+          isValid: false,
+          matchedOptions: selectedOptions,
+          matchedValues: previousSelections,
+          confidence: 'low',
+          needsConfirmation: true,
+          confirmationMessage: "I couldn't find that option. Which option would you like to add?",
+          suggestedAction: 'add_more',
+        } as ValidationResponse);
+
+      default:
+        return NextResponse.json({
+          success: true,
+          isValid: true,
+          matchedOptions: selectedOptions,
+          matchedValues: previousSelections,
+          confidence: 'low',
+          needsConfirmation: true,
+          confirmationMessage:
+            "I didn't quite catch that. Which option would you like to add, or say \"done\" to continue?",
+          suggestedAction: 'add_more',
+        } as ValidationResponse);
+    }
+  } catch {
+    return NextResponse.json({
+      success: false,
+      isValid: false,
+      matchedOptions: [],
+      matchedValues: [],
+      confidence: 'low',
+      needsConfirmation: true,
+      suggestedAction: 'reask',
+    } as ValidationResponse);
+  }
+}
+
+/**
+ * Fallback validation when AI is not available
+ */
+function fallbackValidation(
+  transcript: string,
+  options: Option[],
+  multiSelect: boolean,
+  previousSelections: string[] = []
+): ValidationResponse {
+  const normalized = transcript.toLowerCase().trim();
+
+  // Check for "done" response first
+  if (previousSelections.length > 0 && isDoneResponse(transcript)) {
+    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    return {
+      success: true,
+      isValid: true,
+      matchedOptions: selectedOptions,
+      matchedValues: previousSelections,
+      confidence: 'high',
+      needsConfirmation: false,
+      suggestedAction: 'finish_multiselect',
+    };
+  }
+
+  const matchedOptions: Option[] = [];
+
+  // Try direct label matching
+  for (const opt of options) {
+    const labelLower = opt.label.toLowerCase();
+    if (normalized.includes(labelLower) || labelLower.includes(normalized)) {
+      matchedOptions.push(opt);
+      if (!multiSelect) break;
+    }
+  }
+
+  // Try number-based matching
+  if (matchedOptions.length === 0) {
+    const numberWords: Record<string, number> = {
+      one: 1,
+      first: 1,
+      two: 2,
+      second: 2,
+      three: 3,
+      third: 3,
+      four: 4,
+      fourth: 4,
+      five: 5,
+      fifth: 5,
+    };
+
+    for (const [word, num] of Object.entries(numberWords)) {
+      if (normalized.includes(word) && num <= options.length) {
+        matchedOptions.push(options[num - 1]);
+        if (!multiSelect) break;
+      }
+    }
+
+    // Check for digit numbers
+    const digitMatch = normalized.match(/\b(\d+)\b/g);
+    if (digitMatch && matchedOptions.length === 0) {
+      for (const digit of digitMatch) {
+        const num = parseInt(digit, 10);
+        if (num >= 1 && num <= options.length) {
+          matchedOptions.push(options[num - 1]);
+          if (!multiSelect) break;
+        }
+      }
+    }
+  }
+
+  const isValid = matchedOptions.length > 0;
+  const matchedValues = matchedOptions.map((opt) => opt.value);
+
+  // Check if any matched option is exclusive (no confirmation needed)
+  const hasExclusiveOption = matchedOptions.some((opt) => isExclusiveOption(opt.label));
+
+  return {
+    success: true,
+    isValid,
+    matchedOptions,
+    matchedValues,
+    confidence: isValid ? 'medium' : 'low',
+    needsConfirmation: multiSelect && isValid && !hasExclusiveOption,
+    confirmationMessage: multiSelect && isValid && !hasExclusiveOption
+      ? `You selected ${matchedOptions.map((o) => o.label).join(', ')}. Would you like to add more, or say "done" to continue?`
+      : undefined,
+    invalidReason: !isValid
+      ? "I couldn't match your answer to any option. Please try again."
+      : undefined,
+    suggestedAction: isValid ? (multiSelect && !hasExclusiveOption ? 'confirm' : 'submit') : 'reask',
+  };
+}
