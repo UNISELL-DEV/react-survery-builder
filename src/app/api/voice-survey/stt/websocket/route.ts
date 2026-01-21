@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
   // Check for AWS credentials
   const accessKeyId = process.env.AWS_LOCAL_ACCESS_KEY_ID;
   const secretAccessKey = process.env.AWS_LOCAL_SECRET_ACCESS_KEY;
-  const region = process.env.AWS_REGION || 'us-east-1';
+  const region = process.env.AWS_LOCAL_DEFAULT_REGION || process.env.AWS_REGION || 'us-east-1';
 
   if (!accessKeyId || !secretAccessKey) {
     return NextResponse.json(
