@@ -3,7 +3,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Button } from '@/components/ui/button';
-import { Check, Mic, Loader2, Settings, AlertTriangle, X, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Check,
+  Mic,
+  Loader2,
+  Settings,
+  AlertTriangle,
+  X,
+  RotateCcw,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import Link from 'next/link';
 import { sampleSurvey } from '../surveydata';
 
@@ -81,7 +91,7 @@ export default function VoiceDemoPage() {
     setSubmittedData(null);
     setShowDataDetails(false);
     // Increment key to force re-mount the SurveyForm component
-    setSurveyKey(prev => prev + 1);
+    setSurveyKey((prev) => prev + 1);
   }, []);
 
   const requestMicPermission = async () => {
@@ -247,7 +257,8 @@ export default function VoiceDemoPage() {
 
           {/* Subtitle */}
           <p className="text-gray-500 text-center max-w-md mb-8">
-            Thank you for completing the survey. Your responses have been recorded successfully.
+            Thank you for completing the survey. Your responses have been
+            recorded successfully.
           </p>
 
           {/* Data Summary Card */}
@@ -256,7 +267,9 @@ export default function VoiceDemoPage() {
               onClick={() => setShowDataDetails(!showDataDetails)}
               className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
             >
-              <span className="font-medium text-gray-700">View Submitted Data</span>
+              <span className="font-medium text-gray-700">
+                View Submitted Data
+              </span>
               {showDataDetails ? (
                 <ChevronUp className="w-5 h-5 text-gray-400" />
               ) : (
@@ -301,7 +314,7 @@ export default function VoiceDemoPage() {
           onSubmit={handleSubmit}
           onChange={(data) => console.log('Survey data:', data)}
           customData={{
-            welcomeMessage: 'Hey There! Hope you are doing good!',
+            welcomeMessage: 'Hey there, welcome to our survey!',
             completionMessage:
               'Thank you for completing the survey! Your responses have been recorded.',
             autoListen,
