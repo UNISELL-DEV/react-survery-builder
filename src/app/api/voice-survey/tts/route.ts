@@ -247,7 +247,8 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': 'audio/mpeg',
           'Content-Length': audioBuffer.length.toString(),
-          'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+          // Use private cache to prevent CDN caching (avoids stale audio issues)
+          'Cache-Control': 'private, no-store',
         },
       });
     } catch (error: any) {

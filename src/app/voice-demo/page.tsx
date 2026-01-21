@@ -202,11 +202,13 @@ const sessionEndHandler = async (
  */
 const ttsHandler = async (request: TTSRequest): Promise<TTSResponse> => {
   // Build streaming URL with query parameters
+  // Include timestamp to bust CDN cache (prevents stale audio on production)
   const params = new URLSearchParams({
     text: request.text,
     voice: request.voice || 'Joanna',
     language: request.language || 'en-US',
     engine: 'neural',
+    _t: Date.now().toString(), // Cache buster
   });
 
   // Return streaming URL - audio will start playing as soon as data arrives
