@@ -1,17 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import {
-  Check,
-  Mic,
-  Loader2,
-  Settings,
-  AlertTriangle,
-  X,
-} from 'lucide-react';
+import { Check, Mic, Loader2, Settings, AlertTriangle, X, RotateCcw, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { sampleSurvey } from '../surveydata';
 
@@ -19,7 +11,7 @@ import { sampleSurvey } from '../surveydata';
 const SurveyForm = dynamic(
   () =>
     import('@/packages/survey-form-package/src/renderer/SurveyForm').then(
-      (mod) => mod.SurveyForm
+      (mod) => mod.SurveyForm,
     ),
   {
     ssr: false,
@@ -28,22 +20,30 @@ const SurveyForm = dynamic(
         <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
       </div>
     ),
-  }
+  },
 );
 
 // Voice survey configuration
 const voiceSurvey = sampleSurvey;
 
 export default function VoiceDemoPage() {
-  const [submittedData, setSubmittedData] = useState<Record<string, any> | null>(null);
-  const [showAlert, setShowAlert] = useState(false);
+  const [submittedData, setSubmittedData] = useState<Record<
+    string,
+    any
+  > | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  const [micPermission, setMicPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  const [micPermission, setMicPermission] = useState<
+    'granted' | 'denied' | 'prompt'
+  >('prompt');
   const [browserSupported, setBrowserSupported] = useState(true);
+  const [surveyKey, setSurveyKey] = useState(0);
+  const [showDataDetails, setShowDataDetails] = useState(false);
 
   // Voice settings
   const [autoListen, setAutoListen] = useState(true);
-  const [orbStyle, setOrbStyle] = useState<'pulse' | 'wave' | 'glow' | 'breathe'>('breathe');
+  const [orbStyle, setOrbStyle] = useState<
+    'pulse' | 'wave' | 'glow' | 'breathe'
+  >('breathe');
 
   // Check browser support and permissions on mount
   useEffect(() => {
@@ -73,13 +73,16 @@ export default function VoiceDemoPage() {
     }
   }, []);
 
-  const handleSubmit = (data: Record<string, any>) => {
+  const handleSubmit = useCallback((data: Record<string, any>) => {
     setSubmittedData(data);
-    setShowAlert(true);
-    setTimeout(() => {
-      setShowAlert(false);
-    }, 5000);
-  };
+  }, []);
+
+  const handleRestart = useCallback(() => {
+    setSubmittedData(null);
+    setShowDataDetails(false);
+    // Increment key to force re-mount the SurveyForm component
+    setSurveyKey(prev => prev + 1);
+  }, []);
 
   const requestMicPermission = async () => {
     try {
@@ -174,12 +177,20 @@ export default function VoiceDemoPage() {
 
             <div className="pt-2 border-t border-gray-100 space-y-2">
               <Link href="/chat-demo">
-                <Button variant="outline" size="sm" className="w-full bg-transparent border-gray-200 text-gray-600 hover:bg-gray-50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full bg-transparent border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
                   Switch to Chat Demo
                 </Button>
               </Link>
               <Link href="/demo">
-                <Button variant="outline" size="sm" className="w-full bg-transparent border-gray-200 text-gray-600 hover:bg-gray-50">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full bg-transparent border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
                   Switch to Standard Demo
                 </Button>
               </Link>
@@ -196,7 +207,12 @@ export default function VoiceDemoPage() {
             <span className="text-sm text-white">
               Microphone access required
             </span>
-            <Button size="sm" variant="secondary" onClick={requestMicPermission} className="bg-white text-blue-600 hover:bg-gray-50">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={requestMicPermission}
+              className="bg-white text-blue-600 hover:bg-gray-50"
+            >
               Enable
             </Button>
           </div>
@@ -215,61 +231,91 @@ export default function VoiceDemoPage() {
         </div>
       )}
 
-      {/* Success Alert */}
-      {showAlert && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 animate-in fade-in slide-in-from-top-2">
-          <Alert className="bg-green-50 border-green-200 shadow-lg">
-            <Check className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800">Success!</AlertTitle>
-            <AlertDescription className="text-green-700">
-              Survey submitted successfully.
-            </AlertDescription>
-          </Alert>
-        </div>
-      )}
-
-      {/* Voice Survey - Full Screen */}
-      <SurveyForm
-        survey={voiceSurvey as any}
-        layout="voice"
-        onSubmit={handleSubmit}
-        onChange={(data) => console.log('Survey data:', data)}
-        customData={{
-          welcomeMessage:
-            "Hi! I'm here to help you complete this survey. You can speak your answers or type them. Ready to begin?",
-          completionMessage:
-            "Thank you for completing the survey! Your responses have been recorded.",
-          autoListen,
-          silenceTimeout: 2500,
-          maxListenTime: 20000,
-          orbStyle,
-          sessionConfig: {
-            surveyId: 'voice-demo-survey',
-            useBrowserTTS: true,
-            useBrowserSTT: true,
-          },
-        }}
-        mode="pageless"
-      />
-
-      {/* Submitted Data Preview */}
-      {submittedData && (
-        <div className="fixed bottom-4 left-4 right-4 max-w-md mx-auto bg-white/95 backdrop-blur-sm rounded-xl shadow-xl border border-gray-200 p-4 z-40">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-800">
-              Submitted Data:
-            </h3>
-            <button
-              onClick={() => setSubmittedData(null)}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
+      {/* Show completion screen OR the survey */}
+      {submittedData ? (
+        /* Completion Screen */
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-white via-gray-50 to-gray-100 p-6">
+          {/* Success Icon */}
+          <div className="w-20 h-20 mb-6 rounded-full bg-green-100 flex items-center justify-center animate-in zoom-in duration-300">
+            <Check className="w-10 h-10 text-green-500" />
           </div>
-          <pre className="text-xs bg-gray-50 text-gray-700 p-3 rounded-lg overflow-auto max-h-40 border border-gray-100">
-            {JSON.stringify(submittedData, null, 2)}
-          </pre>
+
+          {/* Title */}
+          <h1 className="text-2xl md:text-3xl font-light text-gray-800 mb-3 text-center">
+            Survey Complete!
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-gray-500 text-center max-w-md mb-8">
+            Thank you for completing the survey. Your responses have been recorded successfully.
+          </p>
+
+          {/* Data Summary Card */}
+          <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden mb-6">
+            <button
+              onClick={() => setShowDataDetails(!showDataDetails)}
+              className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+            >
+              <span className="font-medium text-gray-700">View Submitted Data</span>
+              {showDataDetails ? (
+                <ChevronUp className="w-5 h-5 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+
+            {showDataDetails && (
+              <div className="border-t border-gray-100">
+                <pre className="text-xs bg-gray-50 text-gray-700 p-4 overflow-auto max-h-60">
+                  {JSON.stringify(submittedData, null, 2)}
+                </pre>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+            <Button
+              onClick={handleRestart}
+              className="flex-1 h-12 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-medium"
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Start New Survey
+            </Button>
+            <Link href="/demo" className="flex-1">
+              <Button
+                variant="outline"
+                className="w-full h-12 border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50"
+              >
+                Try Standard Demo
+              </Button>
+            </Link>
+          </div>
         </div>
+      ) : (
+        /* Voice Survey - Full Screen */
+        <SurveyForm
+          key={surveyKey}
+          survey={voiceSurvey as any}
+          layout="voice"
+          onSubmit={handleSubmit}
+          onChange={(data) => console.log('Survey data:', data)}
+          customData={{
+            welcomeMessage: 'Hey There! Hope you are doing good!',
+            completionMessage:
+              'Thank you for completing the survey! Your responses have been recorded.',
+            autoListen,
+            silenceTimeout: 2500,
+            maxListenTime: 20000,
+            orbStyle,
+            sessionConfig: {
+              surveyId: 'voice-demo-survey',
+              useBrowserTTS: true,
+              useBrowserSTT: true,
+            },
+          }}
+          mode="pageless"
+        />
       )}
     </div>
   );

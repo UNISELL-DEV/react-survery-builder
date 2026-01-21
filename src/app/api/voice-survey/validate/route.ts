@@ -13,6 +13,17 @@ interface Option {
   value: string;
 }
 
+interface SchemaProperty {
+  type: string;
+  description?: string;
+  optional?: boolean;
+}
+
+interface OutputSchema {
+  type: string;
+  properties?: Record<string, SchemaProperty>;
+}
+
 interface ValidationRequest {
   transcript: string;
   options: Option[];
@@ -21,6 +32,9 @@ interface ValidationRequest {
   blockType?: string;
   previousSelections?: string[]; // For multi-select, track what's already selected
   isConfirmation?: boolean; // Whether this is a confirmation of selections
+  // Schema-based validation
+  outputSchema?: OutputSchema;
+  inputSchema?: OutputSchema;
 }
 
 interface ValidationResponse {
@@ -32,7 +46,12 @@ interface ValidationResponse {
   needsConfirmation: boolean;
   confirmationMessage?: string;
   invalidReason?: string;
-  suggestedAction?: 'confirm' | 'reask' | 'add_more' | 'submit' | 'finish_multiselect';
+  suggestedAction?:
+    | 'confirm'
+    | 'reask'
+    | 'add_more'
+    | 'submit'
+    | 'finish_multiselect';
 }
 
 // Patterns for "none of the above" type options that don't need confirmation
@@ -52,7 +71,9 @@ const EXCLUSIVE_OPTION_PATTERNS = [
 // Check if an option is an "exclusive" type that shouldn't need confirmation
 function isExclusiveOption(label: string): boolean {
   const normalizedLabel = label.toLowerCase().trim();
-  return EXCLUSIVE_OPTION_PATTERNS.some(pattern => pattern.test(normalizedLabel));
+  return EXCLUSIVE_OPTION_PATTERNS.some((pattern) =>
+    pattern.test(normalizedLabel),
+  );
 }
 
 // Patterns for "done" / "finished" responses
@@ -69,7 +90,209 @@ const DONE_PATTERNS = [
 // Check if the response means "I'm done selecting"
 function isDoneResponse(transcript: string): boolean {
   const normalized = transcript.toLowerCase().trim();
-  return DONE_PATTERNS.some(pattern => pattern.test(normalized));
+  return DONE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+/**
+ * Handle schema-based validation for blocks with outputSchema/inputSchema
+ * Extracts structured data from the transcript according to the schema
+ * Works with ANY schema type - string, number, boolean, array, object
+ */
+async function handleSchemaValidation(
+  transcript: string,
+  schema: OutputSchema,
+  questionLabel: string | undefined,
+  apiKey: string,
+): Promise<NextResponse> {
+  // Build schema description based on schema type
+  let schemaDescription: string;
+  let expectedFormat: string;
+
+  if (schema.type === 'object' && schema.properties) {
+    // Object schema with properties
+    const schemaFields = Object.entries(schema.properties)
+      .map(([key, prop]) => {
+        const required = prop.optional ? '(optional)' : '(required)';
+        return `- ${key}: ${prop.type} ${required}${prop.description ? ` - ${prop.description}` : ''}`;
+      })
+      .join('\n');
+
+    const schemaExample: Record<string, string> = {};
+    for (const [key, prop] of Object.entries(schema.properties)) {
+      if (prop.type === 'number') {
+        schemaExample[key] = '<number>';
+      } else if (prop.type === 'boolean') {
+        schemaExample[key] = '<true or false>';
+      } else if (prop.type === 'array') {
+        schemaExample[key] = '<array>';
+      } else {
+        schemaExample[key] = '<string>';
+      }
+    }
+
+    schemaDescription = `Expected output schema (object with fields):\n${schemaFields}`;
+    expectedFormat = `{
+  ${Object.entries(schemaExample).map(([k, v]) => `"${k}": ${v}`).join(',\n  ')},
+  "isValid": true
+}`;
+  } else if (schema.type === 'string') {
+    schemaDescription = "Expected output: a string value extracted from the user's speech";
+    expectedFormat = `{
+  "value": "<extracted string>",
+  "isValid": true
+}`;
+  } else if (schema.type === 'number') {
+    schemaDescription = 'Expected output: a number value extracted from the user\'s speech (convert spoken numbers like "twenty five" to 25)';
+    expectedFormat = `{
+  "value": <number>,
+  "isValid": true
+}`;
+  } else if (schema.type === 'boolean') {
+    schemaDescription = "Expected output: a boolean value (true/false) based on the user's response (yes/no, true/false, etc.)";
+    expectedFormat = `{
+  "value": <true or false>,
+  "isValid": true
+}`;
+  } else if (schema.type === 'date') {
+    schemaDescription = "Expected output: a date string in ISO format (YYYY-MM-DD) extracted from the user's speech";
+    expectedFormat = `{
+  "value": "<YYYY-MM-DD>",
+  "isValid": true
+}`;
+  } else if (schema.type === 'array') {
+    schemaDescription = "Expected output: an array of values extracted from the user's speech";
+    expectedFormat = `{
+  "value": [<array of values>],
+  "isValid": true
+}`;
+  } else {
+    // Fallback for unknown types
+    schemaDescription = `Expected output type: ${schema.type}`;
+    expectedFormat = `{
+  "value": <extracted value>,
+  "isValid": true
+}`;
+  }
+
+  const systemPrompt = `You are extracting structured data from a user's voice response for a survey.
+Your job is to extract the relevant value(s) from the user's speech and return them in a specific JSON format.
+
+CRITICAL RULES:
+1. Extract the meaningful content from natural speech (e.g., "my name is John" → extract "John", "I am 25 years old" → extract 25)
+2. Convert spoken numbers to actual numbers (e.g., "twenty five" → 25, "one hundred seventy" → 170)
+3. Handle variations in how people express information naturally
+4. For string values, extract the core answer without filler words like "my name is", "I think", "it's", etc.
+5. If you cannot extract a valid value, mark isValid as false
+6. Return ONLY valid JSON - no explanations, no markdown, just the JSON object`;
+
+  const userPrompt = `Question being answered: "${questionLabel || 'Please provide your answer'}"
+
+${schemaDescription}
+
+User's spoken response: "${transcript}"
+
+Extract the data and return JSON in this format:
+${expectedFormat}
+
+If you cannot extract the required information, return:
+{
+  "isValid": false,
+  "clarificationNeeded": "Please provide [what's missing or unclear]"
+}
+
+Return ONLY the JSON object:`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const textContent = data.content?.find(
+      (c: { type: string }) => c.type === 'text',
+    );
+    const responseText = textContent?.text || '';
+
+    // Parse the JSON from the response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return NextResponse.json({
+        success: false,
+        isValid: false,
+        extractedData: null,
+        confidence: 'low',
+        needsConfirmation: true,
+        confirmationMessage:
+          "I couldn't understand your response. Could you please try again?",
+        suggestedAction: 'reask',
+      });
+    }
+
+    const parsedResponse = JSON.parse(jsonMatch[0]);
+
+    if (parsedResponse.isValid === false) {
+      return NextResponse.json({
+        success: true,
+        isValid: false,
+        extractedData: null,
+        confidence: 'low',
+        needsConfirmation: true,
+        confirmationMessage:
+          parsedResponse.clarificationNeeded ||
+          "I couldn't understand your response. Could you please try again?",
+        suggestedAction: 'reask',
+        missingFields: parsedResponse.missingFields,
+      });
+    }
+
+    // For non-object schemas, the extracted data is in the "value" field
+    // For object schemas, the extracted data is the object itself (minus validation flags)
+    let extractedData: unknown;
+    if (schema.type === 'object' && schema.properties) {
+      // Remove internal validation flags from the output
+      const { isValid, missingFields, clarificationNeeded, ...objectData } = parsedResponse;
+      extractedData = objectData;
+    } else {
+      // For scalar/array types, use the "value" field
+      extractedData = parsedResponse.value;
+    }
+
+    return NextResponse.json({
+      success: true,
+      isValid: true,
+      extractedData,
+      confidence: 'high',
+      needsConfirmation: false,
+      suggestedAction: 'submit',
+    });
+  } catch (error) {
+    console.error('Schema validation error:', error);
+    return NextResponse.json({
+      success: false,
+      isValid: false,
+      extractedData: null,
+      confidence: 'low',
+      needsConfirmation: true,
+      confirmationMessage:
+        'I had trouble understanding. Could you please repeat that?',
+      suggestedAction: 'reask',
+    });
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -83,18 +306,40 @@ export async function POST(request: NextRequest) {
       blockType,
       previousSelections = [],
       isConfirmation = false,
+      outputSchema,
+      inputSchema,
     } = body;
 
     // Check if ANTHROPIC_API_KEY is set
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       // Fallback to basic matching without AI
-      return NextResponse.json(fallbackValidation(transcript, options, multiSelect, previousSelections));
+      return NextResponse.json(
+        fallbackValidation(
+          transcript,
+          options,
+          multiSelect,
+          previousSelections,
+        ),
+      );
+    }
+
+    // Handle schema-based validation for ALL blocks with a schema
+    // This handles string, number, boolean, date, array, and object types
+    const schema = inputSchema || outputSchema;
+    if (schema && schema.type) {
+      // Only skip schema validation if there are options (option-based blocks use different logic)
+      // But if the block has options AND a schema, options take precedence
+      if (options.length === 0) {
+        return handleSchemaValidation(transcript, schema, questionLabel, apiKey);
+      }
     }
 
     // Check for "done" response when user has previous selections (multi-select)
     if (previousSelections.length > 0 && isDoneResponse(transcript)) {
-      const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+      const selectedOptions = options.filter((opt) =>
+        previousSelections.includes(opt.value),
+      );
       return NextResponse.json({
         success: true,
         isValid: true,
@@ -108,12 +353,19 @@ export async function POST(request: NextRequest) {
 
     // Build options context for the AI
     const optionsText = options
-      .map((opt, i) => `${i + 1}. Label: "${opt.label}" → Value: "${opt.value}"`)
+      .map(
+        (opt, i) => `${i + 1}. Label: "${opt.label}" → Value: "${opt.value}"`,
+      )
       .join('\n');
 
     // Handle confirmation flow
     if (isConfirmation) {
-      return handleConfirmation(transcript, previousSelections, options, apiKey);
+      return handleConfirmation(
+        transcript,
+        previousSelections,
+        options,
+        apiKey,
+      );
     }
 
     const systemPrompt = `You are a voice survey answer validator. Your job is to analyze a user's spoken response and determine which option(s) they selected from a list of available options.
@@ -169,17 +421,23 @@ Analyze this response and determine which option(s) the user is selecting. Consi
 
     if (!response.ok) {
       console.error('API request failed:', response.status);
-      return NextResponse.json(fallbackValidation(transcript, options, multiSelect));
+      return NextResponse.json(
+        fallbackValidation(transcript, options, multiSelect),
+      );
     }
 
     const data = await response.json();
-    const textContent = data.content?.find((c: { type: string }) => c.type === 'text');
+    const textContent = data.content?.find(
+      (c: { type: string }) => c.type === 'text',
+    );
     const responseText = textContent?.text || '';
 
     // Parse the JSON from the response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return NextResponse.json(fallbackValidation(transcript, options, multiSelect));
+      return NextResponse.json(
+        fallbackValidation(transcript, options, multiSelect),
+      );
     }
 
     const aiResult = JSON.parse(jsonMatch[0]);
@@ -194,10 +452,17 @@ Analyze this response and determine which option(s) the user is selecting. Consi
     // Determine if we need confirmation
     let needsConfirmation = aiResult.needsConfirmation;
     let confirmationMessage = '';
-    let suggestedAction: 'confirm' | 'reask' | 'add_more' | 'submit' | 'finish_multiselect' = 'submit';
+    let suggestedAction:
+      | 'confirm'
+      | 'reask'
+      | 'add_more'
+      | 'submit'
+      | 'finish_multiselect' = 'submit';
 
     // Check if any matched option is an exclusive option (like "none of the above")
-    const hasExclusiveOption = matchedOptions.some((opt: Option) => isExclusiveOption(opt.label));
+    const hasExclusiveOption = matchedOptions.some((opt: Option) =>
+      isExclusiveOption(opt.label),
+    );
 
     if (aiResult.isValid && matchedOptions.length > 0 && hasExclusiveOption) {
       // Exclusive options like "none of the above" don't need confirmation
@@ -206,10 +471,16 @@ Analyze this response and determine which option(s) the user is selecting. Consi
     } else if (aiResult.isValid && multiSelect && matchedOptions.length > 0) {
       // For multi-select, confirm what was selected
       needsConfirmation = true;
-      const selectedLabels = matchedOptions.map((opt: Option) => opt.label).join(', ');
+      const selectedLabels = matchedOptions
+        .map((opt: Option) => opt.label)
+        .join(', ');
       confirmationMessage = `I heard you say ${selectedLabels}. Would you like to add more options, or say "done" to continue?`;
       suggestedAction = 'confirm';
-    } else if (aiResult.isValid && matchedOptions.length > 0 && aiResult.confidence === 'medium') {
+    } else if (
+      aiResult.isValid &&
+      matchedOptions.length > 0 &&
+      aiResult.confidence === 'medium'
+    ) {
       // For single select with medium confidence, ask for confirmation
       needsConfirmation = true;
       confirmationMessage = `Just to confirm, you selected "${matchedOptions[0].label}". Is that correct?`;
@@ -253,11 +524,13 @@ async function handleConfirmation(
   transcript: string,
   previousSelections: string[],
   options: Option[],
-  apiKey: string
+  apiKey: string,
 ): Promise<NextResponse> {
   // First check for "done" pattern locally (faster than AI call)
   if (isDoneResponse(transcript)) {
-    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    const selectedOptions = options.filter((opt) =>
+      previousSelections.includes(opt.value),
+    );
     return NextResponse.json({
       success: true,
       isValid: true,
@@ -272,7 +545,9 @@ async function handleConfirmation(
   // Check for simple "yes" / affirmative responses - in multi-select context, this means add more
   const simpleYesPattern = /^(yes|yeah|yep|sure|yup|ok|okay|uh-huh)\.?$/i;
   if (simpleYesPattern.test(transcript.trim())) {
-    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    const selectedOptions = options.filter((opt) =>
+      previousSelections.includes(opt.value),
+    );
     return NextResponse.json({
       success: true,
       isValid: true,
@@ -340,7 +615,9 @@ What is the user's intent?`;
     }
 
     const data = await response.json();
-    const textContent = data.content?.find((c: { type: string }) => c.type === 'text');
+    const textContent = data.content?.find(
+      (c: { type: string }) => c.type === 'text',
+    );
     const responseText = textContent?.text || '';
 
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
@@ -351,7 +628,9 @@ What is the user's intent?`;
     const result = JSON.parse(jsonMatch[0]);
 
     // Map previousSelections values back to options
-    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    const selectedOptions = options.filter((opt) =>
+      previousSelections.includes(opt.value),
+    );
 
     switch (result.intent) {
       case 'done':
@@ -392,10 +671,18 @@ What is the user's intent?`;
 
       case 'select_option':
         // User named a specific option - add it to the selection
-        if (result.matchedOptionIndex !== null && result.matchedOptionIndex >= 0 && result.matchedOptionIndex < options.length) {
+        if (
+          result.matchedOptionIndex !== null &&
+          result.matchedOptionIndex >= 0 &&
+          result.matchedOptionIndex < options.length
+        ) {
           const newOption = options[result.matchedOptionIndex];
-          const newValues = [...new Set([...previousSelections, newOption.value])];
-          const newOptions = options.filter((opt) => newValues.includes(opt.value));
+          const newValues = [
+            ...new Set([...previousSelections, newOption.value]),
+          ];
+          const newOptions = options.filter((opt) =>
+            newValues.includes(opt.value),
+          );
 
           return NextResponse.json({
             success: true,
@@ -416,7 +703,8 @@ What is the user's intent?`;
           matchedValues: previousSelections,
           confidence: 'low',
           needsConfirmation: true,
-          confirmationMessage: "I couldn't find that option. Which option would you like to add?",
+          confirmationMessage:
+            "I couldn't find that option. Which option would you like to add?",
           suggestedAction: 'add_more',
         } as ValidationResponse);
 
@@ -429,7 +717,7 @@ What is the user's intent?`;
           confidence: 'low',
           needsConfirmation: true,
           confirmationMessage:
-            "I didn't quite catch that. Which option would you like to add, or say \"done\" to continue?",
+            'I didn\'t quite catch that. Which option would you like to add, or say "done" to continue?',
           suggestedAction: 'add_more',
         } as ValidationResponse);
     }
@@ -453,13 +741,15 @@ function fallbackValidation(
   transcript: string,
   options: Option[],
   multiSelect: boolean,
-  previousSelections: string[] = []
+  previousSelections: string[] = [],
 ): ValidationResponse {
   const normalized = transcript.toLowerCase().trim();
 
   // Check for "done" response first
   if (previousSelections.length > 0 && isDoneResponse(transcript)) {
-    const selectedOptions = options.filter((opt) => previousSelections.includes(opt.value));
+    const selectedOptions = options.filter((opt) =>
+      previousSelections.includes(opt.value),
+    );
     return {
       success: true,
       isValid: true,
@@ -521,7 +811,9 @@ function fallbackValidation(
   const matchedValues = matchedOptions.map((opt) => opt.value);
 
   // Check if any matched option is exclusive (no confirmation needed)
-  const hasExclusiveOption = matchedOptions.some((opt) => isExclusiveOption(opt.label));
+  const hasExclusiveOption = matchedOptions.some((opt) =>
+    isExclusiveOption(opt.label),
+  );
 
   return {
     success: true,
@@ -530,12 +822,17 @@ function fallbackValidation(
     matchedValues,
     confidence: isValid ? 'medium' : 'low',
     needsConfirmation: multiSelect && isValid && !hasExclusiveOption,
-    confirmationMessage: multiSelect && isValid && !hasExclusiveOption
-      ? `You selected ${matchedOptions.map((o) => o.label).join(', ')}. Would you like to add more, or say "done" to continue?`
-      : undefined,
+    confirmationMessage:
+      multiSelect && isValid && !hasExclusiveOption
+        ? `You selected ${matchedOptions.map((o) => o.label).join(', ')}. Would you like to add more, or say "done" to continue?`
+        : undefined,
     invalidReason: !isValid
       ? "I couldn't match your answer to any option. Please try again."
       : undefined,
-    suggestedAction: isValid ? (multiSelect && !hasExclusiveOption ? 'confirm' : 'submit') : 'reask',
+    suggestedAction: isValid
+      ? multiSelect && !hasExclusiveOption
+        ? 'confirm'
+        : 'submit'
+      : 'reask',
   };
 }
