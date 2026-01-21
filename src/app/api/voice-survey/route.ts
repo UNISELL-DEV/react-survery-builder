@@ -9,8 +9,8 @@ import { NextRequest, NextResponse } from 'next/server';
  *
  * Environment variables required:
  * - AWS_REGION (default: us-east-1)
- * - AWS_ACCESS_KEY_ID
- * - AWS_SECRET_ACCESS_KEY
+ * - AWS_LOCAL_ACCESS_KEY_ID
+ * - AWS_LOCAL_SECRET_ACCESS_KEY
  */
 
 // Types for voice survey messages
@@ -78,7 +78,9 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'init': {
         // Initialize a new voice session
-        const newSessionId = sessionId || `voice-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+        const newSessionId =
+          sessionId ||
+          `voice-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
         const session: SessionState = {
           sessionId: newSessionId,
           conversationHistory: [],
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
         if (!session) {
           return NextResponse.json(
             { success: false, error: 'Session not found' },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
@@ -131,7 +133,7 @@ export async function POST(request: NextRequest) {
         if (!session) {
           return NextResponse.json(
             { success: false, error: 'Session not found' },
-            { status: 404 }
+            { status: 404 },
           );
         }
 
@@ -180,7 +182,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json(
           { success: false, error: `Unknown action: ${action}` },
-          { status: 400 }
+          { status: 400 },
         );
     }
   } catch (error) {
@@ -190,7 +192,7 @@ export async function POST(request: NextRequest) {
         success: false,
         error: error instanceof Error ? error.message : 'Internal server error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -208,7 +210,7 @@ export async function GET(request: NextRequest) {
     if (!session) {
       return NextResponse.json(
         { success: false, error: 'Session not found' },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -230,7 +232,7 @@ export async function GET(request: NextRequest) {
       webSocket: false, // WebSocket requires custom server
       browserTTS: true,
       browserSTT: true,
-      awsBedrock: !!process.env.AWS_ACCESS_KEY_ID,
+      awsBedrock: !!process.env.AWS_LOCAL_ACCESS_KEY_ID,
     },
   });
 }
@@ -266,7 +268,7 @@ function parseVoiceCommand(transcript: string): VoiceCommand | null {
  */
 function processTranscript(
   transcript: string,
-  blockType?: string
+  blockType?: string,
 ): string | number | boolean | string[] {
   const normalized = transcript.toLowerCase().trim();
 
