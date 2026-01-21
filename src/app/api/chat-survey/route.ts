@@ -7,14 +7,22 @@ import {
   VoiceId,
 } from '@aws-sdk/client-polly';
 
-// Create Polly client for TTS
-const pollyClient = new PollyClient({
-  region: process.env.AWS_LOCAL_DEFAULT_REGION || process.env.AWS_REGION || 'us-east-1',
-  credentials: {
-    accessKeyId: process.env.AWS_LOCAL_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.AWS_LOCAL_SECRET_ACCESS_KEY || '',
-  },
-});
+// Lazy-initialized Polly client (created on first request)
+// This ensures environment variables are available on serverless platforms
+let pollyClient: PollyClient | null = null;
+
+function getPollyClient(): PollyClient {
+  if (!pollyClient) {
+    pollyClient = new PollyClient({
+      region: process.env.AWS_LOCAL_DEFAULT_REGION || process.env.AWS_REGION || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_LOCAL_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.AWS_LOCAL_SECRET_ACCESS_KEY || '',
+      },
+    });
+  }
+  return pollyClient;
+}
 
 /**
  * Generate TTS audio using AWS Polly
@@ -23,43 +31,55 @@ async function generateTTSAudio(
   text: string,
   voice: VoiceId = 'Joanna',
 ): Promise<{ audio: string; format: string; sampleRate: number } | null> {
-  try {
-    // Check for AWS credentials
-    if (
-      !process.env.AWS_LOCAL_ACCESS_KEY_ID ||
-      !process.env.AWS_LOCAL_SECRET_ACCESS_KEY
-    ) {
-      return null;
-    }
-
-    const command = new SynthesizeSpeechCommand({
-      Text: text,
-      TextType: 'text',
-      OutputFormat: OutputFormat.MP3,
-      VoiceId: voice,
-      Engine: Engine.NEURAL,
-      SampleRate: '24000',
-    });
-
-    const response = await pollyClient.send(command);
-
-    if (!response.AudioStream) {
-      return null;
-    }
-
-    // Convert stream to base64
-    const audioBuffer = await streamToBuffer(response.AudioStream);
-    const audioBase64 = audioBuffer.toString('base64');
-
-    return {
-      audio: audioBase64,
-      format: 'mp3',
-      sampleRate: 24000,
-    };
-  } catch (error) {
-    console.error('TTS generation error:', error);
+  // Check for AWS credentials
+  if (
+    !process.env.AWS_LOCAL_ACCESS_KEY_ID ||
+    !process.env.AWS_LOCAL_SECRET_ACCESS_KEY
+  ) {
     return null;
   }
+
+  // Try neural engine first, fall back to standard if not supported in region
+  const enginesToTry = [Engine.NEURAL, Engine.STANDARD];
+
+  for (const engineToUse of enginesToTry) {
+    try {
+      const command = new SynthesizeSpeechCommand({
+        Text: text,
+        TextType: 'text',
+        OutputFormat: OutputFormat.MP3,
+        VoiceId: voice,
+        Engine: engineToUse,
+        SampleRate: '24000',
+      });
+
+      const response = await getPollyClient().send(command);
+
+      if (!response.AudioStream) {
+        continue;
+      }
+
+      // Convert stream to base64
+      const audioBuffer = await streamToBuffer(response.AudioStream);
+      const audioBase64 = audioBuffer.toString('base64');
+
+      return {
+        audio: audioBase64,
+        format: 'mp3',
+        sampleRate: 24000,
+      };
+    } catch (error: any) {
+      // If neural engine not supported, try standard
+      if (error?.name === 'ValidationException' && engineToUse === Engine.NEURAL) {
+        console.warn('Neural engine not supported in this region, falling back to standard');
+        continue;
+      }
+      console.error('TTS generation error:', error);
+      return null;
+    }
+  }
+
+  return null;
 }
 
 /**

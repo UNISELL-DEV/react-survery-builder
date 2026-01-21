@@ -13,14 +13,22 @@ import { PollyClient, SynthesizeSpeechCommand, Engine, OutputFormat, VoiceId, La
  * - AWS_LOCAL_SECRET_ACCESS_KEY
  */
 
-// Create Polly client
-const pollyClient = new PollyClient({
-  region: process.env.AWS_LOCAL_DEFAULT_REGION || process.env.AWS_REGION || 'us-east-1',
-  credentials: {
-    accessKeyId: process.env.AWS_LOCAL_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.AWS_LOCAL_SECRET_ACCESS_KEY || '',
-  },
-});
+// Lazy-initialized Polly client (created on first request)
+// This ensures environment variables are available on serverless platforms
+let pollyClient: PollyClient | null = null;
+
+function getPollyClient(): PollyClient {
+  if (!pollyClient) {
+    pollyClient = new PollyClient({
+      region: process.env.AWS_LOCAL_DEFAULT_REGION || process.env.AWS_REGION || 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.AWS_LOCAL_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.AWS_LOCAL_SECRET_ACCESS_KEY || '',
+      },
+    });
+  }
+  return pollyClient;
+}
 
 // Voice mapping for different languages
 const VOICE_MAP: Record<string, VoiceId> = {
@@ -104,34 +112,55 @@ export async function POST(request: NextRequest) {
       textType = 'ssml';
     }
 
-    // Synthesize speech
-    const command = new SynthesizeSpeechCommand({
-      Text: inputText,
-      TextType: textType,
-      OutputFormat: OutputFormat.MP3,
-      VoiceId: voiceId,
-      LanguageCode: languageCode,
-      Engine: engine === 'neural' ? Engine.NEURAL : Engine.STANDARD,
-      SampleRate: '24000',
-    });
+    // Try neural engine first, fall back to standard if not supported in region
+    const enginesToTry = engine === 'neural'
+      ? [Engine.NEURAL, Engine.STANDARD]
+      : [Engine.STANDARD];
 
-    const response = await pollyClient.send(command);
+    let lastError: any = null;
 
-    if (!response.AudioStream) {
-      throw new Error('No audio stream received from Polly');
+    for (const engineToUse of enginesToTry) {
+      try {
+        const command = new SynthesizeSpeechCommand({
+          Text: inputText,
+          TextType: textType,
+          OutputFormat: OutputFormat.MP3,
+          VoiceId: voiceId,
+          LanguageCode: languageCode,
+          Engine: engineToUse,
+          SampleRate: '24000',
+        });
+
+        const response = await getPollyClient().send(command);
+
+        if (!response.AudioStream) {
+          continue;
+        }
+
+        // Convert stream to base64
+        const audioBuffer = await streamToBuffer(response.AudioStream);
+        const audioBase64 = audioBuffer.toString('base64');
+
+        return NextResponse.json({
+          success: true,
+          audio: audioBase64,
+          format: 'mp3',
+          sampleRate: 24000,
+          contentType: response.ContentType,
+        });
+      } catch (error: any) {
+        lastError = error;
+        // If neural engine not supported, try standard
+        if (error?.name === 'ValidationException' && engineToUse === Engine.NEURAL) {
+          console.warn('Neural engine not supported in this region, falling back to standard');
+          continue;
+        }
+        break;
+      }
     }
 
-    // Convert stream to base64
-    const audioBuffer = await streamToBuffer(response.AudioStream);
-    const audioBase64 = audioBuffer.toString('base64');
-
-    return NextResponse.json({
-      success: true,
-      audio: audioBase64,
-      format: 'mp3',
-      sampleRate: 24000,
-      contentType: response.ContentType,
-    });
+    // If we get here, all engines failed
+    throw lastError || new Error('No audio stream received from Polly');
   } catch (error) {
     console.error('TTS API error:', error);
 
@@ -184,41 +213,55 @@ export async function GET(request: NextRequest) {
     return new NextResponse('AWS credentials not configured', { status: 503 });
   }
 
-  try {
-    const voiceId = (voice as VoiceId) || VOICE_MAP[language] || 'Joanna';
-    const languageCode = LANGUAGE_MAP[language] || 'en-US';
+  const voiceId = (voice as VoiceId) || VOICE_MAP[language] || 'Joanna';
+  const languageCode = LANGUAGE_MAP[language] || 'en-US';
 
-    const command = new SynthesizeSpeechCommand({
-      Text: text,
-      TextType: 'text',
-      OutputFormat: OutputFormat.MP3,
-      VoiceId: voiceId,
-      LanguageCode: languageCode,
-      Engine: engine === 'neural' ? Engine.NEURAL : Engine.STANDARD,
-      SampleRate: '24000',
-    });
+  // Try neural engine first, fall back to standard if not supported in region
+  const enginesToTry = engine === 'neural'
+    ? [Engine.NEURAL, Engine.STANDARD]
+    : [Engine.STANDARD];
 
-    const response = await pollyClient.send(command);
+  for (const engineToUse of enginesToTry) {
+    try {
+      const command = new SynthesizeSpeechCommand({
+        Text: text,
+        TextType: 'text',
+        OutputFormat: OutputFormat.MP3,
+        VoiceId: voiceId,
+        LanguageCode: languageCode,
+        Engine: engineToUse,
+        SampleRate: '24000',
+      });
 
-    if (!response.AudioStream) {
-      return new NextResponse('No audio stream', { status: 500 });
+      const response = await getPollyClient().send(command);
+
+      if (!response.AudioStream) {
+        continue;
+      }
+
+      // Stream the audio directly to the client
+      const audioBuffer = await streamToBuffer(response.AudioStream);
+
+      // Convert Buffer to Uint8Array for NextResponse compatibility
+      return new NextResponse(new Uint8Array(audioBuffer), {
+        headers: {
+          'Content-Type': 'audio/mpeg',
+          'Content-Length': audioBuffer.length.toString(),
+          'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        },
+      });
+    } catch (error: any) {
+      // If neural engine not supported, try standard
+      if (error?.name === 'ValidationException' && engineToUse === Engine.NEURAL) {
+        console.warn('Neural engine not supported in this region, falling back to standard');
+        continue;
+      }
+      console.error('Streaming TTS error:', error);
+      return new NextResponse('TTS generation failed', { status: 500 });
     }
-
-    // Stream the audio directly to the client
-    const audioBuffer = await streamToBuffer(response.AudioStream);
-
-    // Convert Buffer to Uint8Array for NextResponse compatibility
-    return new NextResponse(new Uint8Array(audioBuffer), {
-      headers: {
-        'Content-Type': 'audio/mpeg',
-        'Content-Length': audioBuffer.length.toString(),
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
-      },
-    });
-  } catch (error) {
-    console.error('Streaming TTS error:', error);
-    return new NextResponse('TTS generation failed', { status: 500 });
   }
+
+  return new NextResponse('TTS generation failed', { status: 500 });
 }
 
 /**
