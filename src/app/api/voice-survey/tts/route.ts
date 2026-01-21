@@ -207,7 +207,8 @@ export async function GET(request: NextRequest) {
     // Stream the audio directly to the client
     const audioBuffer = await streamToBuffer(response.AudioStream);
 
-    return new NextResponse(audioBuffer, {
+    // Convert Buffer to Uint8Array for NextResponse compatibility
+    return new NextResponse(new Uint8Array(audioBuffer), {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Content-Length': audioBuffer.length.toString(),

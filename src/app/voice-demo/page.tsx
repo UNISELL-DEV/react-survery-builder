@@ -30,6 +30,7 @@ import type {
   AIHandlerContext,
   AIHandlerResponse,
 } from '@/packages/survey-form-package/src/renderer/layouts/ChatLayout/types';
+import { createAWSTranscribeSessionFactory } from '@/lib/aws-transcribe-client';
 
 // Dynamic import of SurveyForm to avoid SSR issues with audio APIs
 const SurveyForm = dynamic(
@@ -233,17 +234,28 @@ export default function VoiceDemoPage() {
     'pulse' | 'wave' | 'glow' | 'breathe'
   >('breathe');
 
+  // Create STT session factory (using AWS Transcribe for cross-browser support)
+  const sttSessionFactory = useMemo(
+    () =>
+      createAWSTranscribeSessionFactory({
+        websocketUrlEndpoint: '/api/voice-survey/stt/websocket',
+        language: 'en-US',
+        sampleRate: 16000,
+      }),
+    []
+  );
+
   // Check browser support and permissions on mount
   useEffect(() => {
-    // Check for SpeechRecognition support
-    const hasSpeechRecognition =
+    // With custom STT (AWS Transcribe) and custom TTS (AWS Polly),
+    // we only need Web Audio API support (for audio playback and capture)
+    // We no longer depend on browser SpeechRecognition or SpeechSynthesis
+    const hasWebAudio =
       typeof window !== 'undefined' &&
-      ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+      (typeof AudioContext !== 'undefined' ||
+        typeof (window as any).webkitAudioContext !== 'undefined');
 
-    const hasSpeechSynthesis =
-      typeof window !== 'undefined' && 'speechSynthesis' in window;
-
-    setBrowserSupported(hasSpeechRecognition && hasSpeechSynthesis);
+    setBrowserSupported(hasWebAudio);
 
     // Check microphone permission
     if (navigator.permissions) {
@@ -292,8 +304,8 @@ export default function VoiceDemoPage() {
             Browser Not Supported
           </h1>
           <p className="text-gray-600 mb-6">
-            Voice survey requires Speech Recognition and Speech Synthesis APIs.
-            Please use Chrome, Edge, or Safari for the best experience.
+            Voice survey requires Web Audio API support. Please use a modern
+            browser like Chrome, Firefox, Edge, Safari, or Opera.
           </p>
           <Link href="/chat-demo">
             <Button className="bg-blue-500 hover:bg-blue-600">
@@ -524,8 +536,9 @@ export default function VoiceDemoPage() {
               ttsVoice: 'Joanna',
               language: 'en-US',
 
-              // Note: STT still uses browser's SpeechRecognition for real-time streaming
-              // AWS Transcribe Streaming requires WebSocket which is not supported in API routes
+              // Custom STT using AWS Transcribe Streaming for cross-browser support
+              // This replaces browser's SpeechRecognition which doesn't work on Firefox, Opera, etc.
+              sttSessionFactory,
             } satisfies VoiceCustomData
           }
           mode="pageless"

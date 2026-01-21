@@ -132,35 +132,42 @@ async function handleSchemaValidation(
 
     schemaDescription = `Expected output schema (object with fields):\n${schemaFields}`;
     expectedFormat = `{
-  ${Object.entries(schemaExample).map(([k, v]) => `"${k}": ${v}`).join(',\n  ')},
+  ${Object.entries(schemaExample)
+    .map(([k, v]) => `"${k}": ${v}`)
+    .join(',\n  ')},
   "isValid": true
 }`;
   } else if (schema.type === 'string') {
-    schemaDescription = "Expected output: a string value extracted from the user's speech";
+    schemaDescription =
+      "Expected output: a string value extracted from the user's speech";
     expectedFormat = `{
   "value": "<extracted string>",
   "isValid": true
 }`;
   } else if (schema.type === 'number') {
-    schemaDescription = 'Expected output: a number value extracted from the user\'s speech (convert spoken numbers like "twenty five" to 25)';
+    schemaDescription =
+      'Expected output: a number value extracted from the user\'s speech (convert spoken numbers like "twenty five" to 25)';
     expectedFormat = `{
   "value": <number>,
   "isValid": true
 }`;
   } else if (schema.type === 'boolean') {
-    schemaDescription = "Expected output: a boolean value (true/false) based on the user's response (yes/no, true/false, etc.)";
+    schemaDescription =
+      "Expected output: a boolean value (true/false) based on the user's response (yes/no, true/false, etc.)";
     expectedFormat = `{
   "value": <true or false>,
   "isValid": true
 }`;
   } else if (schema.type === 'date') {
-    schemaDescription = "Expected output: a date string in ISO format (YYYY-MM-DD) extracted from the user's speech";
+    schemaDescription =
+      "Expected output: a date string in ISO format (YYYY-MM-DD) extracted from the user's speech";
     expectedFormat = `{
   "value": "<YYYY-MM-DD>",
   "isValid": true
 }`;
   } else if (schema.type === 'array') {
-    schemaDescription = "Expected output: an array of values extracted from the user's speech";
+    schemaDescription =
+      "Expected output: an array of values extracted from the user's speech";
     expectedFormat = `{
   "value": [<array of values>],
   "isValid": true
@@ -211,7 +218,7 @@ Return ONLY the JSON object:`;
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
@@ -265,7 +272,8 @@ Return ONLY the JSON object:`;
     let extractedData: unknown;
     if (schema.type === 'object' && schema.properties) {
       // Remove internal validation flags from the output
-      const { isValid, missingFields, clarificationNeeded, ...objectData } = parsedResponse;
+      const { isValid, missingFields, clarificationNeeded, ...objectData } =
+        parsedResponse;
       extractedData = objectData;
     } else {
       // For scalar/array types, use the "value" field
@@ -331,7 +339,12 @@ export async function POST(request: NextRequest) {
       // Only skip schema validation if there are options (option-based blocks use different logic)
       // But if the block has options AND a schema, options take precedence
       if (options.length === 0) {
-        return handleSchemaValidation(transcript, schema, questionLabel, apiKey);
+        return handleSchemaValidation(
+          transcript,
+          schema,
+          questionLabel,
+          apiKey,
+        );
       }
     }
 
@@ -407,7 +420,7 @@ Analyze this response and determine which option(s) the user is selecting. Consi
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         system: systemPrompt,
         messages: [
@@ -603,7 +616,7 @@ What is the user's intent?`;
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-haiku-4-5-20251001',
         max_tokens: 200,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
