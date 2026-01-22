@@ -53,7 +53,8 @@ interface ValidationResponse {
     | 'reask'
     | 'add_more'
     | 'submit'
-    | 'finish_multiselect';
+    | 'finish_multiselect'
+    | 'navigate_back';
   // For multi-select: whether the matched options should be added or removed
   action?: 'add' | 'remove';
 }
@@ -97,6 +98,29 @@ function isDoneResponse(transcript: string): boolean {
   return DONE_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
+// Patterns for "go back" / "previous question" navigation commands
+// These are simple patterns - more complex natural language is handled by AI
+const BACK_NAVIGATION_PATTERNS = [
+  /^(go\s+)?back$/i,
+  /^previous(\s*(question|one))?$/i,
+  /^before$/i,
+  /^go\s+to\s+(the\s+)?(previous|last)(\s*(question|one))?$/i,
+  /^(i\s+)?(want|need)\s+to\s+go\s+back$/i,
+  /^take\s+me\s+back$/i,
+  /^return(\s+to\s+(the\s+)?(previous|last)(\s*(question|one))?)?$/i,
+  /^(can\s+)?(i\s+)?(go|change|edit|modify)\s+(the\s+)?(previous|last)(\s*(question|one|answer))?$/i,
+  /^(let\s+me\s+)?(change|edit|modify|redo)\s+(my\s+)?(previous|last)(\s*(answer|response))?$/i,
+  /^(i\s+)?(made\s+a\s+)?mistake/i,
+  /^wait/i,
+  /^(oops|whoops)/i,
+];
+
+// Check if the response is a back navigation command
+function isBackNavigationResponse(transcript: string): boolean {
+  const normalized = transcript.toLowerCase().trim();
+  return BACK_NAVIGATION_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
 /**
  * Handle schema-based validation for blocks with outputSchema/inputSchema
  * Extracts structured data from the transcript according to the schema
@@ -109,6 +133,18 @@ async function handleSchemaValidation(
   apiKey: string,
   conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>,
 ): Promise<NextResponse> {
+  // Check for back navigation command first
+  if (isBackNavigationResponse(transcript)) {
+    return NextResponse.json({
+      success: true,
+      isValid: true,
+      matchedOptions: [],
+      matchedValues: [],
+      confidence: 'high',
+      needsConfirmation: false,
+      suggestedAction: 'navigate_back',
+    } as ValidationResponse);
+  }
   // Build schema description based on schema type
   let schemaDescription: string;
   let expectedFormat: string;
@@ -372,6 +408,20 @@ export async function POST(request: NextRequest) {
       conversationHistory,
     } = body;
 
+    // Check for back navigation command first (before any other validation)
+    // This allows users to say "go back" or similar phrases at any point
+    if (isBackNavigationResponse(transcript)) {
+      return NextResponse.json({
+        success: true,
+        isValid: true,
+        matchedOptions: [],
+        matchedValues: [],
+        confidence: 'high',
+        needsConfirmation: false,
+        suggestedAction: 'navigate_back',
+      } as ValidationResponse);
+    }
+
     // Check if ANTHROPIC_API_KEY is set
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -452,6 +502,12 @@ IMPORTANT RULES:
    - "take away pizza" / "get rid of pizza" / "cancel pizza" → action: "remove"
    - "changed my mind about pizza" → action: "remove"
    By default, action should be "add" when user is selecting/adding options.
+9. NAVIGATION DETECTION: If the user wants to go BACK to the previous question, set isNavigateBack to true. Examples:
+   - "go back" / "previous question" / "take me back" → isNavigateBack: true
+   - "I'd like to reconsider my last answer" / "can we go back?" → isNavigateBack: true
+   - "wait, I made a mistake on the last one" / "let me change my previous answer" → isNavigateBack: true
+   - "actually, can I redo the previous question?" / "hmm, go back please" → isNavigateBack: true
+   - "oops" / "whoops" / "hold on" (when clearly wanting to go back) → isNavigateBack: true
 
 Return a JSON object with these exact fields:
 {
@@ -460,6 +516,7 @@ Return a JSON object with these exact fields:
   "confidence": "high" | "medium" | "low",
   "needsConfirmation": boolean,
   "action": "add" | "remove", // whether user wants to add or remove these options
+  "isNavigateBack": boolean, // true if user wants to go back to previous question
   "reason": string // If isValid is false, provide a SHORT user-friendly message asking them to reconfirm (similar to : "I didn't catch that. Could you please repeat your answer?"). Do NOT explain why it failed or list the available options. Use different wordings every time.
 }`;
 
@@ -517,6 +574,19 @@ Analyze this response and determine which option(s) the user is selecting. Consi
     }
 
     const aiResult = JSON.parse(jsonMatch[0]);
+
+    // Check if AI detected back navigation intent
+    if (aiResult.isNavigateBack === true) {
+      return NextResponse.json({
+        success: true,
+        isValid: true,
+        matchedOptions: [],
+        matchedValues: [],
+        confidence: 'high',
+        needsConfirmation: false,
+        suggestedAction: 'navigate_back',
+      } as ValidationResponse);
+    }
 
     // Build the response
     const matchedOptions = (aiResult.matchedOptionIndices || [])
