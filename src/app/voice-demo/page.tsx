@@ -31,6 +31,7 @@ import type {
   AIHandlerResponse,
 } from '@/packages/survey-form-package/src/renderer/layouts/ChatLayout/types';
 import { createAWSTranscribeSessionFactory } from '@/lib/aws-transcribe-client';
+import { createMediaCaptureFactory } from '@/lib/media-capture-factory';
 
 // Dynamic import of SurveyForm to avoid SSR issues with audio APIs
 const SurveyForm = dynamic(
@@ -243,6 +244,28 @@ export default function VoiceDemoPage() {
         websocketUrlEndpoint: '/api/voice-survey/stt/websocket',
         language: 'en-US',
         sampleRate: 16000,
+        // Retry up to 3 times on connection failure
+        maxRetries: 3,
+        // Short timeout for first attempt - fail fast to trigger retry quickly
+        initialTimeout: 5000,
+        // Longer timeout for retry attempts
+        retryTimeout: 10000,
+        // Wait 1.5s after user stops speaking before submitting
+        // This allows for natural pauses without cutting off speech
+        finalTranscriptDelay: 1500,
+        // Enable debug logging in development
+        debug: process.env.NODE_ENV === 'development',
+      }),
+    []
+  );
+
+  // Create media capture factory for cross-platform audio recording
+  // This handles iOS-specific quirks like AudioContext suspension
+  const mediaCaptureFactory = useMemo(
+    () =>
+      createMediaCaptureFactory({
+        sampleRate: 16000,
+        debug: process.env.NODE_ENV === 'development',
       }),
     []
   );
@@ -541,6 +564,10 @@ export default function VoiceDemoPage() {
               // Custom STT using AWS Transcribe Streaming for cross-browser support
               // This replaces browser's SpeechRecognition which doesn't work on Firefox, Opera, etc.
               sttSessionFactory,
+
+              // Custom media capture factory for cross-platform audio recording
+              // This handles iOS-specific quirks like AudioContext suspension and getUserMedia issues
+              mediaCaptureFactory,
             } satisfies VoiceCustomData
           }
           mode="pageless"

@@ -23,14 +23,39 @@ interface AWSTranscribeConfig {
   language?: string;
   /** Audio sample rate in Hz */
   sampleRate?: number;
+  /** Initial connection timeout in ms (default: 5000) - kept short for fast retry */
+  initialTimeout?: number;
+  /** Connection timeout for retry attempts in ms (default: 10000) */
+  retryTimeout?: number;
+  /** Max retry attempts on connection failure (default: 3) */
+  maxRetries?: number;
+  /**
+   * Delay in ms to wait after receiving a final transcript before calling callback.
+   * This allows users to take natural pauses without triggering submission.
+   * If more speech is detected during this delay, the timer resets.
+   * @default 1500
+   */
+  finalTranscriptDelay?: number;
+  /** Enable debug logging */
+  debug?: boolean;
 }
 
 /**
- * Extended STT session with prewarm support
+ * Extended STT session with connection management
  */
 interface STTStreamingSessionWithPrewarm extends STTStreamingSession {
   /** Pre-warm the session by fetching the WebSocket URL early */
   prewarm: () => Promise<void>;
+  /** Pre-connect the WebSocket (call during AI speaking to have connection ready) */
+  preconnect: () => Promise<void>;
+  /** Whether the WebSocket is currently connected */
+  isConnected: boolean;
+  /** Pause listening (stops sending audio but keeps connection open) */
+  pause: () => void;
+  /** Resume listening (starts sending audio again) */
+  resume: () => void;
+  /** Whether listening is currently paused */
+  isPaused: boolean;
 }
 
 /**
@@ -254,89 +279,267 @@ function getCrc32Table(): Uint32Array {
 }
 
 /**
- * Create an AWS Transcribe streaming session
+ * Create an AWS Transcribe streaming session with persistent connection support
  */
 function createAWSTranscribeSession(
   websocketUrl: string,
   onTranscript: (transcript: string, isFinal: boolean) => void,
-  onError?: (error: string) => void
-): STTStreamingSession {
-  let ws: WebSocket | null = null;
-  let isActive = false;
-  let audioQueue: ArrayBuffer[] = [];
-  let isConnected = false;
+  onError?: (error: string) => void,
+  options?: { connectionTimeout?: number; finalTranscriptDelay?: number; debug?: boolean }
+): STTStreamingSessionWithPrewarm {
+  const { connectionTimeout = 15000, finalTranscriptDelay = 1500, debug = false } = options || {};
+  const log = debug ? console.log.bind(console, '[AWSTranscribe]') : () => {};
 
-  const session: STTStreamingSession = {
+  let ws: WebSocket | null = null;
+  let isActive = false;       // True when actively listening (sending audio)
+  let isConnected = false;    // True when WebSocket is connected
+  let isPaused = false;       // True when paused (connected but not sending audio)
+  let audioQueue: ArrayBuffer[] = [];
+  let connectionTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let connectPromise: Promise<void> | null = null;
+
+  // State for transcript finalization delay
+  let accumulatedTranscript = '';
+  let finalizationTimerId: ReturnType<typeof setTimeout> | null = null;
+
+  /**
+   * Clear the finalization timer
+   */
+  const clearFinalizationTimer = () => {
+    if (finalizationTimerId) {
+      clearTimeout(finalizationTimerId);
+      finalizationTimerId = null;
+    }
+  };
+
+  /**
+   * Handle incoming transcript with finalization delay
+   */
+  const handleTranscript = (transcript: string, isFinal: boolean) => {
+    // Ignore transcripts when paused
+    if (isPaused) return;
+
+    if (!isFinal) {
+      onTranscript(transcript, false);
+      return;
+    }
+
+    log('Final transcript received:', transcript);
+
+    if (accumulatedTranscript) {
+      accumulatedTranscript += ' ' + transcript;
+    } else {
+      accumulatedTranscript = transcript;
+    }
+
+    // Show accumulated as partial for feedback
+    onTranscript(accumulatedTranscript, false);
+
+    // Reset finalization timer
+    clearFinalizationTimer();
+    finalizationTimerId = setTimeout(() => {
+      if (accumulatedTranscript && isActive && !isPaused) {
+        log('Finalization delay complete, sending final:', accumulatedTranscript);
+        const finalText = accumulatedTranscript;
+        accumulatedTranscript = '';
+        onTranscript(finalText, true);
+      }
+    }, finalTranscriptDelay);
+  };
+
+  /**
+   * Internal connect function
+   */
+  const connect = (): Promise<void> => {
+    if (isConnected) return Promise.resolve();
+    if (connectPromise) return connectPromise;
+
+    connectPromise = new Promise<void>((resolve, reject) => {
+      let resolved = false;
+
+      const cleanup = () => {
+        if (connectionTimeoutId) {
+          clearTimeout(connectionTimeoutId);
+          connectionTimeoutId = null;
+        }
+        connectPromise = null;
+      };
+
+      const rejectOnce = (error: Error) => {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          reject(error);
+        }
+      };
+
+      const resolveOnce = () => {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          resolve();
+        }
+      };
+
+      try {
+        log('Connecting to WebSocket...');
+        ws = new WebSocket(websocketUrl);
+        ws.binaryType = 'arraybuffer';
+
+        connectionTimeoutId = setTimeout(() => {
+          if (!isConnected && ws) {
+            log('Connection timeout');
+            ws.close();
+            rejectOnce(new Error('WebSocket connection timeout'));
+          }
+        }, connectionTimeout);
+
+        ws.onopen = () => {
+          log('WebSocket connected');
+          isConnected = true;
+
+          // Send queued audio
+          while (audioQueue.length > 0 && !isPaused) {
+            const audio = audioQueue.shift();
+            if (audio) session.sendAudio(audio);
+          }
+
+          resolveOnce();
+        };
+
+        ws.onmessage = (event) => {
+          if (event.data instanceof ArrayBuffer) {
+            const decoded = decodeEventStreamMessage(event.data);
+            if (decoded) {
+              if (decoded.error) {
+                // Check if this is a timeout error from AWS
+                const isTimeoutError = decoded.error.includes('timed out') ||
+                                       decoded.error.includes('no new audio');
+
+                if (isTimeoutError) {
+                  log('AWS Transcribe session timed out, will reconnect on next start');
+                  // Mark as disconnected so next start() will reconnect
+                  isConnected = false;
+                  isActive = false;
+                  isPaused = false;
+                  // Close the WebSocket gracefully
+                  if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.close(1000, 'Session timed out');
+                  }
+                  // Don't call onError for timeout - it's expected and we'll reconnect automatically
+                } else {
+                  console.error('AWS Transcribe error:', decoded.error);
+                  onError?.(decoded.error);
+                }
+              } else if (decoded.transcript !== undefined) {
+                handleTranscript(decoded.transcript, !decoded.isPartial);
+              }
+            }
+          }
+        };
+
+        ws.onerror = (event) => {
+          log('WebSocket error:', event);
+        };
+
+        ws.onclose = (event) => {
+          log('WebSocket closed:', event.code, event.reason);
+          const wasConnected = isConnected;
+          isActive = false;
+          isConnected = false;
+          isPaused = false;
+
+          if (accumulatedTranscript) {
+            clearFinalizationTimer();
+            onTranscript(accumulatedTranscript, true);
+            accumulatedTranscript = '';
+          }
+
+          if (!wasConnected) {
+            if (event.code === 1006) {
+              rejectOnce(new Error('WebSocket connection failed - please check your network'));
+            } else {
+              rejectOnce(new Error(`WebSocket closed before connecting (code: ${event.code})`));
+            }
+          } else if (event.code !== 1000 && event.code !== 1005) {
+            onError?.(`Connection lost (code: ${event.code})`);
+          }
+        };
+      } catch (error) {
+        log('Error creating WebSocket:', error);
+        rejectOnce(error instanceof Error ? error : new Error(String(error)));
+      }
+    });
+
+    return connectPromise;
+  };
+
+  const session: STTStreamingSessionWithPrewarm = {
     get isActive() {
       return isActive;
     },
 
+    get isConnected() {
+      return isConnected;
+    },
+
+    get isPaused() {
+      return isPaused;
+    },
+
+    async prewarm() {
+      // For this session type, prewarm is the same as preconnect
+      return this.preconnect();
+    },
+
+    async preconnect() {
+      log('Pre-connecting WebSocket...');
+      await connect();
+      isPaused = true;  // Start in paused state
+    },
+
     async start() {
-      if (isActive) return;
+      if (isActive && !isPaused) return;
 
-      return new Promise<void>((resolve, reject) => {
-        try {
-          ws = new WebSocket(websocketUrl);
-          ws.binaryType = 'arraybuffer';
+      // Reset transcript state
+      accumulatedTranscript = '';
+      clearFinalizationTimer();
 
-          const connectionTimeout = setTimeout(() => {
-            if (!isConnected) {
-              ws?.close();
-              reject(new Error('WebSocket connection timeout'));
-            }
-          }, 10000);
+      // Connect if not already connected
+      await connect();
 
-          ws.onopen = () => {
-            clearTimeout(connectionTimeout);
-            isActive = true;
-            isConnected = true;
+      isActive = true;
+      isPaused = false;
+      log('Started listening');
+    },
 
-            // Send any queued audio
-            while (audioQueue.length > 0) {
-              const audio = audioQueue.shift();
-              if (audio) {
-                session.sendAudio(audio);
-              }
-            }
+    pause() {
+      if (!isActive || isPaused) return;
+      log('Pausing (keeping connection open)');
+      isPaused = true;
 
-            resolve();
-          };
+      // Send any accumulated transcript as final
+      if (accumulatedTranscript) {
+        clearFinalizationTimer();
+        onTranscript(accumulatedTranscript, true);
+        accumulatedTranscript = '';
+      }
+    },
 
-          ws.onmessage = (event) => {
-            if (event.data instanceof ArrayBuffer) {
-              const decoded = decodeEventStreamMessage(event.data);
-              if (decoded) {
-                if (decoded.error) {
-                  console.error('AWS Transcribe error:', decoded.error);
-                  onError?.(decoded.error);
-                } else if (decoded.transcript !== undefined) {
-                  onTranscript(decoded.transcript, !decoded.isPartial);
-                }
-              }
-            }
-          };
-
-          ws.onerror = (event) => {
-            console.error('WebSocket error:', event);
-            onError?.('WebSocket connection error');
-          };
-
-          ws.onclose = (event) => {
-            isActive = false;
-            isConnected = false;
-            if (event.code !== 1000 && event.code !== 1005) {
-              console.warn('WebSocket closed:', event.code, event.reason);
-            }
-          };
-        } catch (error) {
-          reject(error);
-        }
-      });
+    resume() {
+      if (!isConnected || !isPaused) return;
+      log('Resuming listening');
+      isPaused = false;
+      isActive = true;
+      accumulatedTranscript = '';
+      clearFinalizationTimer();
     },
 
     sendAudio(audio: ArrayBuffer) {
+      // Don't send if paused
+      if (isPaused) return;
+
       if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
-        // Queue audio if not connected yet
         if (isActive) {
           audioQueue.push(audio);
         }
@@ -352,26 +555,35 @@ function createAWSTranscribeSession(
     },
 
     async end() {
-      if (!isActive) return;
-
+      log('Ending session');
       isActive = false;
+      isPaused = false;
       audioQueue = [];
 
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        // Send empty audio event to signal end of stream
-        try {
-          const emptyMessage = encodeEventStreamMessage(new ArrayBuffer(0));
-          ws.send(emptyMessage);
-        } catch (e) {
-          // Ignore
-        }
-
-        // Close after a short delay to allow final transcripts
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        ws.close(1000, 'Session ended');
+      if (accumulatedTranscript) {
+        clearFinalizationTimer();
+        onTranscript(accumulatedTranscript, true);
+        accumulatedTranscript = '';
       }
 
-      ws = null;
+      if (ws) {
+        if (ws.readyState === WebSocket.OPEN) {
+          try {
+            const emptyMessage = encodeEventStreamMessage(new ArrayBuffer(0));
+            ws.send(emptyMessage);
+          } catch (e) {
+            // Ignore
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          ws.close(1000, 'Session ended');
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+          ws.close();
+        }
+        ws = null;
+      }
+
+      clearFinalizationTimer();
     },
   };
 
@@ -421,32 +633,57 @@ export function createAWSTranscribeSessionFactory(
     websocketUrlEndpoint = '/api/voice-survey/stt/websocket',
     language: defaultLanguage = 'en-US',
     sampleRate: defaultSampleRate = 16000,
+    initialTimeout = 5000,  // Short timeout for first attempt - fail fast, retry fast
+    retryTimeout = 10000,   // Longer timeout for retries
+    maxRetries = 3,
+    finalTranscriptDelay = 1500,  // Wait 1.5s after final transcript before submitting
+    debug = false,
   } = config;
+
+  const log = debug ? console.log.bind(console, '[AWSTranscribeFactory]') : () => {};
 
   // Shared URL cache across sessions (URLs are valid for ~5 minutes)
   let cachedUrl: CachedUrl | null = null;
   let fetchPromise: Promise<CachedUrl> | null = null;
 
   /**
+   * Invalidate the cached URL (used after connection failures)
+   */
+  function invalidateCache() {
+    log('Invalidating URL cache');
+    cachedUrl = null;
+    fetchPromise = null;
+  }
+
+  /**
    * Fetch a new WebSocket URL (with deduplication)
    */
-  async function fetchWebSocketUrl(language: string, sampleRate: number): Promise<string> {
+  async function fetchWebSocketUrl(language: string, sampleRate: number, forceRefresh = false): Promise<string> {
+    // Force refresh invalidates cache
+    if (forceRefresh) {
+      invalidateCache();
+    }
+
     // Check if cached URL is still valid (with 30 second buffer)
     if (cachedUrl) {
       const elapsed = (Date.now() - cachedUrl.fetchedAt) / 1000;
       if (elapsed < cachedUrl.expiresIn - 30) {
+        log('Using cached URL (age:', Math.round(elapsed), 's)');
         return cachedUrl.url;
       }
+      log('Cached URL expired');
       cachedUrl = null;
     }
 
     // If already fetching, wait for that request
     if (fetchPromise) {
+      log('Waiting for existing fetch request');
       const result = await fetchPromise;
       return result.url;
     }
 
     // Fetch new URL
+    log('Fetching new WebSocket URL');
     fetchPromise = (async () => {
       const params = new URLSearchParams({
         language,
@@ -469,11 +706,19 @@ export function createAWSTranscribeSessionFactory(
       cachedUrl = cached;
       fetchPromise = null;
 
+      log('Got new WebSocket URL (expires in:', cached.expiresIn, 's)');
       return cached;
     })();
 
     const result = await fetchPromise;
     return result.url;
+  }
+
+  /**
+   * Sleep for a given duration
+   */
+  function sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   return (
@@ -484,46 +729,220 @@ export function createAWSTranscribeSessionFactory(
     const language = sessionConfig?.language || defaultLanguage;
     const sampleRate = sessionConfig?.sampleRate || defaultSampleRate;
 
-    let innerSession: STTStreamingSession | null = null;
+    let innerSession: STTStreamingSessionWithPrewarm | null = null;
+    let isConnecting = false;
+
+    /**
+     * Create a new session with retries
+     */
+    async function createNewSession(): Promise<STTStreamingSessionWithPrewarm> {
+      let lastError: Error | null = null;
+
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const timeout = attempt === 1 ? initialTimeout : retryTimeout;
+          log(`Connection attempt ${attempt}/${maxRetries} (timeout: ${timeout}ms)`);
+
+          // Always get fresh URL when creating new session
+          const forceRefresh = attempt > 1 || innerSession !== null;
+          const websocketUrl = await fetchWebSocketUrl(language, sampleRate, forceRefresh);
+
+          const newSession = createAWSTranscribeSession(
+            websocketUrl,
+            onTranscript,
+            onError,
+            { connectionTimeout: timeout, finalTranscriptDelay, debug }
+          );
+
+          // Connect but start in paused state
+          await newSession.preconnect();
+          log('Connected successfully');
+          return newSession;
+
+        } catch (error) {
+          lastError = error instanceof Error ? error : new Error(String(error));
+          log(`Attempt ${attempt} failed:`, lastError.message);
+          invalidateCache();
+
+          if (attempt < maxRetries) {
+            const delay = Math.min(500 * Math.pow(2, attempt - 1), 5000);
+            log(`Retrying in ${delay}ms...`);
+            await sleep(delay);
+          }
+        }
+      }
+
+      const errorMsg = lastError?.message || 'Failed to connect STT session';
+      console.error('STT session connect failed after', maxRetries, 'attempts:', errorMsg);
+      throw lastError;
+    }
+
+    /**
+     * Ensure we have a connected session, creating/reconnecting if needed
+     */
+    async function ensureSession(): Promise<STTStreamingSessionWithPrewarm> {
+      // If we have a connected session, reuse it
+      if (innerSession?.isConnected) {
+        log('Reusing existing connected session');
+        return innerSession;
+      }
+
+      log('Session not connected, need to create/reconnect');
+
+      // Avoid concurrent connection attempts
+      if (isConnecting) {
+        log('Connection already in progress, waiting...');
+        // Wait for the ongoing connection attempt
+        let waitCount = 0;
+        while (isConnecting && waitCount < 100) {
+          await sleep(100);
+          waitCount++;
+        }
+        if (innerSession?.isConnected) {
+          return innerSession;
+        }
+        // If still connecting after 10 seconds, something is wrong - proceed anyway
+        if (isConnecting) {
+          log('Connection wait timeout, proceeding with new connection');
+          isConnecting = false;
+        }
+      }
+
+      isConnecting = true;
+
+      try {
+        // Clean up old disconnected session
+        if (innerSession) {
+          log('Cleaning up previous session...');
+          await innerSession.end().catch(() => {});
+          innerSession = null;
+        }
+
+        // Invalidate URL cache to get a fresh URL
+        invalidateCache();
+
+        innerSession = await createNewSession();
+        return innerSession;
+      } finally {
+        isConnecting = false;
+      }
+    }
 
     const session: STTStreamingSessionWithPrewarm = {
       get isActive() {
         return innerSession?.isActive ?? false;
       },
 
+      get isConnected() {
+        return innerSession?.isConnected ?? false;
+      },
+
+      get isPaused() {
+        return innerSession?.isPaused ?? true;
+      },
+
       /**
        * Pre-warm by fetching the WebSocket URL early.
-       * This is optional but reduces latency when start() is called.
        */
       async prewarm() {
         try {
           await fetchWebSocketUrl(language, sampleRate);
         } catch (error) {
-          // Prewarm errors are non-fatal - start() will retry
-          console.warn('STT prewarm failed (will retry on start):', error);
+          console.warn('STT prewarm failed (will retry on connect):', error);
         }
       },
 
-      async start() {
-        try {
-          const websocketUrl = await fetchWebSocketUrl(language, sampleRate);
-          innerSession = createAWSTranscribeSession(websocketUrl, onTranscript, onError);
-          await innerSession.start();
-        } catch (error) {
-          const errorMsg = error instanceof Error ? error.message : 'Failed to start STT session';
-          console.error('STT session start error:', errorMsg);
-          onError?.(errorMsg);
-          throw error;
+      /**
+       * Pre-connect the WebSocket. Call this during AI speaking
+       * so the connection is ready when user needs to speak.
+       * This is non-blocking and won't throw errors.
+       * Note: If AI speaks for >15s, AWS may timeout this connection - that's OK,
+       * we'll reconnect when user actually starts speaking.
+       */
+      async preconnect() {
+        // Don't preconnect if already connected
+        if (innerSession?.isConnected) {
+          log('Already connected, skipping preconnect');
+          return;
         }
+
+        log('Pre-connecting...');
+        try {
+          await ensureSession();
+          log('Pre-connect successful, connection ready');
+        } catch (error) {
+          // Pre-connect failures are non-fatal - will retry on start()
+          log('Pre-connect failed (will retry on start):', error);
+          // Make sure innerSession is null so start() will create fresh
+          if (innerSession && !innerSession.isConnected) {
+            innerSession = null;
+          }
+        }
+      },
+
+      /**
+       * Start listening (resumes if paused, reconnects if disconnected)
+       */
+      async start() {
+        log('Starting listening, isConnected:', innerSession?.isConnected);
+
+        // Ensure we have a connected session
+        const sess = await ensureSession();
+
+        // Double-check connection after ensureSession
+        if (!sess.isConnected) {
+          log('Session not connected after ensureSession, retrying...');
+          // Force cleanup and retry
+          innerSession = null;
+          const newSess = await ensureSession();
+          if (!newSess.isConnected) {
+            throw new Error('Failed to establish connection');
+          }
+          newSess.resume();
+          return;
+        }
+
+        if (sess.isPaused) {
+          log('Resuming paused session');
+          sess.resume();
+        } else if (!sess.isActive) {
+          log('Starting fresh session');
+          await sess.start();
+        } else {
+          log('Session already active');
+        }
+      },
+
+      /**
+       * Pause listening but keep connection open
+       */
+      pause() {
+        innerSession?.pause();
+      },
+
+      /**
+       * Resume listening after pause
+       */
+      resume() {
+        innerSession?.resume();
       },
 
       sendAudio(audio: ArrayBuffer) {
-        innerSession?.sendAudio(audio);
+        // Only send if connected
+        if (innerSession?.isConnected) {
+          innerSession.sendAudio(audio);
+        }
       },
 
+      /**
+       * End the session and close the connection.
+       * Call this only when the survey is complete.
+       */
       async end() {
-        await innerSession?.end();
-        innerSession = null;
+        if (innerSession) {
+          await innerSession.end();
+          innerSession = null;
+        }
       },
     };
 
