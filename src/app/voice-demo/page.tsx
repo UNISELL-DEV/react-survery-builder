@@ -13,6 +13,7 @@ import {
   RotateCcw,
   ChevronDown,
   ChevronUp,
+  Volume2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { sampleSurvey } from '../surveydata';
@@ -72,11 +73,10 @@ function getBlockOptions(block: any): Array<{ label: string; value: any }> {
 }
 
 /**
- * AI Handler - calls the chat-survey API for conversational question rephrasing
- * This is now explicitly provided rather than being hardcoded in VoiceLayout.
- * The API also returns TTS audio to avoid a separate TTS call.
+ * Factory function for AI Handler - creates handler with specified voice
+ * This allows the voice to be changed dynamically.
  */
-const aiHandler = async (
+const createAiHandler = (voice: string) => async (
   context: AIHandlerContext,
 ): Promise<AIHandlerResponse> => {
   try {
@@ -95,7 +95,7 @@ const aiHandler = async (
           .map((m) => ({ role: m.role, content: m.content })),
         // Include TTS options - audio will be generated alongside the question
         includeTTS: false,
-        ttsVoice: 'Joanna', // AWS Polly neural voice
+        ttsVoice: voice, // AWS Polly neural voice
       }),
     });
 
@@ -218,6 +218,26 @@ const ttsHandler = async (request: TTSRequest): Promise<TTSResponse> => {
   };
 };
 
+// Available AWS Polly neural voices
+const AVAILABLE_VOICES = [
+  { id: 'Joanna', name: 'Joanna', gender: 'Female', accent: 'US English' },
+  { id: 'Matthew', name: 'Matthew', gender: 'Male', accent: 'US English' },
+  { id: 'Ivy', name: 'Ivy', gender: 'Female (Child)', accent: 'US English' },
+  { id: 'Kendra', name: 'Kendra', gender: 'Female', accent: 'US English' },
+  { id: 'Kimberly', name: 'Kimberly', gender: 'Female', accent: 'US English' },
+  { id: 'Salli', name: 'Salli', gender: 'Female', accent: 'US English' },
+  { id: 'Joey', name: 'Joey', gender: 'Male', accent: 'US English' },
+  { id: 'Justin', name: 'Justin', gender: 'Male (Child)', accent: 'US English' },
+  { id: 'Kevin', name: 'Kevin', gender: 'Male (Child)', accent: 'US English' },
+  { id: 'Ruth', name: 'Ruth', gender: 'Female', accent: 'US English' },
+  { id: 'Stephen', name: 'Stephen', gender: 'Male', accent: 'US English' },
+  { id: 'Amy', name: 'Amy', gender: 'Female', accent: 'British English' },
+  { id: 'Emma', name: 'Emma', gender: 'Female', accent: 'British English' },
+  { id: 'Brian', name: 'Brian', gender: 'Male', accent: 'British English' },
+  { id: 'Arthur', name: 'Arthur', gender: 'Male', accent: 'British English' },
+  { id: 'Olivia', name: 'Olivia', gender: 'Female', accent: 'Australian English' },
+] as const;
+
 export default function VoiceDemoPage() {
   const [submittedData, setSubmittedData] = useState<Record<
     string,
@@ -236,6 +256,9 @@ export default function VoiceDemoPage() {
   const [orbStyle, setOrbStyle] = useState<
     'pulse' | 'wave' | 'glow' | 'breathe'
   >('breathe');
+  const [selectedVoice, setSelectedVoice] = useState('Joanna');
+  const [previewingVoice, setPreviewingVoice] = useState<string | null>(null);
+  const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null);
 
   // Create STT session factory (using AWS Transcribe for cross-browser support)
   const sttSessionFactory = useMemo(
@@ -319,6 +342,57 @@ export default function VoiceDemoPage() {
     }
   };
 
+  // Preview a voice before selecting
+  const previewVoice = useCallback(async (voiceId: string) => {
+    // Stop any currently playing preview
+    if (previewAudio) {
+      previewAudio.pause();
+      previewAudio.src = '';
+      setPreviewAudio(null);
+    }
+
+    setPreviewingVoice(voiceId);
+
+    try {
+      const params = new URLSearchParams({
+        text: 'Hello! This is how I sound. I can help guide you through surveys with a natural, conversational tone.',
+        voice: voiceId,
+        language: 'en-US',
+        engine: 'neural',
+        _t: Date.now().toString(),
+      });
+
+      const audio = new Audio(`/api/voice-survey/tts?${params.toString()}`);
+      setPreviewAudio(audio);
+
+      audio.onended = () => {
+        setPreviewingVoice(null);
+        setPreviewAudio(null);
+      };
+
+      audio.onerror = () => {
+        setPreviewingVoice(null);
+        setPreviewAudio(null);
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('Voice preview error:', error);
+      setPreviewingVoice(null);
+      setPreviewAudio(null);
+    }
+  }, [previewAudio]);
+
+  // Stop preview when unmounting or when settings close
+  useEffect(() => {
+    return () => {
+      if (previewAudio) {
+        previewAudio.pause();
+        previewAudio.src = '';
+      }
+    };
+  }, [previewAudio]);
+
   // Browser not supported warning
   if (!browserSupported) {
     return (
@@ -398,6 +472,54 @@ export default function VoiceDemoPage() {
                 <option value="wave">Wave</option>
                 <option value="glow">Glow</option>
               </select>
+            </div>
+
+            <div className="space-y-2">
+              <span className="text-sm text-gray-700">Voice:</span>
+              <div className="max-h-48 overflow-y-auto border border-gray-200 rounded-lg">
+                {AVAILABLE_VOICES.map((voice) => (
+                  <div
+                    key={voice.id}
+                    className={`flex items-center justify-between px-3 py-2 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0 ${
+                      selectedVoice === voice.id ? 'bg-blue-50' : ''
+                    }`}
+                    onClick={() => setSelectedVoice(voice.id)}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="voice"
+                        checked={selectedVoice === voice.id}
+                        onChange={() => setSelectedVoice(voice.id)}
+                        className="w-3 h-3 text-blue-500"
+                      />
+                      <div>
+                        <div className="text-sm font-medium text-gray-700">
+                          {voice.name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {voice.gender} · {voice.accent}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        previewVoice(voice.id);
+                      }}
+                      disabled={previewingVoice !== null}
+                      className="p-1.5 rounded-full hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      title={`Preview ${voice.name}`}
+                    >
+                      {previewingVoice === voice.id ? (
+                        <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
+                      ) : (
+                        <Volume2 className="w-4 h-4 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="pt-2 border-t border-gray-100 space-y-2">
@@ -550,7 +672,7 @@ export default function VoiceDemoPage() {
 
               // Injectable handlers - these replace the hardcoded API calls
               // Remove these to use the default local-only behavior (no AI)
-              aiHandler, // AI handler now includes TTS audio in response (no separate TTS call)
+              aiHandler: createAiHandler(selectedVoice), // AI handler now includes TTS audio in response (no separate TTS call)
               validationHandler,
               sessionInitHandler,
               sessionEndHandler,
@@ -558,7 +680,7 @@ export default function VoiceDemoPage() {
               // TTS is now included in the aiHandler response from chat-survey API
               // The ttsHandler below is only used as fallback for non-AI speech (e.g., error messages)
               ttsHandler,
-              ttsVoice: 'Joanna',
+              ttsVoice: selectedVoice,
               language: 'en-US',
 
               // Custom STT using AWS Transcribe Streaming for cross-browser support
