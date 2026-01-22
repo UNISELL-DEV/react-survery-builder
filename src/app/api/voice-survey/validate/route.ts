@@ -397,7 +397,7 @@ Return a JSON object with these exact fields:
   "matchedOptionIndices": number[], // 0-based indices of matched options
   "confidence": "high" | "medium" | "low",
   "needsConfirmation": boolean,
-  "reason": string // Brief explanation of the match or why it's invalid
+  "reason": string // If isValid is false, provide a SHORT user-friendly message asking them to reconfirm (similar to : "I didn't catch that. Could you please repeat your answer?"). Do NOT explain why it failed or list the available options. Use different wordings every time.
 }`;
 
     const userPrompt = `Question: "${questionLabel || 'Please select an option'}"
