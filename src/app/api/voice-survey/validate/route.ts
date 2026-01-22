@@ -52,6 +52,8 @@ interface ValidationResponse {
     | 'add_more'
     | 'submit'
     | 'finish_multiselect';
+  // For multi-select: whether the matched options should be added or removed
+  action?: 'add' | 'remove';
 }
 
 // Patterns for "none of the above" type options that don't need confirmation
@@ -387,9 +389,15 @@ IMPORTANT RULES:
 1. Match by semantic meaning, not just exact words. E.g., "I want to lose weight" matches "Specific weight loss target"
 2. Handle speech recognition errors. E.g., "health improvement" should match "Overall health improvement"
 3. Numbers can be spoken as words. E.g., "option one", "first", "1" all mean option 1
-4. For multiSelect: user might say multiple options or add to previous selections
+4. For multiSelect: user might say multiple options, add to previous selections, or REMOVE previously selected options
 5. Common affirmative words like "yes", "yeah", "sure" mean confirmation
 6. Common negative words like "no", "nope", "not that one" mean rejection
+7. REMOVAL DETECTION: If the user wants to REMOVE/UNSELECT an option, set action to "remove". Examples:
+   - "remove pizza" / "delete pizza" / "unselect pizza" → action: "remove"
+   - "I don't want pizza anymore" / "not pizza" / "actually not that one" → action: "remove"
+   - "take away pizza" / "get rid of pizza" / "cancel pizza" → action: "remove"
+   - "changed my mind about pizza" → action: "remove"
+   By default, action should be "add" when user is selecting/adding options.
 
 Return a JSON object with these exact fields:
 {
@@ -397,6 +405,7 @@ Return a JSON object with these exact fields:
   "matchedOptionIndices": number[], // 0-based indices of matched options
   "confidence": "high" | "medium" | "low",
   "needsConfirmation": boolean,
+  "action": "add" | "remove", // whether user wants to add or remove these options
   "reason": string // If isValid is false, provide a SHORT user-friendly message asking them to reconfirm (similar to : "I didn't catch that. Could you please repeat your answer?"). Do NOT explain why it failed or list the available options. Use different wordings every time.
 }`;
 
@@ -477,17 +486,24 @@ Analyze this response and determine which option(s) the user is selecting. Consi
       isExclusiveOption(opt.label),
     );
 
+    // Get the action (add or remove) from AI - default to 'add'
+    const action: 'add' | 'remove' = aiResult.action === 'remove' ? 'remove' : 'add';
+
     if (aiResult.isValid && matchedOptions.length > 0 && hasExclusiveOption) {
       // Exclusive options like "none of the above" don't need confirmation
       needsConfirmation = false;
       suggestedAction = 'submit';
     } else if (aiResult.isValid && multiSelect && matchedOptions.length > 0) {
-      // For multi-select, confirm what was selected
+      // For multi-select, confirm what was selected or removed
       needsConfirmation = true;
       const selectedLabels = matchedOptions
         .map((opt: Option) => opt.label)
         .join(', ');
-      confirmationMessage = `I heard you say ${selectedLabels}. Would you like to add more options, or say "done" to continue?`;
+      if (action === 'remove') {
+        confirmationMessage = `Removed ${selectedLabels}. Would you like to make more changes, or say "done" to continue?`;
+      } else {
+        confirmationMessage = `I heard you say ${selectedLabels}. Would you like to add more options, or say "done" to continue?`;
+      }
       suggestedAction = 'confirm';
     } else if (
       aiResult.isValid &&
@@ -512,6 +528,7 @@ Analyze this response and determine which option(s) the user is selecting. Consi
       confirmationMessage,
       invalidReason: !aiResult.isValid ? aiResult.reason : undefined,
       suggestedAction,
+      action: multiSelect ? action : undefined,
     };
 
     return NextResponse.json(result);
@@ -576,23 +593,25 @@ async function handleConfirmation(
   const systemPrompt = `You are analyzing a user's response in a voice survey.
 The user was asked: "Would you like to add more options, or say 'done' to continue?"
 
-IMPORTANT CONTEXT: The user has already made selection(s). They are being asked if they want to ADD MORE options.
+IMPORTANT CONTEXT: The user has already made selection(s). They are being asked if they want to ADD MORE options or make changes.
 - If they say "yes", "sure", "I'd like to add more" = they want to ADD MORE (not confirm)
 - If they say "no", "no more", "done", "that's all", "continue" = they are DONE and want to submit
-- If they say an option name or description = they are selecting that option to add
-- If they say "no, that's wrong" or "not that one" = they want to REJECT and start over
+- If they say an option name or description = they are selecting that option to ADD
+- If they say "remove X", "delete X", "unselect X", "I don't want X anymore", "not X", "take away X" = they want to REMOVE that option
+- If they say "no, that's wrong" or "not that one" (without specifying which option) = they want to REJECT and start over
 
 Analyze their response and return a JSON object:
 {
-  "intent": "add_more" | "done" | "reject" | "select_option" | "unclear",
+  "intent": "add_more" | "done" | "reject" | "select_option" | "remove_option" | "unclear",
   "matchedOptionIndex": number | null,
   "reason": string
 }
 
 - "add_more" = they want to add more options (said yes, sure, etc.)
 - "done" = they don't want more, ready to submit (said no, done, continue, that's all)
-- "reject" = they want to reject the selection and start over
-- "select_option" = they named or described a specific option to add
+- "reject" = they want to reject ALL selections and start over
+- "select_option" = they named or described a specific option to ADD
+- "remove_option" = they want to REMOVE a specific option from their selections
 - "unclear" = can't determine their intent`;
 
   const optionsText = options
@@ -706,6 +725,7 @@ What is the user's intent?`;
             needsConfirmation: true,
             confirmationMessage: `Added "${newOption.label}". Would you like to add more, or say "done" to continue?`,
             suggestedAction: 'confirm',
+            action: 'add',
           } as ValidationResponse);
         }
         // Couldn't match the option, ask again
@@ -721,6 +741,78 @@ What is the user's intent?`;
           suggestedAction: 'add_more',
         } as ValidationResponse);
 
+      case 'remove_option':
+        // User wants to remove a specific option from their selections
+        if (
+          result.matchedOptionIndex !== null &&
+          result.matchedOptionIndex >= 0 &&
+          result.matchedOptionIndex < options.length
+        ) {
+          const optionToRemove = options[result.matchedOptionIndex];
+          // Check if this option is actually in the current selections
+          if (previousSelections.includes(optionToRemove.value)) {
+            const remainingValues = previousSelections.filter(
+              (v) => v !== optionToRemove.value,
+            );
+            const remainingOptions = options.filter((opt) =>
+              remainingValues.includes(opt.value),
+            );
+
+            // If all options were removed, ask them to select again
+            if (remainingValues.length === 0) {
+              return NextResponse.json({
+                success: true,
+                isValid: true,
+                // Return what's being removed (for consistency with frontend expectations)
+                matchedOptions: [optionToRemove],
+                matchedValues: [optionToRemove.value],
+                confidence: 'high',
+                needsConfirmation: true,
+                confirmationMessage: `Removed "${optionToRemove.label}". You have no options selected. Which option would you like to choose?`,
+                suggestedAction: 'add_more',
+                action: 'remove',
+              } as ValidationResponse);
+            }
+
+            return NextResponse.json({
+              success: true,
+              isValid: true,
+              // Return what's being removed (for consistency with frontend expectations)
+              // The frontend will filter these out from the current selections
+              matchedOptions: [optionToRemove],
+              matchedValues: [optionToRemove.value],
+              confidence: 'high',
+              needsConfirmation: true,
+              confirmationMessage: `Removed "${optionToRemove.label}". You now have ${remainingOptions.map((o) => o.label).join(', ')} selected. Would you like to make more changes, or say "done" to continue?`,
+              suggestedAction: 'confirm',
+              action: 'remove',
+            } as ValidationResponse);
+          }
+          // Option wasn't in selections
+          return NextResponse.json({
+            success: true,
+            isValid: false,
+            matchedOptions: selectedOptions,
+            matchedValues: previousSelections,
+            confidence: 'medium',
+            needsConfirmation: true,
+            confirmationMessage: `"${optionToRemove.label}" wasn't selected. Your current selections are: ${selectedOptions.map((o) => o.label).join(', ')}. Would you like to make changes, or say "done" to continue?`,
+            suggestedAction: 'add_more',
+          } as ValidationResponse);
+        }
+        // Couldn't match the option to remove
+        return NextResponse.json({
+          success: true,
+          isValid: false,
+          matchedOptions: selectedOptions,
+          matchedValues: previousSelections,
+          confidence: 'low',
+          needsConfirmation: true,
+          confirmationMessage:
+            "I couldn't find that option. Which option would you like to remove?",
+          suggestedAction: 'add_more',
+        } as ValidationResponse);
+
       default:
         return NextResponse.json({
           success: true,
@@ -730,7 +822,7 @@ What is the user's intent?`;
           confidence: 'low',
           needsConfirmation: true,
           confirmationMessage:
-            'I didn\'t quite catch that. Which option would you like to add, or say "done" to continue?',
+            'I didn\'t quite catch that. You can add or remove options, or say "done" to continue.',
           suggestedAction: 'add_more',
         } as ValidationResponse);
     }
@@ -847,5 +939,7 @@ function fallbackValidation(
         ? 'confirm'
         : 'submit'
       : 'reask',
+    // Fallback always assumes 'add' since we can't detect removal intent without AI
+    action: multiSelect && isValid ? 'add' : undefined,
   };
 }
