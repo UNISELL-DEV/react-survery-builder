@@ -567,20 +567,22 @@ function createAWSTranscribeSession(
       }
 
       if (ws) {
-        if (ws.readyState === WebSocket.OPEN) {
+        const wsRef = ws;
+        ws = null;
+
+        if (wsRef.readyState === WebSocket.OPEN) {
           try {
             const emptyMessage = encodeEventStreamMessage(new ArrayBuffer(0));
-            ws.send(emptyMessage);
+            wsRef.send(emptyMessage);
           } catch (e) {
             // Ignore
           }
 
           await new Promise((resolve) => setTimeout(resolve, 300));
-          ws.close(1000, 'Session ended');
-        } else if (ws.readyState === WebSocket.CONNECTING) {
-          ws.close();
+          wsRef.close(1000, 'Session ended');
+        } else if (wsRef.readyState === WebSocket.CONNECTING) {
+          wsRef.close();
         }
-        ws = null;
       }
 
       clearFinalizationTimer();
