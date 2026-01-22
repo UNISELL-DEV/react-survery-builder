@@ -35,6 +35,8 @@ interface ValidationRequest {
   // Schema-based validation
   outputSchema?: OutputSchema;
   inputSchema?: OutputSchema;
+  // Conversation history for the current question (for context in multi-turn interactions)
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
 interface ValidationResponse {
@@ -105,6 +107,7 @@ async function handleSchemaValidation(
   schema: OutputSchema,
   questionLabel: string | undefined,
   apiKey: string,
+  conversationHistory?: Array<{ role: 'user' | 'assistant'; content: string }>,
 ): Promise<NextResponse> {
   // Build schema description based on schema type
   let schemaDescription: string;
@@ -191,10 +194,55 @@ CRITICAL RULES:
 2. Convert spoken numbers to actual numbers (e.g., "twenty five" → 25, "one hundred seventy" → 170)
 3. Handle variations in how people express information naturally
 4. For string values, extract the core answer without filler words like "my name is", "I think", "it's", etc.
-5. If you cannot extract a valid value, mark isValid as false
-6. Return ONLY valid JSON - no explanations, no markdown, just the JSON object`;
+5. You should automatically convert values to required formats if you, if you cannot ask the user to provide data in correct format.
+6. If you cannot extract a valid value, mark isValid as false
+7. Return ONLY valid JSON - no explanations, no markdown, just the JSON object
+8. IMPORTANT: If there is conversation history, consider ALL previous user responses when extracting data. For example, if user first said "my height is 170cm" and then said "and my weight is 70kg", you should extract BOTH height and weight from the combined context.`;
 
-  const userPrompt = `Question being answered: "${questionLabel || 'Please provide your answer'}"
+  // Build messages array with conversation history for context
+  const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
+
+  // Add conversation history if available (this provides context from previous turns)
+  if (conversationHistory && conversationHistory.length > 0) {
+    // Add the initial question context
+    messages.push({
+      role: 'user',
+      content: `Question being answered: "${questionLabel || 'Please provide your answer'}"
+
+${schemaDescription}
+
+Please extract data from the user's responses in this conversation. Return JSON in this format:
+${expectedFormat}
+
+If you cannot extract the required information, return:
+{
+  "isValid": false,
+  "clarificationNeeded": "Please provide [what's missing or unclear]"
+}`,
+    });
+
+    // Add previous conversation turns
+    for (const turn of conversationHistory) {
+      if (turn.role === 'user') {
+        messages.push({
+          role: 'user',
+          content: `User said: "${turn.content}"`,
+        });
+      } else {
+        messages.push({ role: 'assistant', content: turn.content });
+      }
+    }
+
+    // Add current transcript as the latest user input
+    messages.push({
+      role: 'user',
+      content: `User's latest response: "${transcript}"
+
+Now extract ALL the data from the complete conversation above and return ONLY the JSON object:`,
+    });
+  } else {
+    // No conversation history - use simple single-turn prompt
+    const userPrompt = `Question being answered: "${questionLabel || 'Please provide your answer'}"
 
 ${schemaDescription}
 
@@ -211,6 +259,9 @@ If you cannot extract the required information, return:
 
 Return ONLY the JSON object:`;
 
+    messages.push({ role: 'user', content: userPrompt });
+  }
+
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -223,7 +274,7 @@ Return ONLY the JSON object:`;
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 500,
         system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }],
+        messages,
       }),
     });
 
@@ -318,6 +369,7 @@ export async function POST(request: NextRequest) {
       isConfirmation = false,
       outputSchema,
       inputSchema,
+      conversationHistory,
     } = body;
 
     // Check if ANTHROPIC_API_KEY is set
@@ -336,7 +388,7 @@ export async function POST(request: NextRequest) {
 
     // Handle schema-based validation for ALL blocks with a schema
     // This handles string, number, boolean, date, array, and object types
-    const schema = inputSchema || outputSchema;
+    const schema = outputSchema || inputSchema;
     if (schema && schema.type) {
       // Only skip schema validation if there are options (option-based blocks use different logic)
       // But if the block has options AND a schema, options take precedence
@@ -346,6 +398,7 @@ export async function POST(request: NextRequest) {
           schema,
           questionLabel,
           apiKey,
+          conversationHistory,
         );
       }
     }
@@ -392,7 +445,8 @@ IMPORTANT RULES:
 4. For multiSelect: user might say multiple options, add to previous selections, or REMOVE previously selected options
 5. Common affirmative words like "yes", "yeah", "sure" mean confirmation
 6. Common negative words like "no", "nope", "not that one" mean rejection
-7. REMOVAL DETECTION: If the user wants to REMOVE/UNSELECT an option, set action to "remove". Examples:
+7. You should automatically convert values to required formats if you, if you cannot ask the user to provide data in correct format.
+8. REMOVAL DETECTION: If the user wants to REMOVE/UNSELECT an option, set action to "remove". Examples:
    - "remove pizza" / "delete pizza" / "unselect pizza" → action: "remove"
    - "I don't want pizza anymore" / "not pizza" / "actually not that one" → action: "remove"
    - "take away pizza" / "get rid of pizza" / "cancel pizza" → action: "remove"
@@ -487,7 +541,8 @@ Analyze this response and determine which option(s) the user is selecting. Consi
     );
 
     // Get the action (add or remove) from AI - default to 'add'
-    const action: 'add' | 'remove' = aiResult.action === 'remove' ? 'remove' : 'add';
+    const action: 'add' | 'remove' =
+      aiResult.action === 'remove' ? 'remove' : 'add';
 
     if (aiResult.isValid && matchedOptions.length > 0 && hasExclusiveOption) {
       // Exclusive options like "none of the above" don't need confirmation

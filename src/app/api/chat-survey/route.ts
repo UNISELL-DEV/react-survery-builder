@@ -14,7 +14,10 @@ let pollyClient: PollyClient | null = null;
 function getPollyClient(): PollyClient {
   if (!pollyClient) {
     pollyClient = new PollyClient({
-      region: process.env.AWS_LOCAL_DEFAULT_REGION || process.env.AWS_REGION || 'us-east-1',
+      region:
+        process.env.AWS_LOCAL_DEFAULT_REGION ||
+        process.env.AWS_REGION ||
+        'us-east-1',
       credentials: {
         accessKeyId: process.env.AWS_LOCAL_ACCESS_KEY_ID || '',
         secretAccessKey: process.env.AWS_LOCAL_SECRET_ACCESS_KEY || '',
@@ -70,8 +73,13 @@ async function generateTTSAudio(
       };
     } catch (error: any) {
       // If neural engine not supported, try standard
-      if (error?.name === 'ValidationException' && engineToUse === Engine.NEURAL) {
-        console.warn('Neural engine not supported in this region, falling back to standard');
+      if (
+        error?.name === 'ValidationException' &&
+        engineToUse === Engine.NEURAL
+      ) {
+        console.warn(
+          'Neural engine not supported in this region, falling back to standard',
+        );
         continue;
       }
       console.error('TTS generation error:', error);
@@ -218,9 +226,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Build multi-field context
+    // Use outputSchema for field definitions (prioritized), fallback to inputSchema
     let multiFieldContext = '';
-    if (currentField && inputSchema?.properties) {
-      const fieldSchema = inputSchema.properties[currentField];
+    const multiFieldSchema =
+      outputSchema?.properties || inputSchema?.properties;
+    if (currentField && multiFieldSchema) {
+      const fieldSchema = multiFieldSchema[currentField];
       const fieldDescription = fieldSchema?.description || currentField;
 
       // Show what we've collected so far
