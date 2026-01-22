@@ -298,18 +298,25 @@ This is question ${questionNumber} of ${totalQuestions}.
 
 Respond with just the conversational question (and optionally a brief acknowledgment of their last answer if appropriate). Nothing else.`;
 
-    // Call Claude API directly using fetch
+    // Call Claude API directly using fetch with prompt caching
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'prompt-caching-2024-07-31',
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 200,
-        system: systemPrompt,
+        system: [
+          {
+            type: 'text',
+            text: systemPrompt,
+            cache_control: { type: 'ephemeral' },
+          },
+        ],
         messages: [
           {
             role: 'user',
