@@ -226,14 +226,15 @@ async function handleSchemaValidation(
 Your job is to extract the relevant value(s) from the user's speech and return them in a specific JSON format.
 
 CRITICAL RULES:
-1. Extract the meaningful content from natural speech (e.g., "my name is John" → extract "John", "I am 25 years old" → extract 25)
-2. Convert spoken numbers to actual numbers (e.g., "twenty five" → 25, "one hundred seventy" → 170)
+1. Extract the meaningful content from natural speech, ignoring filler words and conversational phrasing
+2. Convert spoken numbers to their numeric representation (words to digits)
 3. Handle variations in how people express information naturally
-4. For string values, extract the core answer without filler words like "my name is", "I think", "it's", etc.
-5. You should automatically convert values to required formats if you, if you cannot ask the user to provide data in correct format.
-6. If you cannot extract a valid value, mark isValid as false
+4. For string values, extract the core answer without introductory phrases
+5. Automatically convert values to required formats when possible
+6. If you cannot extract ALL required values, mark isValid as false BUT still return whatever partial data you extracted
 7. Return ONLY valid JSON - no explanations, no markdown, just the JSON object
-8. IMPORTANT: If there is conversation history, consider ALL previous user responses when extracting data. For example, if user first said "my height is 170cm" and then said "and my weight is 70kg", you should extract BOTH height and weight from the combined context.`;
+8. IMPORTANT: If there is conversation history, consider ALL previous user responses when extracting data. Combine information from multiple turns to form a complete response.
+9. PARTIAL DATA: When some fields are missing, set them to null but still include all fields from the schema - populate successfully extracted values and use null for missing ones. Always include "missingFields" array listing the field names that couldn't be extracted.`;
 
   // Build messages array with conversation history for context
   const messages: Array<{ role: 'user' | 'assistant'; content: string }> = [];
@@ -250,10 +251,12 @@ ${schemaDescription}
 Please extract data from the user's responses in this conversation. Return JSON in this format:
 ${expectedFormat}
 
-If you cannot extract the required information, return:
+If you cannot extract ALL required information, return partial data with null for missing fields:
 {
+  ... (extracted fields with values, missing fields set to null),
   "isValid": false,
-  "clarificationNeeded": "Please provide [what's missing or unclear]"
+  "missingFields": ["list", "of", "missing", "field", "names"],
+  "clarificationNeeded": "Please provide [what's missing]"
 }`,
     });
 
@@ -287,10 +290,12 @@ User's spoken response: "${transcript}"
 Extract the data and return JSON in this format:
 ${expectedFormat}
 
-If you cannot extract the required information, return:
+If you cannot extract ALL required information, return partial data with null for missing fields:
 {
+  ... (extracted fields with values, missing fields set to null),
   "isValid": false,
-  "clarificationNeeded": "Please provide [what's missing or unclear]"
+  "missingFields": ["list", "of", "missing", "field", "names"],
+  "clarificationNeeded": "Please provide [what's missing]"
 }
 
 Return ONLY the JSON object:`;
@@ -342,10 +347,27 @@ Return ONLY the JSON object:`;
     const parsedResponse = JSON.parse(jsonMatch[0]);
 
     if (parsedResponse.isValid === false) {
+      // Extract partial data even when validation fails
+      // This allows UI to update with whatever was captured
+      let partialData: unknown = null;
+      if (schema.type === 'object' && schema.properties) {
+        // For object schemas, extract any fields that were captured (non-null values)
+        const { isValid, missingFields, clarificationNeeded, ...objectData } = parsedResponse;
+        // Only include partialData if there's at least one non-null field
+        const hasPartialData = Object.values(objectData).some(v => v !== null && v !== undefined);
+        if (hasPartialData) {
+          partialData = objectData;
+        }
+      } else if (parsedResponse.value !== null && parsedResponse.value !== undefined) {
+        // For scalar types, use the value if present
+        partialData = parsedResponse.value;
+      }
+
       return NextResponse.json({
         success: true,
         isValid: false,
         extractedData: null,
+        partialData, // Include partial data for UI updates
         confidence: 'low',
         needsConfirmation: true,
         confirmationMessage:
