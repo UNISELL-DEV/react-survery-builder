@@ -1,32 +1,41 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import Link from "next/link";
-
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import Link from 'next/link';
 
 import { CreditCard, Loader2 } from 'lucide-react';
-import { BlockDefinition, GlobalCustomField, StandardBlocks, StandardNodes, registerBlock, useSurveyBuilder, ThemeDefinition } from "@/packages/survey-form-package/src";
-import { useTheme } from "next-themes";
-import { useEffect } from "react";
-import { DynamicKeyValueField } from "../builder/components/DynamicKeyValueField";
-import { InteractiveBmiBlock } from "../builder/custom-blocks/InteractiveBmi";
-import { PatientDataMappingField } from "../builder/components/Patientdatamappingfield";
-import { UniqueEffectsBlock } from "../builder/custom-blocks/UniqueEffectsBlock";
-import { RefillsLayout } from "../demo-custom/RefillsLayout";
-import dynamic from "next/dynamic";
+import {
+  BlockDefinition,
+  GlobalCustomField,
+  registerBlock,
+  ThemeDefinition,
+} from '@/packages/survey-form-package/src';
+import { useTheme } from 'next-themes';
+import { useEffect } from 'react';
+import { DynamicKeyValueField } from '../builder/components/DynamicKeyValueField';
+import { InteractiveBmiBlock } from '../builder/custom-blocks/InteractiveBmi';
+import { PatientDataMappingField } from '../builder/components/Patientdatamappingfield';
+import { UniqueEffectsBlock } from '../builder/custom-blocks/UniqueEffectsBlock';
+import { RefillsLayout } from '../demo-custom/RefillsLayout';
+import dynamic from 'next/dynamic';
+import { StandardBlocks } from '@/packages/survey-form-package/src/blocks';
+import { StandardNodes } from '@/packages/survey-form-package/src/builder/nodes';
 
 // Dynamic import directly from SurveyForm file to avoid dagre dependency chain
 const SurveyBuilder = dynamic(
-  () => import("@/packages/survey-form-package/src/builder/survey/SurveyBuilder").then(mod => mod.SurveyBuilder),
+  () =>
+    import('@/packages/survey-form-package/src/builder/survey/SurveyBuilder').then(
+      (mod) => mod.SurveyBuilder,
+    ),
   {
     ssr: false,
     loading: () => (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
-    )
-  }
+    ),
+  },
 );
 
 // LocalStorage key for themes
@@ -58,7 +67,7 @@ const getSavedThemes = (): SavedTheme[] => {
 };
 
 // Create a custom credit card input block
-const CreditCardBlock : BlockDefinition = {
+const CreditCardBlock: BlockDefinition = {
   type: 'credit-card',
   name: 'Credit Card Input',
   description: 'Collect credit card information',
@@ -114,17 +123,17 @@ const CreditCardBlock : BlockDefinition = {
         disabled={disabled}
         className={`w-full p-2 border rounded-md ${error ? 'border-red-500' : 'border-gray-300'} ${disabled ? 'bg-gray-100' : ''}`}
       />
-      {error && (
-        <div className="text-sm text-red-600">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-600">{error}</div>}
     </div>
-  )
+  ),
 };
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
   const [surveyData, setSurveyData] = useState<any>(null);
-  const [customThemes, setCustomThemes] = useState<Record<string, ThemeDefinition>>({});
+  const [customThemes, setCustomThemes] = useState<
+    Record<string, ThemeDefinition>
+  >({});
 
   // Register the custom block when component mounts
   useEffect(() => {
@@ -138,7 +147,7 @@ export default function Home() {
   useEffect(() => {
     const savedThemes = getSavedThemes();
     const themesRecord = Object.fromEntries(
-      savedThemes.map(saved => [saved.name, saved.theme])
+      savedThemes.map((saved) => [saved.name, saved.theme]),
     );
     setCustomThemes(themesRecord);
   }, []);
@@ -146,12 +155,13 @@ export default function Home() {
   // Define your global custom fields
   const globalCustomFields: GlobalCustomField[] = [
     {
-      key: "referenceQuestionKey",
-      label: "Reference Question Key",
-      description: "Unique identifier for this question used in data analysis",
+      key: 'referenceQuestionKey',
+      label: 'Reference Question Key',
+      description: 'Unique identifier for this question used in data analysis',
       component: ({ data, onUpdate, value }) => (
         <DynamicKeyValueField
-          onUpdate={onUpdate} data={data}
+          onUpdate={onUpdate}
+          data={data}
           label="Telegra Question Config"
           keyPlaceholder="Telegra Key"
           valuePlaceholder="Telegra Value"
@@ -159,42 +169,44 @@ export default function Home() {
           keyName="telegraData"
         />
       ),
-      defaultValue: "",
-      showLabel: false
+      defaultValue: '',
+      showLabel: false,
     },
     // You can add more custom fields here
     {
-      key: "questionCategory",
-      label: "Question Category",
-      description: "Category for organizing questions in reports",
+      key: 'questionCategory',
+      label: 'Question Category',
+      description: 'Category for organizing questions in reports',
       component: ({ data, onUpdate, value }) => (
         <input
-          value={value || ""}
-          onChange={(e) => onUpdate({ ...data, questionCategory: e.target.value })}
+          value={value || ''}
+          onChange={(e) =>
+            onUpdate({ ...data, questionCategory: e.target.value })
+          }
           placeholder="e.g. Demographics, Health, Preferences"
           className="w-full p-2 border rounded-md"
         />
       ),
-      defaultValue: "",
-      showLabel: true
+      defaultValue: '',
+      showLabel: true,
     },
     {
-      key: "patientDataKey",
-      label: "Reference patient Key",
-      description: "Map to patient data.",
+      key: 'patientDataKey',
+      label: 'Reference patient Key',
+      description: 'Map to patient data.',
       component: ({ data, onUpdate, value }) => (
         <PatientDataMappingField
-          onUpdate={onUpdate} data={data}
+          onUpdate={onUpdate}
+          data={data}
           label="Patient Data Mapping"
           description="Custom data mapping for patient information."
           keyName="patientMap"
         />
       ),
-      defaultValue: "",
-      showLabel: false
+      defaultValue: '',
+      showLabel: false,
     },
   ];
-
 
   return (
     <main className="min-h-screen p-4">
@@ -226,7 +238,9 @@ export default function Home() {
         <div className="mt-8">
           <h2 className="text-xl font-bold mb-2">Generated Survey Data</h2>
           <pre className="bg-muted p-4 rounded-md overflow-auto max-h-[400px] text-xs">
-            {surveyData ? JSON.stringify(surveyData, null, 2) : "No survey data yet"}
+            {surveyData
+              ? JSON.stringify(surveyData, null, 2)
+              : 'No survey data yet'}
           </pre>
         </div>
       </div>
@@ -238,14 +252,36 @@ export default function Home() {
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
           <span className="inline-flex items-center h-6 w-6">
-            {theme !== 'dark'
-              ? (
-                // Sun Icon
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-blue-700"><circle cx="12" cy="12" r="5" /><path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 6.95l-1.414-1.414M4.464 4.464L3.05 3.05m16.95 1.414l-1.414 1.414M4.464 19.536l-1.414 1.414" /></svg>
-              ) : (
-                // Moon Icon
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-teal-400"><path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 1 0 21 12.79Z" /></svg>
-              )}
+            {theme !== 'dark' ? (
+              // Sun Icon
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-blue-700"
+              >
+                <circle cx="12" cy="12" r="5" />
+                <path d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.95 6.95l-1.414-1.414M4.464 4.464L3.05 3.05m16.95 1.414l-1.414 1.414M4.464 19.536l-1.414 1.414" />
+              </svg>
+            ) : (
+              // Moon Icon
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="h-6 w-6 text-teal-400"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3A7 7 0 1 0 21 12.79Z" />
+              </svg>
+            )}
           </span>
         </Button>
       </div>
