@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2018",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false, // Disables all strict checks
@@ -21,22 +17,15 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@survey-form-renderer/*": [
-        "./src/packages/survey-form-renderer/src/*"
-      ],
-      "@survey-form-builder/*": [
-        "./src/packages/survey-form-builder/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@survey-form-renderer/*": ["./src/packages/survey-form-renderer/src/*"],
+      "@survey-form-builder/*": ["./src/packages/survey-form-builder/src/*"]
     }
   },
   "include": [
@@ -46,7 +35,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

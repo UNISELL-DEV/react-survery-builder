@@ -64,7 +64,7 @@ interface STTStreamingSessionWithPrewarm extends STTStreamingSession {
 type STTStreamingSessionFactoryWithPrewarm = (
   onTranscript: (transcript: string, isFinal: boolean) => void,
   onError?: (error: string) => void,
-  config?: { language?: string; sampleRate?: number }
+  config?: { language?: string; sampleRate?: number },
 ) => STTStreamingSessionWithPrewarm;
 
 /**
@@ -183,7 +183,9 @@ function decodeEventStreamMessage(data: ArrayBuffer): {
       // Header name length
       const nameLength = bytes[offset++];
       // Header name
-      const name = String.fromCharCode(...bytes.slice(offset, offset + nameLength));
+      const name = String.fromCharCode(
+        ...bytes.slice(offset, offset + nameLength),
+      );
       offset += nameLength;
       // Header type
       const type = bytes[offset++];
@@ -192,7 +194,9 @@ function decodeEventStreamMessage(data: ArrayBuffer): {
         // String type
         const valueLength = view.getUint16(offset, false);
         offset += 2;
-        const value = String.fromCharCode(...bytes.slice(offset, offset + valueLength));
+        const value = String.fromCharCode(
+          ...bytes.slice(offset, offset + valueLength),
+        );
         offset += valueLength;
         headers[name] = value;
       } else {
@@ -285,15 +289,23 @@ function createAWSTranscribeSession(
   websocketUrl: string,
   onTranscript: (transcript: string, isFinal: boolean) => void,
   onError?: (error: string) => void,
-  options?: { connectionTimeout?: number; finalTranscriptDelay?: number; debug?: boolean }
+  options?: {
+    connectionTimeout?: number;
+    finalTranscriptDelay?: number;
+    debug?: boolean;
+  },
 ): STTStreamingSessionWithPrewarm {
-  const { connectionTimeout = 15000, finalTranscriptDelay = 1500, debug = false } = options || {};
+  const {
+    connectionTimeout = 15000,
+    finalTranscriptDelay = 1500,
+    debug = false,
+  } = options || {};
   const log = debug ? console.log.bind(console, '[AWSTranscribe]') : () => {};
 
   let ws: WebSocket | null = null;
-  let isActive = false;       // True when actively listening (sending audio)
-  let isConnected = false;    // True when WebSocket is connected
-  let isPaused = false;       // True when paused (connected but not sending audio)
+  let isActive = false; // True when actively listening (sending audio)
+  let isConnected = false; // True when WebSocket is connected
+  let isPaused = false; // True when paused (connected but not sending audio)
   let audioQueue: ArrayBuffer[] = [];
   let connectionTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let connectPromise: Promise<void> | null = null;
@@ -339,7 +351,10 @@ function createAWSTranscribeSession(
     clearFinalizationTimer();
     finalizationTimerId = setTimeout(() => {
       if (accumulatedTranscript && isActive && !isPaused) {
-        log('Finalization delay complete, sending final:', accumulatedTranscript);
+        log(
+          'Finalization delay complete, sending final:',
+          accumulatedTranscript,
+        );
         const finalText = accumulatedTranscript;
         accumulatedTranscript = '';
         onTranscript(finalText, true);
@@ -413,11 +428,14 @@ function createAWSTranscribeSession(
             if (decoded) {
               if (decoded.error) {
                 // Check if this is a timeout error from AWS
-                const isTimeoutError = decoded.error.includes('timed out') ||
-                                       decoded.error.includes('no new audio');
+                const isTimeoutError =
+                  decoded.error.includes('timed out') ||
+                  decoded.error.includes('no new audio');
 
                 if (isTimeoutError) {
-                  log('AWS Transcribe session timed out, will reconnect on next start');
+                  log(
+                    'AWS Transcribe session timed out, will reconnect on next start',
+                  );
                   // Mark as disconnected so next start() will reconnect
                   isConnected = false;
                   isActive = false;
@@ -457,9 +475,17 @@ function createAWSTranscribeSession(
 
           if (!wasConnected) {
             if (event.code === 1006) {
-              rejectOnce(new Error('WebSocket connection failed - please check your network'));
+              rejectOnce(
+                new Error(
+                  'WebSocket connection failed - please check your network',
+                ),
+              );
             } else {
-              rejectOnce(new Error(`WebSocket closed before connecting (code: ${event.code})`));
+              rejectOnce(
+                new Error(
+                  `WebSocket closed before connecting (code: ${event.code})`,
+                ),
+              );
             }
           } else if (event.code !== 1000 && event.code !== 1005) {
             onError?.(`Connection lost (code: ${event.code})`);
@@ -495,7 +521,7 @@ function createAWSTranscribeSession(
     async preconnect() {
       log('Pre-connecting WebSocket...');
       await connect();
-      isPaused = true;  // Start in paused state
+      isPaused = true; // Start in paused state
     },
 
     async start() {
@@ -548,7 +574,7 @@ function createAWSTranscribeSession(
 
       try {
         const encodedMessage = encodeEventStreamMessage(audio);
-        ws.send(encodedMessage);
+        ws.send(encodedMessage as any);
       } catch (error) {
         console.error('Failed to send audio:', error);
       }
@@ -573,7 +599,7 @@ function createAWSTranscribeSession(
         if (wsRef.readyState === WebSocket.OPEN) {
           try {
             const emptyMessage = encodeEventStreamMessage(new ArrayBuffer(0));
-            wsRef.send(emptyMessage);
+            wsRef.send(emptyMessage as any);
           } catch (e) {
             // Ignore
           }
@@ -629,20 +655,22 @@ interface CachedUrl {
  * ```
  */
 export function createAWSTranscribeSessionFactory(
-  config: AWSTranscribeConfig = {}
+  config: AWSTranscribeConfig = {},
 ): STTStreamingSessionFactory {
   const {
     websocketUrlEndpoint = '/api/voice-survey/stt/websocket',
     language: defaultLanguage = 'en-US',
     sampleRate: defaultSampleRate = 16000,
-    initialTimeout = 5000,  // Short timeout for first attempt - fail fast, retry fast
-    retryTimeout = 10000,   // Longer timeout for retries
+    initialTimeout = 5000, // Short timeout for first attempt - fail fast, retry fast
+    retryTimeout = 10000, // Longer timeout for retries
     maxRetries = 3,
-    finalTranscriptDelay = 1500,  // Wait 1.5s after final transcript before submitting
+    finalTranscriptDelay = 1500, // Wait 1.5s after final transcript before submitting
     debug = false,
   } = config;
 
-  const log = debug ? console.log.bind(console, '[AWSTranscribeFactory]') : () => {};
+  const log = debug
+    ? console.log.bind(console, '[AWSTranscribeFactory]')
+    : () => {};
 
   // Shared URL cache across sessions (URLs are valid for ~5 minutes)
   let cachedUrl: CachedUrl | null = null;
@@ -660,7 +688,11 @@ export function createAWSTranscribeSessionFactory(
   /**
    * Fetch a new WebSocket URL (with deduplication)
    */
-  async function fetchWebSocketUrl(language: string, sampleRate: number, forceRefresh = false): Promise<string> {
+  async function fetchWebSocketUrl(
+    language: string,
+    sampleRate: number,
+    forceRefresh = false,
+  ): Promise<string> {
     // Force refresh invalidates cache
     if (forceRefresh) {
       invalidateCache();
@@ -720,13 +752,13 @@ export function createAWSTranscribeSessionFactory(
    * Sleep for a given duration
    */
   function sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   return (
     onTranscript: (transcript: string, isFinal: boolean) => void,
     onError?: (error: string) => void,
-    sessionConfig?: { language?: string; sampleRate?: number }
+    sessionConfig?: { language?: string; sampleRate?: number },
   ): STTStreamingSessionWithPrewarm => {
     const language = sessionConfig?.language || defaultLanguage;
     const sampleRate = sessionConfig?.sampleRate || defaultSampleRate;
@@ -743,24 +775,29 @@ export function createAWSTranscribeSessionFactory(
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
           const timeout = attempt === 1 ? initialTimeout : retryTimeout;
-          log(`Connection attempt ${attempt}/${maxRetries} (timeout: ${timeout}ms)`);
+          log(
+            `Connection attempt ${attempt}/${maxRetries} (timeout: ${timeout}ms)`,
+          );
 
           // Always get fresh URL when creating new session
           const forceRefresh = attempt > 1 || innerSession !== null;
-          const websocketUrl = await fetchWebSocketUrl(language, sampleRate, forceRefresh);
+          const websocketUrl = await fetchWebSocketUrl(
+            language,
+            sampleRate,
+            forceRefresh,
+          );
 
           const newSession = createAWSTranscribeSession(
             websocketUrl,
             onTranscript,
             onError,
-            { connectionTimeout: timeout, finalTranscriptDelay, debug }
+            { connectionTimeout: timeout, finalTranscriptDelay, debug },
           );
 
           // Connect but start in paused state
           await newSession.preconnect();
           log('Connected successfully');
           return newSession;
-
         } catch (error) {
           lastError = error instanceof Error ? error : new Error(String(error));
           log(`Attempt ${attempt} failed:`, lastError.message);
@@ -775,7 +812,12 @@ export function createAWSTranscribeSessionFactory(
       }
 
       const errorMsg = lastError?.message || 'Failed to connect STT session';
-      console.error('STT session connect failed after', maxRetries, 'attempts:', errorMsg);
+      console.error(
+        'STT session connect failed after',
+        maxRetries,
+        'attempts:',
+        errorMsg,
+      );
       throw lastError;
     }
 
@@ -952,4 +994,9 @@ export function createAWSTranscribeSessionFactory(
   };
 }
 
-export type { AWSTranscribeConfig, STTStreamingSession, STTStreamingSessionFactory, STTStreamingSessionWithPrewarm };
+export type {
+  AWSTranscribeConfig,
+  STTStreamingSession,
+  STTStreamingSessionFactory,
+  STTStreamingSessionWithPrewarm,
+};
