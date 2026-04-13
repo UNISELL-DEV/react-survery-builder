@@ -448,10 +448,12 @@ const StripePaymentForm: React.FC<StripePaymentFormWrapperProps> = (props) => {
                 // Cache the setup intent to pass to PaymentFormContent
                 setCachedSetupIntent(result.setupIntent);
 
-                // Initialize Stripe with the merchant's publishable key and connected account
-                const stripe = loadStripe(result.setupIntent.publishable_key, {
-                    stripeAccount: result.setupIntent.stripe_account,
-                });
+                // Initialize Stripe with the merchant's publishable key and connected account (if any)
+                const stripeOptions: Record<string, any> = {};
+                if (result.setupIntent.stripe_account) {
+                    stripeOptions.stripeAccount = result.setupIntent.stripe_account;
+                }
+                const stripe = loadStripe(result.setupIntent.publishable_key, stripeOptions);
 
                 // Merge custom appearance with defaults
                 const mergedAppearance: Appearance = {
