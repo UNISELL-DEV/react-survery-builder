@@ -176,7 +176,7 @@ const VitalsRenderer = React.forwardRef<HTMLDivElement, BlockRendererProps>(
     const fieldName = block.fieldName || "vitals";
     const existing = values?.[fieldName] || {};
     const [vitalValues, setVitalValues] = useState<Record<string, any>>({
-      feet: existing.feet || 5,
+      feet: existing.feet ?? "",
       inches: existing.inches ?? "",
       weight: existing.weight ?? "",
       systolic: existing.systolic ?? "",
